@@ -9,11 +9,9 @@ import MessageBubble from './components/chat/MessageBubble.vue'
 import ChatFooter from './components/chat/ChatFooter.vue'
 
 import Lightbox from './components/Lightbox.vue'
-import { useLightbox } from './composables/useLightbox'
 import AvatarDefault from '/assets/avatar/avatar.webp'
 
 const { filteredTabs, searchQuery, activeTabId, activeTab, isMobileChatOpen, selectTab, closeMobileChat } = useChat(portfolioData)
-const { openLightbox } = useLightbox()
 
 const chatScrollArea = ref<HTMLElement | null>(null)
 
@@ -126,8 +124,7 @@ watch(() => activeTab.value.id, async () => {
         <header
           class="flex h-16 shrink-0 items-center border-b border-wa-border bg-wa-bg-default px-4 dark:border-wa-border-dark dark:bg-wa-bg-default-dark">
           <div
-            class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gray-300 dark:bg-gray-600 cursor-pointer hover:opacity-90 transition-opacity"
-            @click="openLightbox(AvatarDefault)">
+            class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gray-300 dark:bg-gray-600">
             <img :src="AvatarDefault" alt="Meu Perfil" class="h-full w-full object-cover" />
           </div>
           <div class="flex flex-col">
@@ -161,8 +158,7 @@ watch(() => activeTab.value.id, async () => {
           </button>
 
           <div
-            class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-wa-primary font-bold text-white cursor-pointer hover:opacity-90 transition-opacity"
-            @click="openLightbox(activeTab.avatarImage || AvatarDefault)">
+            class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-wa-primary font-bold text-white">
             <img v-if="activeTab.avatarImage" :src="activeTab.avatarImage" alt="Avatar"
               class="h-full w-full object-cover" />
             <span v-else>{{ activeTab.avatarText }}</span>

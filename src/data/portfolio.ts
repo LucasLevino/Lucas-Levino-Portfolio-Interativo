@@ -94,7 +94,7 @@ export const portfolioData: Tab[] = [
       { type: 'text', id: 5, text: 'Minhas principais competências incluem a criação de aplicações modernas e escaláveis, otimização de performance (Core Web Vitals), implementação de estratégias baseadas em dados e integração de inteligência artificial em processos de negócio.', sender: 'me', time: '10:03' },
       { type: 'text', id: 6, text: 'Os resultados que entrego vão de aumento consistente na geração de leads qualificados até a redução de custos operacionais com soluções sob medida. Me preocupo em manter código limpo, documentado e fácil de evoluir.', sender: 'me', time: '10:04' },
       { type: 'text', id: 7, text: 'Se você acredita que a tecnologia deve ser um motor de crescimento, vamos conversar!', sender: 'me', time: '10:05' },
-      { type: 'sticker', id: 8, text: '', sender: 'me', time: '10:05', sticker: StickerConcentrado },
+      { type: 'sticker', id: 8, text: 'Trabalhando...', sender: 'me', time: '10:05', sticker: StickerConcentrado },
       {
         type: 'ogCard',
         id: 9,
@@ -195,7 +195,7 @@ export const portfolioData: Tab[] = [
       { type: 'text', id: 2, text: '🚀 Frontend & Mobile: React.js, Vue 3, Flutter e WordPress. Preocupo-me excessivamente em manter um código limpo e documentado, com foco implacável em Core Web Vitals, performance e otimização para SEO.', sender: 'me', time: '14:05' },
       { type: 'text', id: 3, text: '⚙️ Backend & Infra: Laravel e Node.js. Utilizo PostgreSQL e Redis, sempre orquestrando ambientes com Docker para escalabilidade.', sender: 'me', time: '14:06' },
       { type: 'text', id: 4, text: '📈 Estratégia & Inovação: Aplico inteligência artificial diretamente nos processos de negócio e utilizo dados para garantir conversão digital e vantagem competitiva.', sender: 'me', time: '14:07' },
-      { type: 'sticker', id: 5, text: '', sender: 'me', time: '14:08', sticker: StickerCafe }
+      { type: 'sticker', id: 5, text: 'Pausa pro café ☕', sender: 'me', time: '14:08', sticker: StickerCafe }
     ]
   },
   {
