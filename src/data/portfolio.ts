@@ -94,7 +94,20 @@ export const portfolioData: Tab[] = [
       { type: 'text', id: 5, text: 'Minhas principais competências incluem a criação de aplicações modernas e escaláveis, otimização de performance (Core Web Vitals), implementação de estratégias baseadas em dados e integração de inteligência artificial em processos de negócio.', sender: 'me', time: '10:03' },
       { type: 'text', id: 6, text: 'Os resultados que entrego vão de aumento consistente na geração de leads qualificados até a redução de custos operacionais com soluções sob medida. Me preocupo em manter código limpo, documentado e fácil de evoluir.', sender: 'me', time: '10:04' },
       { type: 'text', id: 7, text: 'Se você acredita que a tecnologia deve ser um motor de crescimento, vamos conversar!', sender: 'me', time: '10:05' },
-      { type: 'sticker', id: 8, text: '', sender: 'me', time: '10:05', sticker: StickerConcentrado }
+      { type: 'sticker', id: 8, text: '', sender: 'me', time: '10:05', sticker: StickerConcentrado },
+      {
+        type: 'ogCard',
+        id: 9,
+        text: 'Se quiser ver tudo isso de forma mais resumida, você pode baixar o meu currículo completo em PDF:',
+        sender: 'me',
+        time: '10:06',
+        ogCard: {
+          title: 'Curriculo_Lucas_Levino.pdf',
+          description: 'Documento PDF',
+          url: '/assets/file/curriculo.pdf',
+          domain: 'Download Seguro'
+        }
+      }
     ]
   },
   {
