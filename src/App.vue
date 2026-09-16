@@ -48,11 +48,10 @@ const handleSend = (text: string) => {
     if (chatScrollArea.value) chatScrollArea.value.scrollTop = chatScrollArea.value.scrollHeight
   })
 
-  // Inicia resposta automática
+  // Inicia resposta automática (Mensagem 1)
   isTyping.value = true
   
   setTimeout(() => {
-    isTyping.value = false
     activeTab.value.messages.push({
       id: Date.now() + 1,
       type: 'text',
@@ -60,41 +59,48 @@ const handleSend = (text: string) => {
       sender: 'me',
       time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
     })
-
-    activeTab.value.messages.push({
-      id: Date.now() + 2,
-      type: 'ogCard',
-      text: 'Basta clicar no link abaixo:',
-      sender: 'me',
-      time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-      ogCard: {
-        title: 'Falar com Lucas Levino no WhatsApp',
-        description: 'Clique para abrir a conversa',
-        url: 'https://wa.me/5565996994999?text=' + encodeURIComponent(text),
-        domain: 'wa.me'
-      }
-    })
-
-    activeTab.value.messages.push({
-      id: Date.now() + 3,
-      type: 'ogCard',
-      text: 'Ah, e aproveitando que você está aqui, deixei meu currículo separado caso queira salvar:',
-      sender: 'me',
-      time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-      ogCard: {
-        title: 'Curriculo_Lucas_Levino.pdf',
-        description: 'Documento PDF',
-        url: '/assets/file/curriculo.pdf',
-        domain: 'Download Seguro'
-      }
-    })
-
     playPopSound()
+    nextTick(() => { if (chatScrollArea.value) chatScrollArea.value.scrollTop = chatScrollArea.value.scrollHeight })
 
-    nextTick(() => {
-      if (chatScrollArea.value) chatScrollArea.value.scrollTop = chatScrollArea.value.scrollHeight
-    })
-  }, 1500)
+    // Mensagem 2 (Link do Whats)
+    setTimeout(() => {
+      activeTab.value.messages.push({
+        id: Date.now() + 2,
+        type: 'ogCard',
+        text: 'Basta clicar no link abaixo:',
+        sender: 'me',
+        time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+        ogCard: {
+          title: 'Falar com Lucas Levino no WhatsApp',
+          description: 'Clique para abrir a conversa',
+          url: 'https://wa.me/5565996994999?text=' + encodeURIComponent(text),
+          domain: 'wa.me'
+        }
+      })
+      playPopSound()
+      nextTick(() => { if (chatScrollArea.value) chatScrollArea.value.scrollTop = chatScrollArea.value.scrollHeight })
+
+      // Mensagem 3 (Currículo)
+      setTimeout(() => {
+        isTyping.value = false
+        activeTab.value.messages.push({
+          id: Date.now() + 3,
+          type: 'ogCard',
+          text: 'Ah, e aproveitando que você está aqui, deixei meu currículo separado caso queira salvar:',
+          sender: 'me',
+          time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+          ogCard: {
+            title: 'Curriculo_Lucas_Levino.pdf',
+            description: 'Documento PDF',
+            url: '/assets/file/curriculo.pdf',
+            domain: 'Download Seguro'
+          }
+        })
+        playPopSound()
+        nextTick(() => { if (chatScrollArea.value) chatScrollArea.value.scrollTop = chatScrollArea.value.scrollHeight })
+      }, 1500) // Delay da msg 3
+    }, 1500) // Delay da msg 2
+  }, 1500) // Delay da msg 1
 }
 
 watch(() => activeTab.value.id, async () => {
