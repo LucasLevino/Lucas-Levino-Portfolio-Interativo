@@ -11,7 +11,7 @@
 > **[10:01] Lucas Levino:** Não! Eu transformei meu portfólio em uma simulação de Whatsapp Web. Acesse e fale comigo de forma interativa. 😎
 
 <div align="center">
-  <a href="https://lucaslevino-94a21.web.app/" target="_blank">
+  <a href="https://lucaslevino.com/" target="_blank">
     <img src="https://img.shields.io/badge/Acessar_Portfólio_Online-25D366?style=for-the-badge&logo=whatsapp&logoColor=white" alt="Acessar Portfólio" />
   </a>
 </div>
