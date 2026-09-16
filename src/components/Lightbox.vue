@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { useLightbox } from '../composables/useLightbox'
 
-const { isOpen, imageUrl, closeLightbox } = useLightbox()
+const { isOpen, imageUrl, imageCaption, closeLightbox } = useLightbox()
 </script>
 
 <template>
   <Teleport to="body">
     <Transition name="lightbox-fade">
       <div v-if="isOpen" 
-        class="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 p-4 backdrop-blur-sm" 
+        class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/95 p-4 backdrop-blur-sm" 
         @click="closeLightbox">
         
         <!-- Botão de Fechar -->
@@ -21,13 +21,20 @@ const { isOpen, imageUrl, closeLightbox } = useLightbox()
           </svg>
         </button>
 
-        <!-- Imagem Ampliada -->
-        <img 
-          :src="imageUrl" 
-          alt="Visualização Ampliada" 
-          class="max-h-[85vh] max-w-[90vw] object-contain drop-shadow-2xl select-none" 
-          @click.stop 
-        />
+        <!-- Container da Imagem e Legenda -->
+        <div class="flex flex-col items-center justify-center h-full w-full pointer-events-none" @click.stop>
+          <img 
+            :src="imageUrl" 
+            alt="Visualização Ampliada" 
+            class="object-contain drop-shadow-2xl select-none pointer-events-auto"
+            :class="imageCaption ? 'w-[283px] h-[283px]' : 'max-h-[85vh] max-w-[90vw]'" 
+          />
+          
+          <!-- Legenda -->
+          <div v-if="imageCaption" class="mt-6 px-4 py-2 text-center text-white/90 text-sm md:text-base font-medium tracking-wide">
+            {{ imageCaption }}
+          </div>
+        </div>
       </div>
     </Transition>
   </Teleport>

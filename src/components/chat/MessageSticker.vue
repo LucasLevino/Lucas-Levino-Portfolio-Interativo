@@ -1,23 +1,29 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { StickerMessage } from '../../data/portfolio'
 import { useLightbox } from '../../composables/useLightbox'
 
-defineProps<{
+const props = defineProps<{
   message: StickerMessage;
   isRead: boolean;
 }>()
 
 const { openLightbox } = useLightbox()
+
+const stickerCaption = computed(() => {
+  if (!props.message.sticker) return 'Sticker'
+  const parts = props.message.sticker.split('/')
+  const filename = parts[parts.length - 1]
+  const name = filename.split('.')[0]
+  // Capitalize first letter and replace dashes/underscores with spaces
+  const cleanName = name.charAt(0).toUpperCase() + name.slice(1).replace(/[-_]/g, ' ')
+  return `${cleanName} • Lucas Levino`
+})
 </script>
 
 <template>
   <div class="relative flex flex-col items-end">
-    <img :src="message.sticker" :alt="message.text || 'Sticker'" class="w-32 sm:w-40 drop-shadow-md cursor-pointer hover:opacity-95 transition-opacity" @click="openLightbox(message.sticker)" />
-
-    <!-- Legenda (nome da figurinha) -->
-    <span v-if="message.text" class="mt-1 text-[11px] font-medium text-wa-text-secondary dark:text-wa-text-secondary-dark/70 bg-white/60 dark:bg-black/40 px-2 py-0.5 rounded-full">
-      {{ message.text }}
-    </span>
+    <img :src="message.sticker" :alt="stickerCaption" class="w-32 sm:w-40 drop-shadow-md cursor-pointer hover:opacity-95 transition-opacity" @click="openLightbox(message.sticker, stickerCaption)" />
 
     <div
       class="mt-1 flex items-center gap-1 text-[11px] text-wa-text-secondary drop-shadow-sm dark:text-wa-text-secondary-dark bg-white/40 dark:bg-black/30 px-1.5 py-0.5 rounded-full">
