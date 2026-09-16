@@ -1,0 +1,95 @@
+@import "tailwindcss";
+
+@theme {
+  /* Cores de Fundo */
+  --color-wa-bg-app: #d1d7db;
+  --color-wa-bg-app-dark: #0a1014;
+  --color-wa-bg-default: #f0f2f5;
+  --color-wa-bg-default-dark: #111b21;
+  --color-wa-bg-chat: #efeae2;
+  --color-wa-bg-chat-dark: #0b141a;
+
+  /* Cores Primárias */
+  --color-wa-primary: #00a884;
+  --color-wa-primary-dark: #008069;
+
+  /* Balões de Mensagem */
+  --color-wa-msg-in: #ffffff;
+  --color-wa-msg-in-dark: #202c33;
+  --color-wa-msg-out: #d9fdd3;
+  --color-wa-msg-out-dark: #005c4b;
+
+  /* Textos */
+  --color-wa-text-primary: #111b21;
+  --color-wa-text-primary-dark: #e9edef;
+  --color-wa-text-secondary: #667781;
+  --color-wa-text-secondary-dark: #8696a0;
+
+  /* Bordas */
+  --color-wa-border: #e9edef;
+  --color-wa-border-dark: #222d34;
+
+  /* Fonte Nativa */
+  --font-sans: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+@layer base {
+
+  html,
+  body {
+    @apply m-0 p-0 h-screen w-screen overflow-hidden bg-wa-bg-app dark:bg-wa-bg-app-dark text-wa-text-primary dark:text-wa-text-primary-dark;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 dark:bg-gray-700 rounded-full;
+  }
+
+  button, a {
+    @apply cursor-pointer;
+
+    &:disabled {
+      @apply cursor-not-allowed;
+    }
+  }
+}
+
+@layer animation {
+
+  .chat-list-enter-active {
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .chat-list-leave-active {
+    transition: all 0.2s ease-in;
+  }
+
+  .chat-list-enter-from {
+    opacity: 0;
+    transform: translateY(15px) scale(0.95);
+  }
+
+  .chat-list-leave-to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  .chat-list-enter-active:nth-child(2) {
+    transition-delay: 50ms;
+  }
+
+  .chat-list-enter-active:nth-child(3) {
+    transition-delay: 100ms;
+  }
+
+  .chat-list-enter-active:nth-child(4) {
+    transition-delay: 150ms;
+  }
+}
