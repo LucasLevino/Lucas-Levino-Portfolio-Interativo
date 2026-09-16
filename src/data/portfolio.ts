@@ -89,11 +89,11 @@ export const portfolioData: Tab[] = [
     messages: [
       { type: 'text', id: 1, text: 'Olá, Lucas! Pode me contar um pouco sobre sua trajetória e foco atual?', sender: 'visitor', time: '10:00' },
       { type: 'text', id: 2, text: `Olá! Sou Desenvolvedor Web, Engenheiro da Computação (UNIC) e Especialista em Soluções Digitais. Tenho ${myAge} anos e o meu foco é transformar ideias em produtos digitais que geram resultados mensuráveis.`, sender: 'me', time: '10:01' },
-      { type: 'text', id: 3, text: 'Atualmente sou Especialista de Desenvolvimento na TVCA, onde aplico minha experiência em Desenvolvimento de aplicações, Vue JS, Laravel, WordPress, React e frontend para unir performance técnica e visão estratégica de negócios.', sender: 'me', time: '10:02' },
+      { type: 'text', id: 3, text: 'Atualmente sou Especialista de Desenvolvimento na TVCA, onde aplico minha experiência em desenvolvimento de aplicações frontend e backend com Vue JS, Laravel, WordPress e React para unir performance técnica e visão estratégica de negócios.', sender: 'me', time: '10:02' },
       { type: 'text', id: 4, text: 'Também sou cofundador da Sitemakers, agência especializada em criação de sites profissionais, SEO, otimização de performance e conversão digital.', sender: 'me', time: '10:02' },
-      { type: 'text', id: 5, text: 'Minhas principais competências incluem a criação de aplicações modernas e escaláveis, otimização de performance (Core Web Vitals), implementação de estratégias baseadas em dados e integração de inteligência artificial em processos de negócio.', sender: 'me', time: '10:03' },
-      { type: 'text', id: 6, text: 'Os resultados que entrego vão de aumento consistente na geração de leads qualificados até a redução de custos operacionais com soluções sob medida. Me preocupo em manter código limpo, documentado e fácil de evoluir.', sender: 'me', time: '10:04' },
-      { type: 'text', id: 7, text: 'Se você acredita que a tecnologia deve ser um motor de crescimento, vamos conversar!', sender: 'me', time: '10:05' },
+      { type: 'text', id: 5, text: 'Minhas principais competências incluem a criação de aplicações web, otimização de performance (Core Web Vitals), implementação de estratégias baseadas em dados e integração de inteligência artificial em processos de negócio.', sender: 'me', time: '10:03' },
+      { type: 'text', id: 6, text: 'Meus projetos aumentam a geração de leads qualificados e reduzem custos operacionais com soluções sob medida. Me preocupo em manter código limpo, documentado e fácil de evoluir.', sender: 'me', time: '10:04' },
+      { type: 'text', id: 7, text: 'Se você acredita que tecnologia é motor de crescimento, vamos conversar!', sender: 'me', time: '10:05' },
       { type: 'sticker', id: 8, text: 'Trabalhando...', sender: 'me', time: '10:05', sticker: StickerConcentrado },
       {
         type: 'ogCard',
@@ -121,11 +121,11 @@ export const portfolioData: Tab[] = [
     isRead: false,
     messages: [
       { type: 'text', id: 1, text: 'Como foi a sua evolução profissional e quais projetos destacam sua experiência?', sender: 'visitor', time: '11:58' },
-      { type: 'text', id: 2, text: 'Minha jornada começou em 2019 na Óticas Paris Vision, administrando e-commerce e integrações com grandes marketplaces via Vtex. Em 2020, fui para a Lab Metrics como Dev Frontend & Mobile, e em seguida atuei na Webgru, até assumir como Especialista na TVCA em 2022.', sender: 'me', time: '11:59' },
-      { type: 'text', id: 3, text: 'Toda essa bagagem me permitiu atuar em desafios complexos, como a evolução do MVP para a plataforma SaaS "Eventmakers" (Laravel/Vue 3) e o desenvolvimento na Sitemakers e agências parceiras.', sender: 'me', time: '12:00' },
+      { type: 'text', id: 2, text: 'Comecei em 2019 na Óticas Paris Vision, administrando e-commerce e integrações com marketplaces via VTEX. Em 2020, fui para a Lab Metrics como Dev Frontend & Mobile, e em seguida atuei na Webgru, até assumir como Especialista na TVCA em 2022.', sender: 'me', time: '11:59' },
+      { type: 'text', id: 3, text: 'Toda essa bagagem virou desafios reais, como evoluir o MVP para a plataforma SaaS "Eventmakers" (Laravel/Vue 3) e desenvolver na Sitemakers e em agências parceiras.', sender: 'me', time: '12:00' },
       { type: 'iframe',
         id: 4,
-        text: 'Por exemplo, este é o Design & Front-End que desenvolvi (WordPress) para a New Intercâmbios.',
+        text: 'Este é o Design & Front-End que desenvolvi (WordPress) para a New Intercâmbios.',
         sender: 'me',
         time: '12:01',
         iframe: 'https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Fproto%2F5u3Y4OYduTuFRxQapcjtul%2FNew%3Fnode-id%3D79%253A323%26viewport%3D1167%252C554%252C0.10126150399446487%26scaling%3Dscale-down-width'
@@ -171,11 +171,11 @@ export const portfolioData: Tab[] = [
     isRead: false,
     messages: [
       { type: 'text', id: 1, text: 'Com toda essa bagagem, você teve algum reconhecimento ou premiação de destaque recentemente?', sender: 'visitor', time: '15:00' },
-      { type: 'text', id: 2, text: 'Sim! Em dezembro de 2025, eu e a Pollyana Araújo conquistamos o 𝟭º 𝗹𝘂𝗴𝗮𝗿 no 1° Prêmio de Jornalismo do Governo de Mato Grosso, na categoria Internet.', sender: 'me', time: '15:01' },
+      { type: 'text', id: 2, text: 'Sim! Em dezembro de 2025, eu e a Pollyana Araújo conquistamos o 1º lugar no 1° Prêmio de Jornalismo do Governo de Mato Grosso, na categoria Internet.', sender: 'me', time: '15:01' },
       { type: 'text', id: 3, text: 'A matéria premiada foi a "Receita de coragem: Empreendedores encontram em MT solo fértil para abrir o próprio negócio", publicada no Portal Primeira Página.', sender: 'me', time: '15:02' },
       { type: 'iframe',
         id: 4,
-        text: 'Fiquei muito feliz com esse reconhecimento e com tudo que ele representa para o nosso trabalho no ecossistema digital.',
+        text: 'Fiquei muito feliz com esse reconhecimento.',
         sender: 'me',
         time: '15:03',
         iframe: 'https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7407825424539447296?collapsed=1'
@@ -193,8 +193,8 @@ export const portfolioData: Tab[] = [
     messages: [
       { type: 'text', id: 1, text: 'Como é o seu ecossistema de desenvolvimento no dia a dia?', sender: 'visitor', time: '14:00' },
       { type: 'text', id: 2, text: '🚀 Frontend & Mobile: React.js, Vue 3, Flutter e WordPress. Preocupo-me excessivamente em manter um código limpo e documentado, com foco implacável em Core Web Vitals, performance e otimização para SEO.', sender: 'me', time: '14:05' },
-      { type: 'text', id: 3, text: '⚙️ Backend & Infra: Laravel e Node.js. Utilizo PostgreSQL e Redis, sempre orquestrando ambientes com Docker para escalabilidade.', sender: 'me', time: '14:06' },
-      { type: 'text', id: 4, text: '📈 Estratégia & Inovação: Aplico inteligência artificial diretamente nos processos de negócio e utilizo dados para garantir conversão digital e vantagem competitiva.', sender: 'me', time: '14:07' },
+      { type: 'text', id: 3, text: '⚙️ Backend & Infra: Laravel e Node.js. Uso PostgreSQL e Redis, sempre orquestrando ambientes com Docker para escalabilidade.', sender: 'me', time: '14:06' },
+      { type: 'text', id: 4, text: '📈 Estratégia & Inovação: Aplico inteligência artificial nos processos de negócio e uso dados para melhorar conversão digital.', sender: 'me', time: '14:07' },
       { type: 'sticker', id: 5, text: 'Pausa pro café ☕', sender: 'me', time: '14:08', sticker: StickerCafe }
     ]
   },
