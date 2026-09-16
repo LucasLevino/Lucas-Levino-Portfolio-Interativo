@@ -30,12 +30,12 @@
 * [x] **5.4. Animações de Entrada:** Adicionar pequenas transições ao abrir uma conversa, para que as mensagens não apareçam secas na tela.
 
 ### Fase 6: SEO e Acessibilidade (A11y)
-* [ ] **6.1. Meta Tags Globais:** Configurar Title, Description e tags Open Graph (para quando compartilharem o link do seu portfólio no LinkedIn).
-* [ ] **6.2. Estrutura de Heading (`<h1>`, `<h2>`):** Garantir que, mesmo dentro de balões de mensagem, exista uma hierarquia lógica de títulos escondida ou integrada no layout.
-* [ ] **6.3. JSON-LD (Schema Markup):** Adicionar microdados estruturados (`Person` ou `ProfilePage`) no `<head>` para que os motores de busca leiam seus dados profissionais independentemente do layout visual.
-* [ ] **6.4. ARIA Labels:** Garantir que botões com apenas ícones tenham `aria-label` descritivo.
+* [x] **6.1. Meta Tags Globais:** Configurar Title, Description e tags Open Graph (para quando compartilharem o link do seu portfólio no LinkedIn).
+* [x] **6.2. Estrutura de Heading (`<h1>`, `<h2>`):** Garantir que, mesmo dentro de balões de mensagem, exista uma hierarquia lógica de títulos escondida ou integrada no layout.
+* [x] **6.3. JSON-LD (Schema Markup):** Adicionar microdados estruturados (`Person` ou `ProfilePage`) no `<head>` para que os motores de busca leiam seus dados profissionais independentemente do layout visual.
+* [x] **6.4. ARIA Labels:** Garantir que botões com apenas ícones tenham `aria-label` descritivo.
 
 ### Fase 7: Polimento e Deploy
 * [ ] **7.1. Auditoria de Performance:** Rodar o Lighthouse no Chrome para garantir nota 100 em Performance, Accessibility e SEO.
 * [ ] **7.2. Revisão Cross-Browser:** Testar visualmente no Safari, Chrome e Firefox.
-* [ ] **7.3. Deploy:** Configurar a subida do projeto (sugestão: Vercel ou Netlify, pela integração nativa e rápida com Vite).
+* [x] **7.3. Deploy:** Configurar a subida do projeto (Firebase Hosting).
