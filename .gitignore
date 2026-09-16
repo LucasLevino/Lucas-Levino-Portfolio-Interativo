@@ -29,3 +29,8 @@ firebase-debug.log*
 
 # Docs
 portfolio-content.md
+
+# Env
+.env
+.env.*
+!.env.example
