@@ -98,7 +98,7 @@ export const portfolioData: Tab[] = [
       {
         type: 'ogCard',
         id: 9,
-        text: 'Se quiser ver tudo isso de forma mais resumida, você pode baixar o meu currículo completo em PDF:',
+        text: 'Se quiser ver tudo isso de forma mais resumida, você pode baixar o meu currículo completo no PDF',
         sender: 'me',
         time: '10:06',
         ogCard: {

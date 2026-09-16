@@ -55,7 +55,7 @@ const handleSend = (text: string) => {
     activeTab.value.messages.push({
       id: Date.now() + 1,
       type: 'text',
-      text: 'Opa, legal que você testou o chat! 😅\n\nComo este é um portfólio automático, eu não consigo te responder por aqui em tempo real. Mas se quiser falar comigo, é só me chamar no WhatsApp oficial:',
+      text: 'Opa, legal que você testou o chat! 😅\n\nComo este é um portfólio automático, eu não consigo te responder por aqui em tempo real. Mas se quiser falar comigo, é só me chamar no WhatsApp...',
       sender: 'me',
       time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
     })
@@ -67,7 +67,7 @@ const handleSend = (text: string) => {
       activeTab.value.messages.push({
         id: Date.now() + 2,
         type: 'ogCard',
-        text: 'Basta clicar no link abaixo:',
+        text: 'Basta clicar no link!',
         sender: 'me',
         time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
         ogCard: {
@@ -86,7 +86,7 @@ const handleSend = (text: string) => {
         activeTab.value.messages.push({
           id: Date.now() + 3,
           type: 'ogCard',
-          text: 'Ah, e aproveitando que você está aqui, deixei meu currículo separado caso queira salvar:',
+          text: 'Ah, e aproveitando que você está aqui, deixei meu currículo separado caso queira salvar.',
           sender: 'me',
           time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
           ogCard: {
