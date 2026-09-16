@@ -3,7 +3,7 @@ import AvatarResumo from '/assets/avatar/avatar-resumo.webp';
 import AvatarPremio from '/assets/avatar/avatar-premio.webp';
 import AvatarProjetos from '/assets/avatar/avatar-projeto.webp';
 import StickerConcentrado from '/assets/stickers/desenvolvendo-concentrado.webp';
-import StickerCafe from '/assets/stickers/café.webp';
+import StickerCafe from '/assets/stickers/cafe.webp';
 import StickerForte from '/assets/stickers/forte.webp';
 import StickerJoinha from '/assets/stickers/joinha.webp';
 import StickerParabens from '/assets/stickers/parabens.webp';
