@@ -51,7 +51,7 @@ const previewText = computed(() => {
         
         <div class="flex flex-1 items-center gap-1 truncate">
           <svg 
-            v-if="lastMessage?.sender === 'me'" 
+            v-if="lastMessage?.sender === 'visitor'" 
             viewBox="0 0 16 15" width="16" height="15" fill="currentColor" 
             class="shrink-0 transition-colors duration-500"
             :class="tab.isRead ? 'text-[#53bdeb]' : 'text-gray-400 dark:text-gray-500'"
