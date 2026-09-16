@@ -1,18 +1,17 @@
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { portfolioData, type Tab } from '../data/portfolio'
+import { ref, computed } from 'vue'
+import type { Tab } from '../data/portfolio'
+import { useHashRouter } from './useHashRouter'
 
-const tabs = ref<Tab[]>(portfolioData)
-const searchQuery = ref('') // 1. Variável que guarda o que o usuário digita
+export function useChat(initialTabs: Tab[]) {
+  const tabs = ref<Tab[]>(initialTabs)
+  const searchQuery = ref('')
+  const isMobileChatOpen = ref<boolean>(false)
 
-const getInitialTab = () => {
-  const hash = window.location.hash.replace('#', '')
-  return tabs.value.some(t => t.id === hash) ? hash : portfolioData[0].id
-}
+  const validHashes = initialTabs.map(t => t.id)
+  const defaultHash = validHashes.length > 0 ? validHashes[0] : ''
 
-const activeTabId = ref<string>(getInitialTab())
-const isMobileChatOpen = ref<boolean>(false)
+  const { currentHash: activeTabId, setHash } = useHashRouter(defaultHash, validHashes)
 
-export function useChat() {
   const activeTab = computed(() => {
     return tabs.value.find(tab => tab.id === activeTabId.value) || tabs.value[0]
   })
@@ -24,15 +23,14 @@ export function useChat() {
     
     return tabs.value.filter(tab => {
       const matchTitle = tab.title.toLowerCase().includes(query);
-      const matchMessages = tab.messages.some(msg => msg.text.toLowerCase().includes(query));
+      const matchMessages = tab.messages.some(msg => 'text' in msg && msg.text && msg.text.toLowerCase().includes(query));
       return matchTitle || matchMessages;
     });
   })
 
   const selectTab = (id: string) => {
-    activeTabId.value = id
+    setHash(id)
     isMobileChatOpen.value = true
-    window.location.hash = id
 
     const selected = tabs.value.find(t => t.id === id)
     if (selected) {
@@ -50,22 +48,6 @@ export function useChat() {
   const closeMobileChat = () => {
     isMobileChatOpen.value = false
   }
-
-  const handleHashChange = () => {
-    const hash = window.location.hash.replace('#', '')
-    if (hash && tabs.value.some(t => t.id === hash)) {
-      activeTabId.value = hash
-    }
-  }
-
-  onMounted(() => {
-    window.location.hash = activeTabId.value
-    window.addEventListener('hashchange', handleHashChange)
-  })
-
-  onUnmounted(() => {
-    window.removeEventListener('hashchange', handleHashChange)
-  })
 
   return {
     tabs,

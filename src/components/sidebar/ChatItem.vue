@@ -16,9 +16,9 @@ const lastMessage = computed(() => {
 // 2. Inteligência para exibir o texto correto (Tratando figurinhas e links)
 const previewText = computed(() => {
   if (!lastMessage.value) return '';
-  if (lastMessage.value.text) return lastMessage.value.text;
-  if (lastMessage.value.sticker) return '📷 Figurinha';
-  if (lastMessage.value.ogCard || lastMessage.value.iframe) return '🔗 Link';
+  if ('text' in lastMessage.value && lastMessage.value.text) return lastMessage.value.text;
+  if (lastMessage.value.type === 'sticker') return '📷 Figurinha';
+  if (lastMessage.value.type === 'iframe' || lastMessage.value.type === 'ogCard') return '🔗 Link';
   return '';
 })
 </script>

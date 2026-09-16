@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, nextTick, watch } from 'vue'
 
+import { portfolioData } from './data/portfolio'
 import { useChat } from './composables/useChat'
 import ChatItem from './components/sidebar/ChatItem.vue'
 import SearchBar from './components/sidebar/SearchBar.vue'
@@ -9,7 +10,7 @@ import ChatFooter from './components/chat/ChatFooter.vue'
 
 import AvatarDefault from '/assets/avatar/avatar.webp'
 
-const { filteredTabs, searchQuery, activeTabId, activeTab, isMobileChatOpen, selectTab, closeMobileChat } = useChat()
+const { filteredTabs, searchQuery, activeTabId, activeTab, isMobileChatOpen, selectTab, closeMobileChat } = useChat(portfolioData)
 
 const chatScrollArea = ref<HTMLElement | null>(null)
 
