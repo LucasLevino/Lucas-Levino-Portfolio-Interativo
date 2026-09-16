@@ -207,7 +207,18 @@ export const portfolioData: Tab[] = [
     time: 'Semana passada',
     messages: [
       { type: 'text', id: 1, text: 'Excelente perfil! Quais os melhores canais para entrarmos em contato?', sender: 'visitor', time: '16:00' }, 
-      { type: 'text', id: 2, text: 'Você pode baixar a versão em PDF do meu currículo clicando no botão do rodapé desta tela.', sender: 'me', time: '16:01' },
+      { type: 'ogCard', 
+        id: 2, 
+        text: 'Você pode baixar a versão em PDF do meu currículo clicando no ícone ali no topo da tela, ou direto por este anexo:', 
+        sender: 'me', 
+        time: '16:01',
+        ogCard: {
+          title: 'Curriculo_Lucas_Levino.pdf',
+          description: 'Documento PDF',
+          url: '/assets/file/curriculo.pdf',
+          domain: 'Download Seguro'
+        }
+      },
       { type: 'ogCard',
         id: 3,
         text: '🔗 Acompanhe minhas reflexões sobre tecnologia e conecte-se comigo no LinkedIn:\nhttps://www.linkedin.com/in/lucas-levino',
