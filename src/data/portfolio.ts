@@ -234,14 +234,14 @@ export const portfolioData: Tab[] = [
       },
       { type: 'ogCard',
         id: 4,
-        text: '💻 E aqui está o meu repositório de códigos. Fique à vontade para explorar meus projetos e portfólio web:\nhttps://lucaslevino.github.io/',
+        text: '💻 E aqui está o meu repositório de códigos. Fique à vontade para explorar meus projetos e portfólio web:\nhttps://github.com/LucasLevino',
         sender: 'me',
         time: '16:04',
         ogCard: {
           title: 'LucasLevino - Portfólio & GitHub',
           description: 'Explore meus projetos em Vue, Laravel, React, Flutter e muito mais.',
           image: 'https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png',
-          url: 'https://lucaslevino.github.io/',
+          url: 'https://github.com/LucasLevino',
           domain: 'github.io'
         }
       },
