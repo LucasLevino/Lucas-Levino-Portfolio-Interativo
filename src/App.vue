@@ -14,6 +14,89 @@ const { filteredTabs, searchQuery, activeTabId, activeTab, isMobileChatOpen, sel
 
 const chatScrollArea = ref<HTMLElement | null>(null)
 
+const downloadCV = () => {
+  const link = document.createElement('a')
+  link.href = '/assets/file/curriculo.pdf'
+  link.download = 'curriculo-lucas-levino.pdf'
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}
+
+const isTyping = ref(false)
+
+const playPopSound = () => {
+  try {
+    const audio = new Audio('/assets/pop.mp3') // Coloque um pop.mp3 na pasta public/assets
+    audio.play().catch(() => {})
+  } catch (e) {}
+}
+
+const handleSend = (text: string) => {
+  // Adiciona a mensagem do usuário
+  const time = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+  activeTab.value.messages.push({
+    id: Date.now(),
+    type: 'text',
+    text: text,
+    sender: 'visitor',
+    time: time
+  })
+
+  // Scroll
+  nextTick(() => {
+    if (chatScrollArea.value) chatScrollArea.value.scrollTop = chatScrollArea.value.scrollHeight
+  })
+
+  // Inicia resposta automática
+  isTyping.value = true
+  
+  setTimeout(() => {
+    isTyping.value = false
+    activeTab.value.messages.push({
+      id: Date.now() + 1,
+      type: 'text',
+      text: 'Opa, legal que você testou o chat! 😅\n\nComo este é um portfólio automático, eu não consigo te responder por aqui em tempo real. Mas se quiser falar comigo, é só me chamar no WhatsApp oficial:',
+      sender: 'me',
+      time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+    })
+
+    activeTab.value.messages.push({
+      id: Date.now() + 2,
+      type: 'ogCard',
+      text: 'Basta clicar no link abaixo:',
+      sender: 'me',
+      time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+      ogCard: {
+        title: 'Falar com Lucas Levino no WhatsApp',
+        description: 'Clique para abrir a conversa',
+        url: 'https://wa.me/5565996994999?text=' + encodeURIComponent(text),
+        domain: 'wa.me'
+      }
+    })
+
+    activeTab.value.messages.push({
+      id: Date.now() + 3,
+      type: 'ogCard',
+      text: 'Ah, e aproveitando que você está aqui, deixei meu currículo separado caso queira salvar:',
+      sender: 'me',
+      time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+      ogCard: {
+        title: 'Curriculo_Lucas_Levino.pdf',
+        description: 'Documento PDF',
+        url: '/assets/file/curriculo.pdf',
+        domain: 'Download Seguro'
+      }
+    })
+
+    playPopSound()
+
+    nextTick(() => {
+      if (chatScrollArea.value) chatScrollArea.value.scrollTop = chatScrollArea.value.scrollHeight
+    })
+  }, 1500)
+}
+
 watch(() => activeTab.value.id, async () => {
   await nextTick()
   if (chatScrollArea.value) {
@@ -78,7 +161,19 @@ watch(() => activeTab.value.id, async () => {
             <h2 class="font-semibold leading-tight text-wa-text-primary dark:text-wa-text-primary-dark">
               {{ activeTab.title }}
             </h2>
-            <span class="text-xs text-wa-text-secondary">online</span>
+            <span v-if="isTyping" class="text-xs text-wa-primary font-medium">digitando...</span>
+            <span v-else class="text-xs text-wa-text-secondary">online</span>
+          </div>
+
+          <div class="ml-auto flex items-center gap-2">
+            <button @click="downloadCV"
+              class="flex items-center justify-center rounded-full p-2 text-wa-text-secondary transition-colors hover:bg-black/5 hover:text-wa-primary dark:hover:bg-white/10 dark:hover:text-wa-primary-dark"
+              aria-label="Baixar Currículo em PDF"
+              title="Baixar Currículo PDF">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+              </svg>
+            </button>
           </div>
         </header>
 
@@ -93,7 +188,7 @@ watch(() => activeTab.value.id, async () => {
           </TransitionGroup>
         </div>
 
-        <ChatFooter />
+        <ChatFooter @on-send="handleSend" />
       </section>
 
     </article>
