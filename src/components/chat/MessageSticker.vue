@@ -1,15 +1,18 @@
 <script setup lang="ts">
 import type { StickerMessage } from '../../data/portfolio'
+import { useLightbox } from '../../composables/useLightbox'
 
 defineProps<{
   message: StickerMessage;
   isRead: boolean;
 }>()
+
+const { openLightbox } = useLightbox()
 </script>
 
 <template>
   <div class="relative flex flex-col items-end">
-    <img :src="message.sticker" alt="Sticker" class="w-32 sm:w-40 drop-shadow-md" />
+    <img :src="message.sticker" alt="Sticker" class="w-32 sm:w-40 drop-shadow-md cursor-pointer hover:opacity-95 transition-opacity" @click="openLightbox(message.sticker)" />
 
     <div
       class="mt-1 flex items-center gap-1 text-[11px] text-wa-text-secondary drop-shadow-sm dark:text-wa-text-secondary-dark bg-white/40 dark:bg-black/30 px-1.5 py-0.5 rounded-full">

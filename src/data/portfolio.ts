@@ -209,7 +209,7 @@ export const portfolioData: Tab[] = [
       { type: 'text', id: 1, text: 'Excelente perfil! Quais os melhores canais para entrarmos em contato?', sender: 'visitor', time: '16:00' }, 
       { type: 'ogCard', 
         id: 2, 
-        text: 'Você pode baixar a versão em PDF do meu currículo clicando no ícone ali no topo da tela, ou direto por este anexo:', 
+        text: 'Você pode baixar a versão em PDF do meu currículo clicando no ícone ali no topo da tela, ou direto por este link!', 
         sender: 'me', 
         time: '16:01',
         ogCard: {

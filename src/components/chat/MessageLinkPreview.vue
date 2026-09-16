@@ -1,16 +1,20 @@
 <script setup lang="ts">
 import type { OgCardMessage } from '../../data/portfolio'
+import { useLightbox } from '../../composables/useLightbox'
 
 defineProps<{
   message: OgCardMessage;
 }>()
+
+const { openLightbox } = useLightbox()
 </script>
 
 <template>
   <a :href="message.ogCard.url" target="_blank" rel="noopener noreferrer"
-    class="mb-2 flex flex-col overflow-hidden rounded-md bg-black/5 transition-colors hover:bg-black/10 dark:bg-black/20 dark:hover:bg-black/30 border-l-4 border-[#027eb5] dark:border-[#53bdeb] cursor-pointer no-underline">
+    class="mb-2 flex flex-col overflow-hidden rounded-md bg-black/5 transition-colors hover:bg-black/10 dark:bg-black/20 dark:hover:bg-black/30 border-l-4 border-[#027eb5] dark:border-[#53bdeb] cursor-pointer no-underline group">
     <img v-if="message.ogCard.image" :src="message.ogCard.image" alt="Preview"
-      class="h-[140px] w-full object-cover" />
+      class="h-[140px] w-full object-cover group-hover:opacity-90 transition-opacity" 
+      @click.prevent="openLightbox(message.ogCard.image)" />
     <div class="flex flex-col gap-0.5 p-2.5">
       <h3 class="truncate text-sm font-semibold text-wa-text-primary dark:text-wa-text-primary-dark">{{
         message.ogCard.title }}</h3>
