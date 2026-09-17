@@ -36,6 +36,6 @@
 * [x] **6.4. ARIA Labels:** Garantir que botões com apenas ícones tenham `aria-label` descritivo.
 
 ### Fase 7: Polimento e Deploy
-* [ ] **7.1. Auditoria de Performance:** Rodar o Lighthouse no Chrome para garantir nota 100 em Performance, Accessibility e SEO.
-* [ ] **7.2. Revisão Cross-Browser:** Testar visualmente no Safari, Chrome e Firefox.
+* [x] **7.1. Auditoria de Performance:** Rodar o Lighthouse no Chrome para garantir nota 100 em Performance, Accessibility e SEO.
+* [-] **7.2. Revisão Cross-Browser:** Testar visualmente no Safari, Chrome e Firefox.
 * [x] **7.3. Deploy:** Configurar a subida do projeto (Firebase Hosting).

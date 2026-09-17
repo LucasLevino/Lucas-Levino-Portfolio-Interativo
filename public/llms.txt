@@ -1,0 +1,16 @@
+# Lucas Levino - Portfolio
+
+> Desenvolvedor Full Stack, Engenheiro da Computação e Cofundador da Sitemakers.
+
+This is the portfolio of Lucas Levino, a Full Stack Developer, Software Architect, and Computer Engineer based in Cuiabá, Brazil. He specializes in Vue 3, Laravel, React, Flutter, and SEO.
+
+## Links
+
+- [LinkedIn](https://www.linkedin.com/in/lucas-levino)
+- [GitHub](https://github.com/LucasLevino)
+- [Portfolio](https://lucaslevino.com/)
+
+## Contact
+
+- [WhatsApp](https://wa.me/5565996994999)
+- [Email](mailto:lucas_levino@outlook.com)
