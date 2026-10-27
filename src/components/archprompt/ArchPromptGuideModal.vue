@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import { GUIDE_PHASES } from '../../data/archprompt'
 
-defineProps<{
+const props = defineProps<{
   isOpen: boolean
   isDark: boolean
 }>()
@@ -11,19 +12,36 @@ const emit = defineEmits<{
   (e: 'apply-reference'): void
 }>()
 
+const closeButtonRef = ref<HTMLButtonElement | null>(null)
+
 const handleApplyAndClose = () => {
   emit('apply-reference')
   emit('close')
 }
 
-const phaseColorMap: Record<string, string> = {
-  blue: 'border-blue-500/30 bg-blue-500/10 text-blue-400',
-  orange: 'border-orange-500/30 bg-orange-500/10 text-orange-400',
-  emerald: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400',
-  cyan: 'border-cyan-500/30 bg-cyan-500/10 text-cyan-400',
-  amber: 'border-amber-500/30 bg-amber-500/10 text-amber-400',
-  purple: 'border-purple-500/30 bg-purple-500/10 text-purple-400'
+const handleKeyDown = (e: KeyboardEvent) => {
+  if (e.key === 'Escape' && props.isOpen) {
+    emit('close')
+  }
 }
+
+watch(
+  () => props.isOpen,
+  async open => {
+    if (open) {
+      await nextTick()
+      closeButtonRef.value?.focus()
+    }
+  }
+)
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeyDown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeyDown)
+})
 </script>
 
 <template>
@@ -31,52 +49,64 @@ const phaseColorMap: Record<string, string> = {
     <Transition name="guide-fade">
       <div
         v-if="isOpen"
-        class="fixed inset-0 z-50 flex items-center justify-end bg-black/75 backdrop-blur-xs"
+        class="fixed inset-0 z-50 flex items-center justify-end bg-black/70"
         @click="emit('close')"
       >
         <aside
-          class="relative flex h-full w-full max-w-3xl flex-col overflow-hidden border-l shadow-2xl"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="guide-dialog-title"
+          class="relative flex h-full w-full max-w-3xl flex-col overflow-hidden border-l shadow-xl font-arch-sans"
           :class="
             isDark
-              ? 'bg-zinc-950 border-zinc-800 text-zinc-200'
-              : 'bg-white border-zinc-200 text-zinc-800'
+              ? 'bg-stone-950 border-stone-800 text-stone-200'
+              : 'bg-[#FAF8F5] border-stone-300 text-stone-800'
           "
           @click.stop
         >
           <!-- Header do Drawer -->
           <header
             class="flex items-center justify-between border-b px-6 py-5 shrink-0"
-            :class="isDark ? 'border-zinc-800 bg-zinc-900/60' : 'border-zinc-200 bg-zinc-50'"
+            :class="isDark ? 'border-stone-800 bg-stone-900' : 'border-stone-200 bg-white'"
           >
             <div>
               <div class="flex items-center gap-2">
-                <span class="rounded-md bg-indigo-500/15 px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider text-indigo-400 border border-indigo-500/30">
-                  Metodologia Oficial
+                <span
+                  class="rounded-md border px-2 py-0.5 font-mono text-[11px] font-medium uppercase tracking-wide"
+                  :class="
+                    isDark
+                      ? 'border-amber-500/40 bg-amber-500/10 text-amber-300'
+                      : 'border-amber-700/30 bg-amber-50 text-amber-800'
+                  "
+                >
+                  Metodologia de 6 Fases
                 </span>
-                <span class="text-xs" :class="isDark ? 'text-zinc-400' : 'text-zinc-500'">
-                  Do Macro ao Micro + Técnico
+                <span class="text-xs font-mono" :class="isDark ? 'text-stone-400' : 'text-stone-600'">
+                  MACRO → MÉDIO → MICRO → TÉCNICO
                 </span>
               </div>
               <h2
-                class="mt-1 text-xl font-bold tracking-tight"
-                :class="isDark ? 'text-white' : 'text-zinc-900'"
+                id="guide-dialog-title"
+                class="mt-1.5 font-display text-xl md:text-2xl font-bold tracking-tight"
+                :class="isDark ? 'text-stone-100' : 'text-stone-900'"
               >
-                Guia de Engenharia de Prompts para Visualização Arquitetônica
+                Engenharia de Prompts para Visualização Arquitetônica
               </h2>
             </div>
 
             <button
+              ref="closeButtonRef"
               type="button"
               @click="emit('close')"
-              class="rounded-xl p-2 transition-colors"
+              class="rounded-md p-2 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
               :class="
                 isDark
-                  ? 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
-                  : 'text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900'
+                  ? 'text-stone-400 hover:bg-stone-800 hover:text-stone-100'
+                  : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900'
               "
-              aria-label="Fechar Guia"
+              aria-label="Fechar guia metodológico"
             >
-              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M18 6 6 18" /><path d="m6 6 12 12" />
               </svg>
             </button>
@@ -84,154 +114,202 @@ const phaseColorMap: Record<string, string> = {
 
           <!-- Corpo com Scroll -->
           <div class="flex-1 overflow-y-auto p-6 space-y-8">
-            <!-- Prompt de Referência Colorido -->
+            <!-- Prompt de Referência Desconstruído -->
             <section
-              class="rounded-2xl border p-5"
+              class="rounded-lg border p-5"
               :class="
                 isDark
-                  ? 'bg-zinc-900/60 border-zinc-800'
-                  : 'bg-zinc-50 border-zinc-200'
+                  ? 'bg-stone-900 border-stone-800'
+                  : 'bg-white border-stone-200 shadow-2xs'
               "
             >
-              <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-                <h3 class="text-xs font-bold uppercase tracking-wider text-indigo-400">
-                  Prompt de Referência Desconstruído (6 Fases)
-                </h3>
+              <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                <div>
+                  <h3
+                    class="font-display text-base font-bold"
+                    :class="isDark ? 'text-stone-100' : 'text-stone-900'"
+                  >
+                    Prompt de Referência Desconstruído
+                  </h3>
+                  <p class="text-xs mt-0.5" :class="isDark ? 'text-stone-400' : 'text-stone-600'">
+                    Cada segmento cumpre uma função espacial e técnica na geração da imagem.
+                  </p>
+                </div>
+
                 <button
                   type="button"
                   @click="handleApplyAndClose"
-                  class="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-indigo-500 transition-colors"
+                  class="inline-flex items-center gap-2 rounded-md px-3.5 py-2 text-xs font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+                  :class="
+                    isDark
+                      ? 'bg-amber-500 text-stone-950 hover:bg-amber-400'
+                      : 'bg-amber-700 text-white hover:bg-amber-800'
+                  "
                 >
-                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <svg aria-hidden="true" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <polygon points="5 3 19 12 5 21 5 3" />
                   </svg>
-                  Carregar este exemplo no Gerador
+                  <span>Preencher com este exemplo</span>
                 </button>
               </div>
 
-              <p class="text-sm leading-relaxed font-medium space-x-1">
-                <span class="rounded px-1.5 py-0.5 bg-blue-500/15 text-blue-300 border border-blue-500/30" title="Fase 1: Sujeito e Contexto">
+              <div
+                class="rounded-md border p-4 font-mono text-xs md:text-sm leading-relaxed space-y-2"
+                :class="
+                  isDark
+                    ? 'bg-stone-950 border-stone-800 text-stone-200'
+                    : 'bg-stone-50 border-stone-200 text-stone-800'
+                "
+              >
+                <p>
+                  <span class="font-bold" :class="isDark ? 'text-amber-400' : 'text-amber-800'">[01 MACRO]</span>
                   Render the architecture as a refined contemporary luxury residence in a natural forest hillside setting,
-                </span>
-                <span class="rounded px-1.5 py-0.5 bg-orange-500/15 text-orange-300 border border-orange-500/30" title="Fase 2: Materialidade">
+                  <span class="font-bold" :class="isDark ? 'text-amber-400' : 'text-amber-800'">[02 MÉDIO]</span>
                   using warm off-white masonry, natural timber, large floor-to-ceiling glass, and dark metal frames.
-                </span>
-                <span class="rounded px-1.5 py-0.5 bg-emerald-500/15 text-emerald-300 border border-emerald-500/30" title="Fase 3: Paisagismo">
+                  <span class="font-bold" :class="isDark ? 'text-amber-400' : 'text-amber-800'">[03 MICRO]</span>
                   Surround the house with mature pine trees, layered grasses, shrubs, and subtle planting.
-                </span>
-                <span class="rounded px-1.5 py-0.5 bg-cyan-500/15 text-cyan-300 border border-cyan-500/30" title="Fase 4: Primeiro Plano">
+                  <span class="font-bold" :class="isDark ? 'text-amber-400' : 'text-amber-800'">[04 1º PLANO]</span>
                   Add a calm natural pond in the foreground with realistic reflections, soft ripples, shoreline stones, and a small rustic wooden rowboat.
-                </span>
-                <span class="rounded px-1.5 py-0.5 bg-amber-500/15 text-amber-300 border border-amber-500/30" title="Fase 5: Iluminação e Atmosfera">
+                  <span class="font-bold" :class="isDark ? 'text-amber-400' : 'text-amber-800'">[05 LUZ & CLIMA]</span>
                   Use warm late-afternoon golden-hour light filtering through the trees, with soft cinematic shadows and subtle interior glow. Keep the scene peaceful, luxurious, natural, and architecture-focused.
-                </span>
-                <span class="rounded px-1.5 py-0.5 bg-purple-500/15 text-purple-300 border border-purple-500/30" title="Fase 6: Parâmetros Técnicos">
+                  <span class="font-bold" :class="isDark ? 'text-amber-400' : 'text-amber-800'">[06 TÉCNICO]</span>
                   Ultra-realistic architectural visualization, soft global illumination, detailed vegetation, no text, 1:1.
-                </span>
-              </p>
+                </p>
+              </div>
             </section>
 
             <!-- 1. A Anatomia do Prompt -->
             <section class="space-y-4">
               <div>
                 <h3
-                  class="text-lg font-bold"
-                  :class="isDark ? 'text-white' : 'text-zinc-900'"
+                  class="font-display text-lg font-bold"
+                  :class="isDark ? 'text-stone-100' : 'text-stone-900'"
                 >
-                  1. A Anatomia do Prompt (Desconstrução)
+                  1. Anatomia das 6 Fases
                 </h3>
                 <p
-                  class="text-sm mt-1"
-                  :class="isDark ? 'text-zinc-400' : 'text-zinc-600'"
+                  class="text-sm mt-1 max-w-prose leading-relaxed"
+                  :class="isDark ? 'text-stone-300' : 'text-stone-700'"
                 >
-                  Um prompt de sucesso não é um amontoado de palavras, mas uma narrativa visual estruturada em ordem lógica de importância para a IA (do <strong>Macro</strong> para o <strong>Micro</strong>, finalizando com o <strong>Técnico</strong>).
+                  Modelos de difusão atribuem maior peso semântico aos tokens iniciais. Por isso, a narrativa parte da escala <strong>Macro</strong> (sujeito e implantação), passa pela escala <strong>Média</strong> (materiais) e <strong>Micro</strong> (paisagismo e primeiro plano), e finaliza com iluminação e parâmetros técnicos.
                 </p>
               </div>
 
               <div class="grid grid-cols-1 gap-4">
-                <div
+                <article
                   v-for="item in GUIDE_PHASES"
                   :key="item.phase"
-                  class="rounded-xl border p-4 transition-colors"
+                  class="rounded-lg border p-4"
                   :class="
                     isDark
-                      ? 'bg-zinc-900/40 border-zinc-800'
-                      : 'bg-white border-zinc-200 shadow-2xs'
+                      ? 'bg-stone-900/70 border-stone-800'
+                      : 'bg-white border-stone-200 shadow-2xs'
                   "
                 >
                   <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
-                    <h4
-                      class="font-bold text-sm"
-                      :class="isDark ? 'text-zinc-100' : 'text-zinc-900'"
-                    >
-                      {{ item.title }}
-                    </h4>
+                    <div class="flex items-center gap-2.5">
+                      <span
+                        class="inline-flex h-6 w-6 items-center justify-center rounded font-mono text-xs font-semibold tabular-nums"
+                        :class="
+                          isDark
+                            ? 'bg-amber-500/15 text-amber-300 border border-amber-500/30'
+                            : 'bg-amber-100 text-amber-900 border border-amber-300'
+                        "
+                      >
+                        0{{ item.phase }}
+                      </span>
+                      <h4
+                        class="font-display font-bold text-sm md:text-base"
+                        :class="isDark ? 'text-stone-100' : 'text-stone-900'"
+                      >
+                        {{ item.title }}
+                      </h4>
+                    </div>
+
                     <span
-                      class="rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
-                      :class="phaseColorMap[item.accent]"
+                      class="rounded-md border px-2 py-0.5 font-mono text-[10px] font-medium uppercase tracking-wide"
+                      :class="
+                        isDark
+                          ? 'border-stone-700 bg-stone-950 text-stone-300'
+                          : 'border-stone-200 bg-stone-100 text-stone-700'
+                      "
                     >
                       {{ item.tag }}
                     </span>
                   </div>
 
-                  <blockquote
-                    class="my-2 border-l-2 border-indigo-500 pl-3 italic text-xs"
-                    :class="isDark ? 'text-zinc-300' : 'text-zinc-700'"
+                  <p
+                    class="my-2.5 rounded-md border px-3 py-2 font-mono text-xs"
+                    :class="
+                      isDark
+                        ? 'bg-stone-950 border-stone-800 text-stone-300'
+                        : 'bg-stone-50 border-stone-200 text-stone-800'
+                    "
                   >
                     {{ item.originalText }}
-                  </blockquote>
+                  </p>
 
-                  <div class="mt-3 space-y-1.5 text-xs">
-                    <p :class="isDark ? 'text-zinc-300' : 'text-zinc-700'">
-                      <strong class="text-indigo-400">O que faz:</strong> {{ item.whatItDoes }}
-                    </p>
-                    <p :class="isDark ? 'text-zinc-400' : 'text-zinc-600'">
-                      <strong class="text-emerald-400">Onde colocar:</strong> {{ item.placement }}
-                    </p>
-                  </div>
-                </div>
+                  <dl class="mt-3 space-y-2 text-xs leading-relaxed">
+                    <div class="flex flex-col sm:flex-row sm:gap-2">
+                      <dt class="font-semibold shrink-0" :class="isDark ? 'text-amber-400' : 'text-amber-800'">
+                        Função visual:
+                      </dt>
+                      <dd :class="isDark ? 'text-stone-300' : 'text-stone-700'">
+                        {{ item.whatItDoes }}
+                      </dd>
+                    </div>
+                    <div class="flex flex-col sm:flex-row sm:gap-2">
+                      <dt class="font-semibold shrink-0" :class="isDark ? 'text-stone-200' : 'text-stone-900'">
+                        Posicionamento:
+                      </dt>
+                      <dd :class="isDark ? 'text-stone-400' : 'text-stone-600'">
+                        {{ item.placement }}
+                      </dd>
+                    </div>
+                  </dl>
+                </article>
               </div>
             </section>
 
-            <!-- 2. Ordem Exata de Blocos -->
+            <!-- 2. Ordem Sequencial de Construção -->
             <section
-              class="rounded-2xl border p-5 space-y-3"
+              class="rounded-lg border p-5 space-y-3"
               :class="
                 isDark
-                  ? 'bg-zinc-900/40 border-zinc-800'
-                  : 'bg-zinc-50 border-zinc-200'
+                  ? 'bg-stone-900/70 border-stone-800'
+                  : 'bg-white border-stone-200 shadow-2xs'
               "
             >
               <h3
-                class="text-base font-bold"
-                :class="isDark ? 'text-white' : 'text-zinc-900'"
+                class="font-display text-base font-bold"
+                :class="isDark ? 'text-stone-100' : 'text-stone-900'"
               >
-                2. Metodologia: Os 6 Blocos Sequenciais
+                2. Sequência de Blocos do Template
               </h3>
-              <ol class="space-y-2 text-xs list-decimal list-inside" :class="isDark ? 'text-zinc-300' : 'text-zinc-700'">
+              <ol class="space-y-2.5 text-xs list-decimal list-inside leading-relaxed" :class="isDark ? 'text-stone-300' : 'text-stone-700'">
                 <li>
-                  <strong>Ação + Tipo de Construção + Estilo Arquitetônico + Bioma:</strong>
-                  <code class="ml-1 rounded bg-indigo-500/10 px-1.5 py-0.5 text-indigo-300">Render a [prédio] in a [estilo] style, located in a [ambiente].</code>
+                  <strong>Ação + Tipologia + Estilo + Bioma:</strong>
+                  <code class="ml-1 rounded px-1.5 py-0.5 font-mono" :class="isDark ? 'bg-stone-950 text-amber-300' : 'bg-stone-100 text-amber-900'">Render the architecture as a [estilo] [tipologia] in a [bioma] setting</code>
                 </li>
                 <li>
-                  <strong>Materiais Principais + Cores/Texturas:</strong>
-                  <code class="ml-1 rounded bg-indigo-500/10 px-1.5 py-0.5 text-indigo-300">using [material 1], [material 2], and [material 3].</code>
+                  <strong>Materiais Principais e Texturas:</strong>
+                  <code class="ml-1 rounded px-1.5 py-0.5 font-mono" :class="isDark ? 'bg-stone-950 text-amber-300' : 'bg-stone-100 text-amber-900'">using [material 1], [material 2], and [material 3].</code>
                 </li>
                 <li>
                   <strong>Paisagismo (Background e Midground):</strong>
-                  <code class="ml-1 rounded bg-indigo-500/10 px-1.5 py-0.5 text-indigo-300">Surround the building with [plantas/árvores/terreno].</code>
+                  <code class="ml-1 rounded px-1.5 py-0.5 font-mono" :class="isDark ? 'bg-stone-950 text-amber-300' : 'bg-stone-100 text-amber-900'">Surround the house with [vegetação e terreno].</code>
                 </li>
                 <li>
                   <strong>Composição Frontal (Foreground):</strong>
-                  <code class="ml-1 rounded bg-indigo-500/10 px-1.5 py-0.5 text-indigo-300">In the foreground, add [água, reflexos, rua, objetos de escala].</code>
+                  <code class="ml-1 rounded px-1.5 py-0.5 font-mono" :class="isDark ? 'bg-stone-950 text-amber-300' : 'bg-stone-100 text-amber-900'">Add a [água, reflexos, calçamento ou escala] in the foreground.</code>
                 </li>
                 <li>
-                  <strong>Iluminação + Sombras + Atmosfera:</strong>
-                  <code class="ml-1 rounded bg-indigo-500/10 px-1.5 py-0.5 text-indigo-300">Use [luz e horário] with [sombras/clima]. Keep the scene [adjetivos].</code>
+                  <strong>Iluminação, Sombras e Clima:</strong>
+                  <code class="ml-1 rounded px-1.5 py-0.5 font-mono" :class="isDark ? 'bg-stone-950 text-amber-300' : 'bg-stone-100 text-amber-900'">Use [luz e horário] with [sombras]. Keep the scene [atmosfera].</code>
                 </li>
                 <li>
-                  <strong>Keywords Técnicas (Modificadores Finais):</strong>
-                  <code class="ml-1 rounded bg-indigo-500/10 px-1.5 py-0.5 text-indigo-300">[estilo visual], [motor de render], [qualidade], [aspect ratio].</code>
+                  <strong>Keywords Técnicas e Proporção:</strong>
+                  <code class="ml-1 rounded px-1.5 py-0.5 font-mono" :class="isDark ? 'bg-stone-950 text-amber-300' : 'bg-stone-100 text-amber-900'">[estilo de render], [restrições], [aspect ratio].</code>
                 </li>
               </ol>
             </section>
@@ -240,17 +318,22 @@ const phaseColorMap: Record<string, string> = {
           <!-- Footer do Drawer -->
           <footer
             class="flex items-center justify-between border-t px-6 py-4 shrink-0"
-            :class="isDark ? 'border-zinc-800 bg-zinc-900/60' : 'border-zinc-200 bg-zinc-50'"
+            :class="isDark ? 'border-stone-800 bg-stone-900' : 'border-stone-200 bg-white'"
           >
-            <span class="text-xs" :class="isDark ? 'text-zinc-400' : 'text-zinc-500'">
-              Use os modos <strong>Rápido (7 blocos)</strong> ou <strong>Avançado (12 blocos)</strong> para aplicar esta metodologia.
+            <span class="text-xs" :class="isDark ? 'text-stone-400' : 'text-stone-600'">
+              Alterne entre <strong>7 Blocos (Rápido)</strong> e <strong>12 Blocos (Granular)</strong> na barra superior.
             </span>
             <button
               type="button"
               @click="emit('close')"
-              class="rounded-xl bg-zinc-800 px-4 py-2 text-xs font-semibold text-white hover:bg-zinc-700 transition-colors"
+              class="rounded-md border px-4 py-2 text-xs font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+              :class="
+                isDark
+                  ? 'border-stone-700 bg-stone-800 text-stone-100 hover:bg-stone-700'
+                  : 'border-stone-300 bg-stone-900 text-white hover:bg-stone-800'
+              "
             >
-              Entendi, voltar ao Studio
+              Fechar guia
             </button>
           </footer>
         </aside>
@@ -260,9 +343,11 @@ const phaseColorMap: Record<string, string> = {
 </template>
 
 <style scoped>
-.guide-fade-enter-active,
+.guide-fade-enter-active {
+  transition: opacity 0.2s ease-out;
+}
 .guide-fade-leave-active {
-  transition: opacity 0.25s ease;
+  transition: opacity 0.15s ease-in;
 }
 .guide-fade-enter-from,
 .guide-fade-leave-to {

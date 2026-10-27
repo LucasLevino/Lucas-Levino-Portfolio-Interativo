@@ -29,8 +29,13 @@
   --color-wa-border: #e9edef;
   --color-wa-border-dark: #222d34;
 
-  /* Fonte Nativa */
+  /* Fonte Nativa (WhatsApp Portfolio) */
   --font-sans: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+  /* Tipografia Editorial & Arquitetônica (/archprompt) */
+  --font-display: "Bricolage Grotesque", Georgia, serif;
+  --font-arch-sans: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 }
 
 @layer base {
@@ -91,5 +96,16 @@
 
   .chat-list-enter-active:nth-child(4) {
     transition-delay: 150ms;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
