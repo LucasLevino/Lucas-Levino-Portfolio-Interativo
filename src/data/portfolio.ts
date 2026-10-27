@@ -2,6 +2,7 @@ import AvatarContato from '/assets/avatar/avatar-contato.webp';
 import AvatarResumo from '/assets/avatar/avatar-resumo.webp';
 import AvatarPremio from '/assets/avatar/avatar-premio.webp';
 import AvatarProjetos from '/assets/avatar/avatar-projeto.webp';
+import AvatarArchPrompt from '/assets/avatar/avatar-archoprompt.png';
 import StickerConcentrado from '/assets/stickers/desenvolvendo-concentrado.webp';
 import StickerCafe from '/assets/stickers/cafe.webp';
 import StickerForte from '/assets/stickers/forte.webp';
@@ -123,35 +124,40 @@ export const portfolioData: Tab[] = [
       { type: 'text', id: 1, text: 'Como foi a sua evolução profissional e quais projetos destacam sua experiência?', sender: 'visitor', time: '11:58' },
       { type: 'text', id: 2, text: 'Comecei em 2019 na Óticas Paris Vision, administrando e-commerce e integrações com marketplaces via VTEX. Em 2020, fui para a Lab Metrics como Dev Frontend & Mobile, e em seguida atuei na Webgru, até assumir como Especialista na TVCA em 2022.', sender: 'me', time: '11:59' },
       { type: 'text', id: 3, text: 'Toda essa bagagem virou desafios reais, como evoluir o MVP para a plataforma SaaS "Eventmakers" (Laravel/Vue 3) e desenvolver na Sitemakers e em agências parceiras.', sender: 'me', time: '12:00' },
-      { type: 'iframe',
+      {
+        type: 'iframe',
         id: 4,
         text: 'Este é o Design & Front-End que desenvolvi (WordPress) para a New Intercâmbios.',
         sender: 'me',
         time: '12:01',
         iframe: 'https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Fproto%2F5u3Y4OYduTuFRxQapcjtul%2FNew%3Fnode-id%3D79%253A323%26viewport%3D1167%252C554%252C0.10126150399446487%26scaling%3Dscale-down-width'
       },
-      { type: 'iframe',
+      {
+        type: 'iframe',
         id: 5,
         text: 'Este é o site em WordPress que desenvolvi para a agência de branding Martinelli.',
         sender: 'me',
         time: '12:02',
         iframe: 'https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Fproto%2FNVu9euClCofh5lmIiWSYM9%2FRafa-M.%3Fnode-id%3D63%253A28%26viewport%3D771%252C37%252C0.11810070276260376%26scaling%3Dscale-down-width'
       },
-      { type: 'iframe',
+      {
+        type: 'iframe',
         id: 6,
         text: 'Este é o aplicativo para gerenciamento de pauta da agência Anna+, construído com ReactJS e Flutter (uso interno).',
         sender: 'me',
         time: '12:03',
         iframe: 'https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Ffile%2F6seYhAgiG5YUG4InL0ltNp%2FAnna-Jobs%3Fnode-id%3D104%253A717'
       },
-      { type: 'iframe',
+      {
+        type: 'iframe',
         id: 7,
         text: 'Aqui temos o Front-End (WordPress) que desenvolvi para a instituição Educare-MT.',
         sender: 'me',
         time: '12:04',
         iframe: 'https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Fproto%2F938eQAdEw80PEa0A8O9oj9%2FEducare%3Fnode-id%3D231%253A5%26viewport%3D800%252C414%252C0.19536884129047394%26scaling%3Dscale-down-width'
       },
-      { type: 'iframe',
+      {
+        type: 'iframe',
         id: 8,
         text: 'E, por fim, o protótipo de design feito para a Delta Seguros.',
         sender: 'me',
@@ -163,7 +169,7 @@ export const portfolioData: Tab[] = [
   {
     id: 'premios',
     title: 'Prêmios & Destaques',
-    avatarText: '🏆', 
+    avatarText: '🏆',
     avatarImage: AvatarPremio,
     lastMessage: '1º lugar no Prêmio de Jornalismo de MT',
     unreadCount: 1,
@@ -173,7 +179,8 @@ export const portfolioData: Tab[] = [
       { type: 'text', id: 1, text: 'Com toda essa bagagem, você teve algum reconhecimento ou premiação de destaque recentemente?', sender: 'visitor', time: '15:00' },
       { type: 'text', id: 2, text: 'Sim! Em dezembro de 2025, eu e a Pollyana Araújo conquistamos o 1º lugar no 1° Prêmio de Jornalismo do Governo de Mato Grosso, na categoria Internet.', sender: 'me', time: '15:01' },
       { type: 'text', id: 3, text: 'A matéria premiada foi a "Receita de coragem: Empreendedores encontram em MT solo fértil para abrir o próprio negócio", publicada no Portal Primeira Página.', sender: 'me', time: '15:02' },
-      { type: 'iframe',
+      {
+        type: 'iframe',
         id: 4,
         text: 'Fiquei muito feliz com esse reconhecimento.',
         sender: 'me',
@@ -206,11 +213,12 @@ export const portfolioData: Tab[] = [
     lastMessage: 'lucas_levino@outlook.com | (65) 98435-6877',
     time: 'Semana passada',
     messages: [
-      { type: 'text', id: 1, text: 'Excelente perfil! Quais os melhores canais para entrarmos em contato?', sender: 'visitor', time: '16:00' }, 
-      { type: 'ogCard', 
-        id: 2, 
-        text: 'Você pode baixar a versão em PDF do meu currículo clicando no ícone ali no topo da tela, ou direto por este link!', 
-        sender: 'me', 
+      { type: 'text', id: 1, text: 'Excelente perfil! Quais os melhores canais para entrarmos em contato?', sender: 'visitor', time: '16:00' },
+      {
+        type: 'ogCard',
+        id: 2,
+        text: 'Você pode baixar a versão em PDF do meu currículo clicando no ícone ali no topo da tela, ou direto por este link!',
+        sender: 'me',
         time: '16:01',
         ogCard: {
           title: 'Curriculo_Lucas_Levino.pdf',
@@ -219,7 +227,8 @@ export const portfolioData: Tab[] = [
           domain: 'Download Seguro'
         }
       },
-      { type: 'ogCard',
+      {
+        type: 'ogCard',
         id: 3,
         text: '🔗 Acompanhe minhas reflexões sobre tecnologia e conecte-se comigo no LinkedIn:\nhttps://www.linkedin.com/in/lucas-levino',
         sender: 'me',
@@ -232,7 +241,8 @@ export const portfolioData: Tab[] = [
           domain: 'linkedin.com'
         }
       },
-      { type: 'ogCard',
+      {
+        type: 'ogCard',
         id: 4,
         text: '💻 E aqui está o meu repositório de códigos. Fique à vontade para explorar meus projetos e portfólio web:\nhttps://github.com/LucasLevino',
         sender: 'me',
@@ -246,11 +256,59 @@ export const portfolioData: Tab[] = [
         }
       },
       { type: 'sticker', id: 5, text: '', sender: 'me', time: '16:05', sticker: StickerJoinha },
-      { type: 'text',
+      {
+        type: 'text',
         id: 6,
         text: 'Se preferir falarmos diretamente, basta clicar no link do meu WhatsApp ou me mandar um e-mail:\n\n📱 WhatsApp: https://wa.me/5565996994999 \n📧 E-mail: mailto:lucas_levino@outlook.com',
         sender: 'me',
         time: '16:06'
+      }
+    ]
+  },
+  {
+    id: 'archprompt',
+    title: 'ArchiPrompt Studio (IA)',
+    avatarText: 'AP',
+    avatarImage: AvatarArchPrompt,
+    lastMessage: 'Gerador dinâmico de prompts arquitetônicos',
+    unreadCount: 1,
+    time: 'Novo',
+    isRead: false,
+    messages: [
+      {
+        type: 'text',
+        id: 1,
+        text: 'Lucas, vi que você une engenharia de software com Inteligência Artificial. Tem algum projeto ou ferramenta interativa que eu possa testar agora mesmo aqui no navegador?',
+        sender: 'visitor',
+        time: '13:10'
+      },
+      {
+        type: 'text',
+        id: 2,
+        text: 'Tenho sim! Desenvolvi o ArchiPrompt Studio, um laboratório interativo de engenharia de prompts voltado para visualização arquitetônica (ArchViz), design de interiores e modelagem 3D.',
+        sender: 'me',
+        time: '13:11'
+      },
+      {
+        type: 'text',
+        id: 3,
+        text: 'Ele estrutura o prompt em 6 fases técnicas (do Macro ao Micro) e adapta toda a gramática em inglês para 8 contextos: Externo, Interno, Design de Interiores, Luzes (Luminotécnico), Ambiente, Móveis, Móveis em 3D e até um Sistema Interativo de Plantas Baixas (2D para 3D).',
+        sender: 'me',
+        time: '13:12'
+      },
+      {
+        type: 'ogCard',
+        id: 4,
+        text: 'Clique no card abaixo ou acesse o atalho direto para abrir e testar o gerador agora:\nhttps://lucaslevino.com/archprompt',
+        sender: 'me',
+        time: '13:13',
+        ogCard: {
+          title: 'ArchiPrompt Studio — Gerador Dinâmico de Prompts Arquitetônicos',
+          description: 'Construa prompts técnicos em 6 fases para Fachadas, Interiores, Iluminação IES, Móveis 3D e Plantas Baixas Interativas.',
+          image: AvatarArchPrompt,
+          url: '/archprompt',
+          domain: 'lucaslevino.com/archprompt · Abrir Ambiente'
+        }
       }
     ]
   }

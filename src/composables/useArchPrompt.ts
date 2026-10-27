@@ -1,8 +1,7 @@
 import { ref, computed, watch } from 'vue'
 import {
-  QUICK_FIELDS,
-  ADVANCED_FIELDS,
-  CURATED_PRESETS,
+  ARCH_CONTEXTS,
+  type ArchContextId,
   type PromptMode,
   type QuickFieldId,
   type AdvancedFieldId,
@@ -24,6 +23,7 @@ export interface PromptSegment {
 
 export interface PromptHistoryItem {
   id: string
+  contextId?: ArchContextId
   title: string
   prompt: string
   mode: PromptMode
@@ -61,7 +61,6 @@ const createEmptyAdvancedData = (): AdvancedPromptData => ({
   aspectRatio: ''
 })
 
-// Normalize and parse comma / "and" separated items in a field
 function parseFieldTokens(raw: string): string[] {
   if (!raw.trim()) return []
   return raw
@@ -87,16 +86,15 @@ function formatFieldTokens(tokens: string[], joinWithAnd = false): string {
 }
 
 export function useArchPrompt() {
+  const activeContextId = ref<ArchContextId>('exterior')
   const mode = ref<PromptMode>('quick')
   const quickData = ref<QuickPromptData>(createEmptyQuickData())
   const advancedData = ref<AdvancedPromptData>(createEmptyAdvancedData())
 
-  // Manual editing of the final generated prompt
   const isManualEdit = ref(false)
   const manualPromptText = ref('')
   const activePresetId = ref<string | null>(null)
 
-  // Theme (Default Dark Studio as in prompt_generator.jsx)
   const loadInitialTheme = (): boolean => {
     try {
       const saved = localStorage.getItem(THEME_STORAGE_KEY)
@@ -113,7 +111,6 @@ export function useArchPrompt() {
     } catch {}
   }
 
-  // History & Favorites in localStorage
   const loadHistory = (): PromptHistoryItem[] => {
     try {
       const raw = localStorage.getItem(HISTORY_STORAGE_KEY)
@@ -133,10 +130,28 @@ export function useArchPrompt() {
     } catch {}
   }
 
-  // Current active fields configuration
-  const currentFields = computed(() => {
-    return mode.value === 'quick' ? QUICK_FIELDS : ADVANCED_FIELDS
+  const activeContext = computed(() => {
+    return ARCH_CONTEXTS.find(c => c.id === activeContextId.value) || ARCH_CONTEXTS[0]
   })
+
+  const currentFields = computed(() => {
+    return mode.value === 'quick'
+      ? activeContext.value.quickFields
+      : activeContext.value.advancedFields
+  })
+
+  const contextPresets = computed(() => {
+    return activeContext.value.presets
+  })
+
+  const selectContext = (ctxId: ArchContextId) => {
+    if (activeContextId.value === ctxId) return
+    activeContextId.value = ctxId
+    quickData.value = createEmptyQuickData()
+    advancedData.value = createEmptyAdvancedData()
+    activePresetId.value = null
+    isManualEdit.value = false
+  }
 
   const getFieldValue = (fieldId: string): string => {
     if (mode.value === 'quick') {
@@ -149,7 +164,6 @@ export function useArchPrompt() {
     activePresetId.value = null
     if (mode.value === 'quick') {
       quickData.value[fieldId as QuickFieldId] = value
-      // Sync shared fields to advanced
       if (fieldId in advancedData.value) {
         advancedData.value[fieldId as AdvancedFieldId] = value
       }
@@ -161,7 +175,6 @@ export function useArchPrompt() {
     }
   }
 
-  // Check if a chip is active in the given field
   const isChipSelected = (fieldId: string, chipValue: string): boolean => {
     const current = getFieldValue(fieldId).toLowerCase()
     if (!current) return false
@@ -171,7 +184,6 @@ export function useArchPrompt() {
     return current.includes(target)
   }
 
-  // Toggle a chip into/out of a field
   const toggleChip = (fieldId: string, chipValue: string) => {
     const fieldCfg = currentFields.value.find(f => f.id === fieldId)
     const currentRaw = getFieldValue(fieldId)
@@ -182,8 +194,7 @@ export function useArchPrompt() {
       return
     }
 
-    // Special case for style in quick mode when combining subject + setting ("in a ...")
-    if (mode.value === 'quick' && fieldId === 'style') {
+    if (mode.value === 'quick' && fieldId === 'style' && activeContextId.value === 'exterior') {
       const lowerChip = chipValue.toLowerCase()
       const isSettingChip = lowerChip.startsWith('in a ') || lowerChip.startsWith('in an ')
       if (currentRaw.toLowerCase().includes(lowerChip)) {
@@ -195,12 +206,10 @@ export function useArchPrompt() {
         return
       }
       if (isSettingChip) {
-        // Replace existing "in a ... setting" or append
         const withoutOldSetting = currentRaw.replace(/\s+in an?\s+[^,.]+setting/i, '').trim()
         setFieldValue(fieldId, withoutOldSetting ? `${withoutOldSetting} ${chipValue}` : chipValue)
         return
       } else {
-        // Extract existing setting if present
         const settingMatch = currentRaw.match(/(\bin an?\s+[^,.]+setting)/i)
         const settingPart = settingMatch ? settingMatch[1] : ''
         setFieldValue(fieldId, settingPart ? `${chipValue} ${settingPart}` : chipValue)
@@ -216,7 +225,6 @@ export function useArchPrompt() {
       tokens.splice(existingIndex, 1)
       setFieldValue(fieldId, formatFieldTokens(tokens, fieldCfg?.joinWithAnd))
     } else {
-      // Also check if chipValue itself contains commas (e.g. "8k resolution, photorealistic")
       if (currentRaw.toLowerCase().includes(targetLower)) {
         const cleaned = currentRaw
           .replace(new RegExp(chipValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'ig'), '')
@@ -230,12 +238,15 @@ export function useArchPrompt() {
     }
   }
 
-  // Construct structured segments for live preview highlighting
+  // Construct structured segments dynamically based on activeContext connectors
   const promptSegments = computed<PromptSegment[]>(() => {
+    const conn = activeContext.value.connectors
+
     if (mode.value === 'quick') {
       const d = quickData.value
+      const qFields = activeContext.value.quickFields
       const seg = (id: QuickFieldId, placeholder: string): PromptSegment => {
-        const cfg = QUICK_FIELDS.find(f => f.id === id)!
+        const cfg = qFields.find(f => f.id === id) || qFields[0]
         const val = d[id]?.trim()
         const cleanVal = val ? val.replace(/\.$/, '') : `[${placeholder}]`
         return {
@@ -249,22 +260,18 @@ export function useArchPrompt() {
         }
       }
 
-      const fgValue = d.foreground?.trim() || ''
-      const fgHasPrefix = /^a\s+|^an\s+/i.test(fgValue)
-      const fgHasInForeground = /in the foreground/i.test(fgValue)
-
       return [
-        { type: 'static', text: 'Render the architecture as a ' },
+        { type: 'static', text: conn.intro },
         seg('style', 'style'),
-        { type: 'static', text: ', using ' },
+        { type: 'static', text: conn.materialsBridge },
         seg('materials', 'materials'),
-        { type: 'static', text: '. Surround the house with ' },
+        { type: 'static', text: conn.environmentBridge },
         seg('environment', 'environment'),
-        { type: 'static', text: fgHasPrefix ? '. Add ' : '. Add a ' },
+        { type: 'static', text: conn.foregroundBridge },
         seg('foreground', 'foreground'),
-        { type: 'static', text: fgValue && !fgHasInForeground ? ' in the foreground. Use ' : '. Use ' },
+        { type: 'static', text: conn.lightingBridge },
         seg('lighting', 'lighting'),
-        { type: 'static', text: '. Keep the scene ' },
+        { type: 'static', text: conn.moodBridge },
         seg('mood', 'mood'),
         { type: 'static', text: '. ' },
         seg('technical', 'technical'),
@@ -272,8 +279,9 @@ export function useArchPrompt() {
       ]
     } else {
       const d = advancedData.value
+      const aFields = activeContext.value.advancedFields
       const seg = (id: AdvancedFieldId, placeholder: string): PromptSegment => {
-        const cfg = ADVANCED_FIELDS.find(f => f.id === id)!
+        const cfg = aFields.find(f => f.id === id) || aFields[0]
         const val = d[id]?.trim()
         const cleanVal = val ? val.replace(/\.$/, '') : `[${placeholder}]`
         return {
@@ -288,23 +296,23 @@ export function useArchPrompt() {
       }
 
       return [
-        { type: 'static', text: 'Render the architecture as a ' },
+        { type: 'static', text: conn.advIntro },
         seg('archStyle', 'style'),
         { type: 'static', text: ' ' },
-        seg('buildingType', 'building type'),
-        { type: 'static', text: ' in a ' },
-        seg('location', 'location'),
-        { type: 'static', text: ' setting, using ' },
+        seg('buildingType', 'subject'),
+        { type: 'static', text: conn.advLocationBridge },
+        seg('location', 'context'),
+        { type: 'static', text: conn.advMaterialsBridge },
         seg('materials', 'materials'),
-        { type: 'static', text: '. Surround the architecture with ' },
-        seg('environment', 'landscaping'),
-        { type: 'static', text: '. In the foreground, add ' },
-        seg('foreground', 'foreground element'),
-        { type: 'static', text: '. Use ' },
+        { type: 'static', text: conn.advEnvironmentBridge },
+        seg('environment', 'environment'),
+        { type: 'static', text: conn.advForegroundBridge },
+        seg('foreground', 'foreground'),
+        { type: 'static', text: conn.advLightingBridge },
         seg('lighting', 'lighting'),
-        { type: 'static', text: ' with ' },
+        { type: 'static', text: conn.advLightingDetailBridge },
         seg('lightingDetail', 'light details'),
-        { type: 'static', text: '. Keep the scene ' },
+        { type: 'static', text: conn.advMoodBridge },
         seg('mood', 'mood'),
         { type: 'static', text: '. ' },
         seg('renderStyle', 'render style'),
@@ -317,17 +325,14 @@ export function useArchPrompt() {
     }
   })
 
-  // Constructed prompt string from template
   const templatePrompt = computed(() => {
     return promptSegments.value.map(s => s.text).join('')
   })
 
-  // Final prompt (either template or manually edited)
   const finalPrompt = computed(() => {
     return isManualEdit.value ? manualPromptText.value : templatePrompt.value
   })
 
-  // Keep manualPromptText synced when not in manual edit mode
   watch(
     templatePrompt,
     newVal => {
@@ -348,7 +353,6 @@ export function useArchPrompt() {
     manualPromptText.value = templatePrompt.value
   }
 
-  // Completion statistics
   const completionStats = computed(() => {
     const fields = currentFields.value
     const total = fields.length
@@ -364,11 +368,9 @@ export function useArchPrompt() {
     }
   })
 
-  // Switch between Quick & Advanced while bridging values
   const switchMode = (newMode: PromptMode) => {
     if (mode.value === newMode) return
     if (newMode === 'advanced') {
-      // Map quick -> advanced if advanced fields are empty
       if (!advancedData.value.materials && quickData.value.materials) {
         advancedData.value.materials = quickData.value.materials
       }
@@ -376,37 +378,30 @@ export function useArchPrompt() {
         advancedData.value.environment = quickData.value.environment
       }
       if (!advancedData.value.foreground && quickData.value.foreground) {
-        advancedData.value.foreground = quickData.value.foreground.replace(/\s+in the foreground/i, '')
+        advancedData.value.foreground = quickData.value.foreground
       }
       if (!advancedData.value.mood && quickData.value.mood) {
         advancedData.value.mood = quickData.value.mood
       }
       if (!advancedData.value.archStyle && quickData.value.style) {
-        const match = quickData.value.style.match(/^(.*?)\s+(residence|mansion|pavilion|eco-lodge|cabin|museum|villa|tower)\s*(?:in an?\s+(.*?)\s*setting)?$/i)
-        if (match) {
-          advancedData.value.archStyle = match[1].trim()
-          advancedData.value.buildingType = match[2].trim()
-          if (match[3]) advancedData.value.location = match[3].trim()
-        } else {
-          advancedData.value.archStyle = quickData.value.style
-        }
+        advancedData.value.archStyle = quickData.value.style
       }
       if (!advancedData.value.lighting && quickData.value.lighting) {
-        const parts = quickData.value.lighting.split(/,\s*with\s+/i)
-        advancedData.value.lighting = parts[0].trim()
-        if (parts[1]) advancedData.value.lightingDetail = parts[1].trim()
+        advancedData.value.lighting = quickData.value.lighting
       }
       if (!advancedData.value.renderStyle && quickData.value.technical) {
-        advancedData.value.renderStyle = 'Ultra-realistic architectural visualization, soft global illumination, detailed vegetation'
+        advancedData.value.renderStyle = quickData.value.technical
         advancedData.value.extraCommands = 'no text'
         advancedData.value.aspectRatio = '1:1'
       }
     } else {
-      // Map advanced -> quick
       if (advancedData.value.archStyle || advancedData.value.buildingType || advancedData.value.location) {
-        const s = [advancedData.value.archStyle, advancedData.value.buildingType].filter(Boolean).join(' ')
-        const loc = advancedData.value.location ? ` in a ${advancedData.value.location} setting` : ''
-        if (s) quickData.value.style = `${s}${loc}`
+        const parts = [
+          advancedData.value.archStyle,
+          advancedData.value.buildingType,
+          advancedData.value.location
+        ].filter(Boolean)
+        if (parts.length > 0) quickData.value.style = parts.join(' ')
       }
       if (advancedData.value.materials) quickData.value.materials = advancedData.value.materials
       if (advancedData.value.environment) quickData.value.environment = advancedData.value.environment
@@ -414,10 +409,10 @@ export function useArchPrompt() {
       if (advancedData.value.lighting || advancedData.value.lightingDetail) {
         quickData.value.lighting = [
           advancedData.value.lighting,
-          advancedData.value.lightingDetail ? `with ${advancedData.value.lightingDetail}` : ''
+          advancedData.value.lightingDetail
         ]
           .filter(Boolean)
-          .join(', ')
+          .join(', with ')
       }
       if (advancedData.value.mood) quickData.value.mood = advancedData.value.mood
       if (advancedData.value.renderStyle || advancedData.value.extraCommands || advancedData.value.aspectRatio) {
@@ -433,36 +428,37 @@ export function useArchPrompt() {
     mode.value = newMode
   }
 
-  // Load curated preset
   const loadPreset = (preset: CuratedPreset) => {
+    if (preset.contextId && preset.contextId !== activeContextId.value) {
+      activeContextId.value = preset.contextId
+    }
     quickData.value = { ...preset.quick }
     advancedData.value = { ...preset.advanced }
     activePresetId.value = preset.id
     isManualEdit.value = false
   }
 
-  // Load the official Reference Prompt from guia_de_prompts_arquitet_nicos.md
   const loadReferenceExample = () => {
-    loadPreset(CURATED_PRESETS[0])
+    const firstPreset = activeContext.value.presets[0]
+    if (firstPreset) {
+      loadPreset(firstPreset)
+    }
   }
 
-  // Randomize / Surprise Me
   const surpriseMe = () => {
     activePresetId.value = null
     isManualEdit.value = false
 
     const pickRandom = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)]
 
-    // Generate for both modes so switching modes keeps the surprise
-    for (const field of QUICK_FIELDS) {
+    for (const field of activeContext.value.quickFields) {
       quickData.value[field.id] = pickRandom(field.options).value
     }
-    for (const field of ADVANCED_FIELDS) {
+    for (const field of activeContext.value.advancedFields) {
       advancedData.value[field.id] = pickRandom(field.options).value
     }
   }
 
-  // Clear all fields
   const clearAll = () => {
     quickData.value = createEmptyQuickData()
     advancedData.value = createEmptyAdvancedData()
@@ -470,7 +466,6 @@ export function useArchPrompt() {
     isManualEdit.value = false
   }
 
-  // Save current prompt to history
   const saveToHistory = (markFavorite = false, customTitle?: string) => {
     const promptStr = finalPrompt.value.trim()
     if (!promptStr) return
@@ -484,13 +479,15 @@ export function useArchPrompt() {
 
     const defaultTitle =
       customTitle ||
-      (mode.value === 'quick'
-        ? quickData.value.style.slice(0, 48) || 'Prompt Arquitetônico'
-        : `${advancedData.value.archStyle} ${advancedData.value.buildingType}`.trim().slice(0, 48) ||
-          'Prompt Avançado')
+      `[${activeContext.value.label}] ` +
+        (mode.value === 'quick'
+          ? quickData.value.style.slice(0, 38) || 'Prompt'
+          : `${advancedData.value.archStyle} ${advancedData.value.buildingType}`.trim().slice(0, 38) ||
+            'Prompt')
 
     const newItem: PromptHistoryItem = {
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      contextId: activeContextId.value,
       title: defaultTitle,
       prompt: promptStr,
       mode: mode.value,
@@ -524,6 +521,9 @@ export function useArchPrompt() {
   }
 
   const restoreHistoryItem = (item: PromptHistoryItem) => {
+    if (item.contextId) {
+      activeContextId.value = item.contextId
+    }
     mode.value = item.mode
     quickData.value = { ...item.quickData }
     advancedData.value = { ...item.advancedData }
@@ -532,6 +532,10 @@ export function useArchPrompt() {
   }
 
   return {
+    activeContextId,
+    activeContext,
+    contextPresets,
+    selectContext,
     mode,
     quickData,
     advancedData,
