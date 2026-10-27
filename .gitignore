@@ -28,7 +28,8 @@ dist-ssr
 firebase-debug.log*
 
 # Docs
-portfolio-content.md
+/docs
+/.agents
 
 # Env
 .env
