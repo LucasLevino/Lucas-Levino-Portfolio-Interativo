@@ -1,6 +1,7 @@
 import { ref, computed, watch } from 'vue'
 import {
   ARCH_CONTEXTS,
+  REFERENCE_IMAGE_FIELD,
   type ArchContextId,
   type PromptMode,
   type QuickFieldId,
@@ -8,7 +9,8 @@ import {
   type QuickPromptData,
   type AdvancedPromptData,
   type CuratedPreset,
-  type FieldAccent
+  type FieldAccent,
+  type ArchFieldConfig
 } from '../data/archprompt'
 
 export interface PromptSegment {
@@ -19,6 +21,7 @@ export interface PromptSegment {
   phase?: number
   accent?: FieldAccent
   isPlaceholder?: boolean
+  isOptional?: boolean
 }
 
 export interface PromptHistoryItem {
@@ -27,6 +30,7 @@ export interface PromptHistoryItem {
   title: string
   prompt: string
   mode: PromptMode
+  imageRef?: string
   quickData: QuickPromptData
   advancedData: AdvancedPromptData
   createdAt: string
@@ -34,7 +38,7 @@ export interface PromptHistoryItem {
 }
 
 const HISTORY_STORAGE_KEY = 'lucaslevino_archprompt_history_v1'
-const THEME_STORAGE_KEY = 'lucaslevino_archprompt_theme_v1'
+const THEME_STORAGE_KEY = 'lucaslevino_archprompt_theme_v2'
 
 const createEmptyQuickData = (): QuickPromptData => ({
   style: '',
@@ -88,6 +92,7 @@ function formatFieldTokens(tokens: string[], joinWithAnd = false): string {
 export function useArchPrompt() {
   const activeContextId = ref<ArchContextId>('exterior')
   const mode = ref<PromptMode>('quick')
+  const imageRef = ref<string>('')
   const quickData = ref<QuickPromptData>(createEmptyQuickData())
   const advancedData = ref<AdvancedPromptData>(createEmptyAdvancedData())
 
@@ -100,7 +105,7 @@ export function useArchPrompt() {
       const saved = localStorage.getItem(THEME_STORAGE_KEY)
       if (saved !== null) return saved === 'dark'
     } catch {}
-    return true
+    return false
   }
   const isDark = ref<boolean>(loadInitialTheme())
 
@@ -134,10 +139,12 @@ export function useArchPrompt() {
     return ARCH_CONTEXTS.find(c => c.id === activeContextId.value) || ARCH_CONTEXTS[0]
   })
 
-  const currentFields = computed(() => {
-    return mode.value === 'quick'
-      ? activeContext.value.quickFields
-      : activeContext.value.advancedFields
+  const currentFields = computed<ArchFieldConfig<string>[]>(() => {
+    const contextFields =
+      mode.value === 'quick'
+        ? activeContext.value.quickFields
+        : activeContext.value.advancedFields
+    return [REFERENCE_IMAGE_FIELD, ...contextFields]
   })
 
   const contextPresets = computed(() => {
@@ -154,6 +161,9 @@ export function useArchPrompt() {
   }
 
   const getFieldValue = (fieldId: string): string => {
+    if (fieldId === 'imageRef') {
+      return imageRef.value
+    }
     if (mode.value === 'quick') {
       return quickData.value[fieldId as QuickFieldId] ?? ''
     }
@@ -161,6 +171,10 @@ export function useArchPrompt() {
   }
 
   const setFieldValue = (fieldId: string, value: string) => {
+    if (fieldId === 'imageRef') {
+      imageRef.value = value
+      return
+    }
     activePresetId.value = null
     if (mode.value === 'quick') {
       quickData.value[fieldId as QuickFieldId] = value
@@ -238,9 +252,37 @@ export function useArchPrompt() {
     }
   }
 
-  // Construct structured segments dynamically based on activeContext connectors
+  // Construct structured segments dynamically based on activeContext connectors + imageRef
   const promptSegments = computed<PromptSegment[]>(() => {
     const conn = activeContext.value.connectors
+    const cleanImageRef = imageRef.value.trim().replace(/^[,\s]+|[.\s]+$/g, '')
+
+    const imageRefSegments: PromptSegment[] = cleanImageRef
+      ? [
+          { type: 'static', text: ', ' },
+          {
+            type: 'variable',
+            text: cleanImageRef,
+            fieldId: 'imageRef',
+            label: REFERENCE_IMAGE_FIELD.label,
+            phase: 0,
+            accent: REFERENCE_IMAGE_FIELD.accent,
+            isPlaceholder: false
+          }
+        ]
+      : [
+          { type: 'static', text: ' ', isOptional: true },
+          {
+            type: 'variable',
+            text: '[+ referenciar imagem(ns) enviada(s)]',
+            fieldId: 'imageRef',
+            label: REFERENCE_IMAGE_FIELD.label,
+            phase: 0,
+            accent: REFERENCE_IMAGE_FIELD.accent,
+            isPlaceholder: true,
+            isOptional: true
+          }
+        ]
 
     if (mode.value === 'quick') {
       const d = quickData.value
@@ -263,6 +305,7 @@ export function useArchPrompt() {
       return [
         { type: 'static', text: conn.intro },
         seg('style', 'style'),
+        ...imageRefSegments,
         { type: 'static', text: conn.materialsBridge },
         seg('materials', 'materials'),
         { type: 'static', text: conn.environmentBridge },
@@ -302,6 +345,7 @@ export function useArchPrompt() {
         seg('buildingType', 'subject'),
         { type: 'static', text: conn.advLocationBridge },
         seg('location', 'context'),
+        ...imageRefSegments,
         { type: 'static', text: conn.advMaterialsBridge },
         seg('materials', 'materials'),
         { type: 'static', text: conn.advEnvironmentBridge },
@@ -326,7 +370,10 @@ export function useArchPrompt() {
   })
 
   const templatePrompt = computed(() => {
-    return promptSegments.value.map(s => s.text).join('')
+    return promptSegments.value
+      .filter(s => !s.isOptional)
+      .map(s => s.text)
+      .join('')
   })
 
   const finalPrompt = computed(() => {
@@ -354,9 +401,12 @@ export function useArchPrompt() {
   }
 
   const completionStats = computed(() => {
-    const fields = currentFields.value
-    const total = fields.length
-    const filled = fields.filter(f => Boolean(getFieldValue(f.id).trim())).length
+    const coreFields =
+      mode.value === 'quick'
+        ? activeContext.value.quickFields
+        : activeContext.value.advancedFields
+    const total = coreFields.length
+    const filled = coreFields.filter(f => Boolean(getFieldValue(f.id).trim())).length
     const percentage = Math.round((filled / total) * 100)
     const isReady = filled === total && !finalPrompt.value.includes('[')
     return {
@@ -364,7 +414,8 @@ export function useArchPrompt() {
       total,
       pending: total - filled,
       percentage,
-      isReady
+      isReady,
+      hasImageRef: Boolean(imageRef.value.trim())
     }
   })
 
@@ -460,6 +511,7 @@ export function useArchPrompt() {
   }
 
   const clearAll = () => {
+    imageRef.value = ''
     quickData.value = createEmptyQuickData()
     advancedData.value = createEmptyAdvancedData()
     activePresetId.value = null
@@ -491,6 +543,7 @@ export function useArchPrompt() {
       title: defaultTitle,
       prompt: promptStr,
       mode: mode.value,
+      imageRef: imageRef.value,
       quickData: { ...quickData.value },
       advancedData: { ...advancedData.value },
       createdAt: new Date().toLocaleString('pt-BR', {
@@ -525,6 +578,7 @@ export function useArchPrompt() {
       activeContextId.value = item.contextId
     }
     mode.value = item.mode
+    imageRef.value = item.imageRef || ''
     quickData.value = { ...item.quickData }
     advancedData.value = { ...item.advancedData }
     isManualEdit.value = false
@@ -537,6 +591,7 @@ export function useArchPrompt() {
     contextPresets,
     selectContext,
     mode,
+    imageRef,
     quickData,
     advancedData,
     currentFields,

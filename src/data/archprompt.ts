@@ -2145,6 +2145,124 @@ export const ARCH_CONTEXTS: ArchContextConfig[] = [
   }
 ]
 
+// ============================================================================
+// CAMPO GLOBAL DE DIRETRIZ DE IMAGEM(NS) DE REFERÊNCIA ENVIADA(S) COM O PROMPT
+// ============================================================================
+export const REFERENCE_IMAGE_FIELD: ArchFieldConfig<'imageRef'> = {
+  id: 'imageRef',
+  phase: 0,
+  phaseTitle: 'Imagem(ns) de Referência no Prompt',
+  label: 'Attached Image Directive',
+  labelPt: 'Referência à(s) Imagem(ns) Enviada(s) com o Prompt',
+  description:
+    'Instrua a IA sobre como utilizar a(s) imagem(ns) que você anexar junto com o prompt (print do 3D/SketchUp, croqui, planta baixa, foto do local ou referências de materiais/estilo). Deixe em branco se não for enviar imagem.',
+  guideTip:
+    'Ao enviar mais de uma imagem na IA, especifique o papel de cada uma (ex: Imagem 1 para geometria/estrutura e Imagem 2 para estilo/materiais).',
+  icon: 'layers',
+  accent: 'amber',
+  placeholder:
+    'Ex: strictly following the exact architectural geometry and camera angle from the attached reference image (deixe vazio se não anexar imagem)',
+  joinWithAnd: true,
+  options: [
+    {
+      value:
+        'strictly following the exact architectural geometry, massing, proportions, and camera angle from the attached reference image',
+      labelPt:
+        'Print 3D / Croqui (1 Imagem): Seguir estritamente a geometria, volumetria, proporções e ângulo da imagem enviada'
+    },
+    {
+      value:
+        'preserving the exact building geometry and perspective from the first attached image while applying the surface materials, textures, and lighting mood from the second attached reference image',
+      labelPt:
+        '2 Imagens Anexas: Manter a geometria/perspectiva da 1ª imagem e aplicar materiais e iluminação da 2ª imagem'
+    },
+    {
+      value:
+        'preserving the spatial layout from the first attached image, applying the wall and floor finishes from the second image, and incorporating the furniture pieces from the third attached reference image',
+      labelPt:
+        '3 Imagens Anexas: 1ª Imagem (Espaço/Layout) + 2ª Imagem (Revestimentos) + 3ª Imagem (Mobiliário)'
+    },
+    {
+      value:
+        'using the attached reference image as visual inspiration for the architectural style, lighting atmosphere, and color palette',
+      labelPt:
+        'Moodboard / Estilo: Usar a imagem enviada apenas como referência estética, atmosfera e paleta de cores'
+    },
+    {
+      value:
+        'applying the exact surface materials, textures, and finishes shown in the attached reference images to the architectural surfaces',
+      labelPt:
+        'Amostra de Materiais: Aplicar os materiais, texturas e revestimentos exatos mostrados nas imagens anexas'
+    },
+    {
+      value:
+        'keeping the existing spatial structure, walls, windows, and camera perspective from the attached photo while upgrading only the finishes, lighting, and furniture',
+      labelPt:
+        'Foto do Local (Reforma / Retrofit): Manter paredes, janelas e ângulo da foto enviada, renovando apenas acabamentos e mobiliário'
+    },
+    {
+      value:
+        'seamlessly integrating the architectural design into the real site photograph provided in the attached image, matching its perspective, horizon line, and natural sunlight',
+      labelPt:
+        'Foto Real do Terreno: Implantar o projeto na foto do terreno enviada, respeitando perspectiva e luz solar'
+    },
+    {
+      value:
+        'extruding and rendering the scene strictly based on the exact wall layout, room proportions, doors, and window openings of the attached floor plan image',
+      labelPt:
+        'Planta Baixa Anexada: Levantar e renderizar o espaço seguindo exatamente paredes, portas e janelas da planta enviada'
+    },
+    {
+      value:
+        'incorporating the exact furniture pieces, lighting fixtures, and decor objects shown in the attached reference images into the scene',
+      labelPt:
+        'Mobiliário / Objetos de Referência: Inserir no ambiente as peças de mobiliário e luminárias exatas das imagens enviadas'
+    }
+  ],
+  chips: [
+    {
+      label: 'Seguir Geometria/Câmera da Imagem (Print 3D / Croqui)',
+      value:
+        'strictly following the exact architectural geometry, proportions, and camera angle from the attached reference image'
+    },
+    {
+      label: 'Imagem 1 (Geometria/Base) + Imagem 2 (Estilo/Materiais)',
+      value:
+        'preserving the exact building geometry and perspective from the first attached image while applying the materials and lighting mood from the second attached reference image'
+    },
+    {
+      label: 'Seguir Estilo e Atmosfera da Imagem (Moodboard)',
+      value:
+        'using the attached reference image as visual inspiration for the architectural style, lighting atmosphere, and color palette'
+    },
+    {
+      label: 'Aplicar Materiais/Texturas da(s) Imagem(ns)',
+      value:
+        'applying the exact surface materials, textures, and finishes shown in the attached reference images'
+    },
+    {
+      label: 'Manter Foto do Local e Reformar Acabamentos',
+      value:
+        'keeping the existing spatial structure and perspective from the attached photo while upgrading the finishes, lighting, and decor'
+    },
+    {
+      label: 'Inserir Projeto na Foto do Terreno Enviada',
+      value:
+        'seamlessly integrating the architectural design into the real site photograph provided in the attached image'
+    },
+    {
+      label: 'Seguir Paredes e Layout da Planta Anexa',
+      value:
+        'extruding and rendering the scene strictly following the exact wall layout, doors, and windows of the attached floor plan image'
+    },
+    {
+      label: 'Inserir Mobiliário/Objeto da Imagem Anexa',
+      value:
+        'incorporating the exact furniture pieces and fixtures shown in the attached reference images'
+    }
+  ]
+}
+
 // Backwards-compatible exports
 export const QUICK_FIELDS = EXTERIOR_QUICK_FIELDS
 export const ADVANCED_FIELDS = ARCH_CONTEXTS[0].advancedFields

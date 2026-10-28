@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import { GUIDE_PHASES } from '../../data/archprompt'
+import ArchIcon from './ArchIcon.vue'
 
 const props = defineProps<{
   isOpen: boolean
@@ -49,48 +50,48 @@ onUnmounted(() => {
     <Transition name="guide-fade">
       <div
         v-if="isOpen"
-        class="fixed inset-0 z-50 flex items-center justify-end bg-black/70"
+        class="fixed inset-0 z-50 flex items-center justify-end bg-[#282824]/65"
         @click="emit('close')"
       >
         <aside
           role="dialog"
           aria-modal="true"
           aria-labelledby="guide-dialog-title"
-          class="relative flex h-full w-full max-w-3xl flex-col overflow-hidden border-l shadow-xl font-arch-sans"
+          class="relative flex h-full w-full max-w-3xl flex-col overflow-hidden border-l-[2px] font-arch-sans"
           :class="
             isDark
-              ? 'bg-stone-950 border-stone-800 text-stone-200'
-              : 'bg-[#FAF8F5] border-stone-300 text-stone-800'
+              ? 'bg-[#161614] border-[#77766F] text-[#FAF9F6]'
+              : 'bg-[#F5F1E9] border-[#282824] text-[#282824]'
           "
           @click.stop
         >
-          <!-- Header do Drawer -->
+          <!-- Header do Drawer Editorial -->
           <header
-            class="flex items-center justify-between border-b px-6 py-5 shrink-0"
-            :class="isDark ? 'border-stone-800 bg-stone-900' : 'border-stone-200 bg-white'"
+            class="flex items-center justify-between border-b-[1.75px] px-6 py-5 shrink-0"
+            :class="isDark ? 'border-[#77766F]/40 bg-[#1F1F1C]' : 'border-[#282824] bg-[#FAF9F6]'"
           >
             <div>
-              <div class="flex items-center gap-2">
+              <div class="flex flex-wrap items-center gap-2">
                 <span
-                  class="rounded-md border px-2 py-0.5 font-mono text-[11px] font-medium uppercase tracking-wide"
+                  class="rounded-[8px] border-[1.5px] px-2.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wide"
                   :class="
                     isDark
-                      ? 'border-amber-500/40 bg-amber-500/10 text-amber-300'
-                      : 'border-amber-700/30 bg-amber-50 text-amber-800'
+                      ? 'border-[#C98268] bg-[#C98268]/20 text-[#FAF9F6]'
+                      : 'border-[#282824] bg-[#C98268] text-[#282824] shadow-[2px_2px_0px_#282824]'
                   "
                 >
-                  Metodologia de 6 Fases
+                  Caderno Metodológico · 6 Fases
                 </span>
-                <span class="text-xs font-mono" :class="isDark ? 'text-stone-400' : 'text-stone-600'">
+                <span class="text-xs font-mono" :class="isDark ? 'text-[#D8D0C3]/75' : 'text-[#77766F]'">
                   MACRO → MÉDIO → MICRO → TÉCNICO
                 </span>
               </div>
               <h2
                 id="guide-dialog-title"
-                class="mt-1.5 font-display text-xl md:text-2xl font-bold tracking-tight"
-                :class="isDark ? 'text-stone-100' : 'text-stone-900'"
+                class="mt-2 font-display text-xl md:text-2xl font-semibold tracking-tight"
+                :class="isDark ? 'text-[#FAF9F6]' : 'text-[#282824]'"
               >
-                Engenharia de Prompts para Visualização Arquitetônica
+                Engenharia de Prompts para Arquitetura Contemporânea
               </h2>
             </div>
 
@@ -98,17 +99,10 @@ onUnmounted(() => {
               ref="closeButtonRef"
               type="button"
               @click="emit('close')"
-              class="rounded-md p-2 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
-              :class="
-                isDark
-                  ? 'text-stone-400 hover:bg-stone-800 hover:text-stone-100'
-                  : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900'
-              "
+              class="arch-btn-icon h-9 w-9 inline-flex items-center justify-center"
               aria-label="Fechar guia metodológico"
             >
-              <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M18 6 6 18" /><path d="m6 6 12 12" />
-              </svg>
+              <ArchIcon name="close" :size="18" />
             </button>
           </header>
 
@@ -116,63 +110,53 @@ onUnmounted(() => {
           <div class="flex-1 overflow-y-auto p-6 space-y-8">
             <!-- Prompt de Referência Desconstruído -->
             <section
-              class="rounded-lg border p-5"
+              class="rounded-[14px] border-[1.75px] p-5"
               :class="
                 isDark
-                  ? 'bg-stone-900 border-stone-800'
-                  : 'bg-white border-stone-200 shadow-2xs'
+                  ? 'bg-[#1F1F1C] border-[#77766F]/50 shadow-[4px_4px_0px_#000000]'
+                  : 'bg-[#FAF9F6] border-[#282824] shadow-[4px_4px_0px_#282824]'
               "
             >
               <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
                 <div>
-                  <h3
-                    class="font-display text-base font-bold"
-                    :class="isDark ? 'text-stone-100' : 'text-stone-900'"
-                  >
+                  <h3 class="font-display text-base md:text-lg font-semibold">
                     Prompt de Referência Desconstruído
                   </h3>
-                  <p class="text-xs mt-0.5" :class="isDark ? 'text-stone-400' : 'text-stone-600'">
-                    Cada segmento cumpre uma função espacial e técnica na geração da imagem.
+                  <p class="text-xs mt-0.5" :class="isDark ? 'text-[#D8D0C3]/75' : 'text-[#77766F]'">
+                    Cada segmento cumpre uma função espacial, material e luminotécnica.
                   </p>
                 </div>
 
                 <button
                   type="button"
                   @click="handleApplyAndClose"
-                  class="inline-flex items-center gap-2 rounded-md px-3.5 py-2 text-xs font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
-                  :class="
-                    isDark
-                      ? 'bg-amber-500 text-stone-950 hover:bg-amber-400'
-                      : 'bg-amber-700 text-white hover:bg-amber-800'
-                  "
+                  class="arch-btn-primary inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold"
                 >
-                  <svg aria-hidden="true" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polygon points="5 3 19 12 5 21 5 3" />
-                  </svg>
-                  <span>Preencher com este exemplo</span>
+                  <ArchIcon name="layers" :size="14" />
+                  <span>Aplicar Exemplo no Estúdio</span>
                 </button>
               </div>
 
               <div
-                class="rounded-md border p-4 font-mono text-xs md:text-sm leading-relaxed space-y-2"
+                class="rounded-[10px] border-[1.5px] p-4 font-mono text-xs md:text-sm leading-relaxed"
                 :class="
                   isDark
-                    ? 'bg-stone-950 border-stone-800 text-stone-200'
-                    : 'bg-stone-50 border-stone-200 text-stone-800'
+                    ? 'bg-[#161614] border-[#77766F]/40 text-[#E8E8E3]'
+                    : 'bg-[#F5F1E9] border-[#282824] text-[#282824]'
                 "
               >
                 <p>
-                  <span class="font-bold" :class="isDark ? 'text-amber-400' : 'text-amber-800'">[01 MACRO]</span>
+                  <span class="font-bold underline decoration-[#C98268] decoration-2">[01 MACRO]</span>
                   Render the architecture as a refined contemporary luxury residence in a natural forest hillside setting,
-                  <span class="font-bold" :class="isDark ? 'text-amber-400' : 'text-amber-800'">[02 MÉDIO]</span>
+                  <span class="font-bold underline decoration-[#C98268] decoration-2">[02 MÉDIO]</span>
                   using warm off-white masonry, natural timber, large floor-to-ceiling glass, and dark metal frames.
-                  <span class="font-bold" :class="isDark ? 'text-amber-400' : 'text-amber-800'">[03 MICRO]</span>
+                  <span class="font-bold underline decoration-[#C98268] decoration-2">[03 MICRO]</span>
                   Surround the house with mature pine trees, layered grasses, shrubs, and subtle planting.
-                  <span class="font-bold" :class="isDark ? 'text-amber-400' : 'text-amber-800'">[04 1º PLANO]</span>
+                  <span class="font-bold underline decoration-[#C98268] decoration-2">[04 1º PLANO]</span>
                   Add a calm natural pond in the foreground with realistic reflections, soft ripples, shoreline stones, and a small rustic wooden rowboat.
-                  <span class="font-bold" :class="isDark ? 'text-amber-400' : 'text-amber-800'">[05 LUZ & CLIMA]</span>
+                  <span class="font-bold underline decoration-[#C98268] decoration-2">[05 LUZ & CLIMA]</span>
                   Use warm late-afternoon golden-hour light filtering through the trees, with soft cinematic shadows and subtle interior glow. Keep the scene peaceful, luxurious, natural, and architecture-focused.
-                  <span class="font-bold" :class="isDark ? 'text-amber-400' : 'text-amber-800'">[06 TÉCNICO]</span>
+                  <span class="font-bold underline decoration-[#C98268] decoration-2">[06 TÉCNICO]</span>
                   Ultra-realistic architectural visualization, soft global illumination, detailed vegetation, no text, 1:1.
                 </p>
               </div>
@@ -181,17 +165,14 @@ onUnmounted(() => {
             <!-- 1. A Anatomia do Prompt -->
             <section class="space-y-4">
               <div>
-                <h3
-                  class="font-display text-lg font-bold"
-                  :class="isDark ? 'text-stone-100' : 'text-stone-900'"
-                >
-                  1. Anatomia das 6 Fases
+                <h3 class="font-display text-lg font-semibold">
+                  1. Anatomia das 6 Fases Arquitetônicas
                 </h3>
                 <p
                   class="text-sm mt-1 max-w-prose leading-relaxed"
-                  :class="isDark ? 'text-stone-300' : 'text-stone-700'"
+                  :class="isDark ? 'text-[#E8E8E3]/80' : 'text-[#77766F]'"
                 >
-                  Modelos de difusão atribuem maior peso semântico aos tokens iniciais. Por isso, a narrativa parte da escala <strong>Macro</strong> (sujeito e implantação), passa pela escala <strong>Média</strong> (materiais) e <strong>Micro</strong> (paisagismo e primeiro plano), e finaliza com iluminação e parâmetros técnicos.
+                  Modelos de difusão atribuem maior peso semântico aos tokens iniciais. Por isso, a narrativa parte da escala <strong>Macro</strong> (sujeito e implantação), passa pela escala <strong>Média</strong> (materialidade) e <strong>Micro</strong> (paisagismo e primeiro plano), e finaliza com iluminação e parâmetros técnicos.
                 </p>
               </div>
 
@@ -199,39 +180,36 @@ onUnmounted(() => {
                 <article
                   v-for="item in GUIDE_PHASES"
                   :key="item.phase"
-                  class="rounded-lg border p-4"
+                  class="rounded-[12px] border-[1.75px] p-4"
                   :class="
                     isDark
-                      ? 'bg-stone-900/70 border-stone-800'
-                      : 'bg-white border-stone-200 shadow-2xs'
+                      ? 'bg-[#1F1F1C] border-[#77766F]/40'
+                      : 'bg-[#FAF9F6] border-[#282824] shadow-[3px_3px_0px_#282824]'
                   "
                 >
                   <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
                     <div class="flex items-center gap-2.5">
                       <span
-                        class="inline-flex h-6 w-6 items-center justify-center rounded font-mono text-xs font-semibold tabular-nums"
+                        class="inline-flex h-7 w-7 items-center justify-center rounded-[8px] border-[1.5px] font-mono text-xs font-semibold tabular-nums"
                         :class="
                           isDark
-                            ? 'bg-amber-500/15 text-amber-300 border border-amber-500/30'
-                            : 'bg-amber-100 text-amber-900 border border-amber-300'
+                            ? 'bg-[#C98268]/25 text-[#FAF9F6] border-[#D8B99A]'
+                            : 'bg-[#C98268] text-[#282824] border-[#282824] shadow-[2px_2px_0px_#282824]'
                         "
                       >
                         0{{ item.phase }}
                       </span>
-                      <h4
-                        class="font-display font-bold text-sm md:text-base"
-                        :class="isDark ? 'text-stone-100' : 'text-stone-900'"
-                      >
+                      <h4 class="font-display font-semibold text-sm md:text-base">
                         {{ item.title }}
                       </h4>
                     </div>
 
                     <span
-                      class="rounded-md border px-2 py-0.5 font-mono text-[10px] font-medium uppercase tracking-wide"
+                      class="rounded-[6px] border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide"
                       :class="
                         isDark
-                          ? 'border-stone-700 bg-stone-950 text-stone-300'
-                          : 'border-stone-200 bg-stone-100 text-stone-700'
+                          ? 'border-[#77766F]/40 bg-[#161614] text-[#D8D0C3]'
+                          : 'border-[#282824]/40 bg-[#E8E8E3] text-[#282824]'
                       "
                     >
                       {{ item.tag }}
@@ -239,11 +217,11 @@ onUnmounted(() => {
                   </div>
 
                   <p
-                    class="my-2.5 rounded-md border px-3 py-2 font-mono text-xs"
+                    class="my-2.5 rounded-[8px] border px-3 py-2 font-mono text-xs"
                     :class="
                       isDark
-                        ? 'bg-stone-950 border-stone-800 text-stone-300'
-                        : 'bg-stone-50 border-stone-200 text-stone-800'
+                        ? 'bg-[#161614] border-[#77766F]/40 text-[#E8E8E3]'
+                        : 'bg-[#F5F1E9] border-[#282824]/40 text-[#282824]'
                     "
                   >
                     {{ item.originalText }}
@@ -251,18 +229,14 @@ onUnmounted(() => {
 
                   <dl class="mt-3 space-y-2 text-xs leading-relaxed">
                     <div class="flex flex-col sm:flex-row sm:gap-2">
-                      <dt class="font-semibold shrink-0" :class="isDark ? 'text-amber-400' : 'text-amber-800'">
-                        Função visual:
-                      </dt>
-                      <dd :class="isDark ? 'text-stone-300' : 'text-stone-700'">
+                      <dt class="font-semibold shrink-0">Função visual:</dt>
+                      <dd :class="isDark ? 'text-[#E8E8E3]/80' : 'text-[#77766F]'">
                         {{ item.whatItDoes }}
                       </dd>
                     </div>
                     <div class="flex flex-col sm:flex-row sm:gap-2">
-                      <dt class="font-semibold shrink-0" :class="isDark ? 'text-stone-200' : 'text-stone-900'">
-                        Posicionamento:
-                      </dt>
-                      <dd :class="isDark ? 'text-stone-400' : 'text-stone-600'">
+                      <dt class="font-semibold shrink-0">Posicionamento:</dt>
+                      <dd :class="isDark ? 'text-[#E8E8E3]/80' : 'text-[#77766F]'">
                         {{ item.placement }}
                       </dd>
                     </div>
@@ -270,70 +244,22 @@ onUnmounted(() => {
                 </article>
               </div>
             </section>
-
-            <!-- 2. Ordem Sequencial de Construção -->
-            <section
-              class="rounded-lg border p-5 space-y-3"
-              :class="
-                isDark
-                  ? 'bg-stone-900/70 border-stone-800'
-                  : 'bg-white border-stone-200 shadow-2xs'
-              "
-            >
-              <h3
-                class="font-display text-base font-bold"
-                :class="isDark ? 'text-stone-100' : 'text-stone-900'"
-              >
-                2. Sequência de Blocos do Template
-              </h3>
-              <ol class="space-y-2.5 text-xs list-decimal list-inside leading-relaxed" :class="isDark ? 'text-stone-300' : 'text-stone-700'">
-                <li>
-                  <strong>Ação + Tipologia + Estilo + Bioma:</strong>
-                  <code class="ml-1 rounded px-1.5 py-0.5 font-mono" :class="isDark ? 'bg-stone-950 text-amber-300' : 'bg-stone-100 text-amber-900'">Render the architecture as a [estilo] [tipologia] in a [bioma] setting</code>
-                </li>
-                <li>
-                  <strong>Materiais Principais e Texturas:</strong>
-                  <code class="ml-1 rounded px-1.5 py-0.5 font-mono" :class="isDark ? 'bg-stone-950 text-amber-300' : 'bg-stone-100 text-amber-900'">using [material 1], [material 2], and [material 3].</code>
-                </li>
-                <li>
-                  <strong>Paisagismo (Background e Midground):</strong>
-                  <code class="ml-1 rounded px-1.5 py-0.5 font-mono" :class="isDark ? 'bg-stone-950 text-amber-300' : 'bg-stone-100 text-amber-900'">Surround the house with [vegetação e terreno].</code>
-                </li>
-                <li>
-                  <strong>Composição Frontal (Foreground):</strong>
-                  <code class="ml-1 rounded px-1.5 py-0.5 font-mono" :class="isDark ? 'bg-stone-950 text-amber-300' : 'bg-stone-100 text-amber-900'">Add a [água, reflexos, calçamento ou escala] in the foreground.</code>
-                </li>
-                <li>
-                  <strong>Iluminação, Sombras e Clima:</strong>
-                  <code class="ml-1 rounded px-1.5 py-0.5 font-mono" :class="isDark ? 'bg-stone-950 text-amber-300' : 'bg-stone-100 text-amber-900'">Use [luz e horário] with [sombras]. Keep the scene [atmosfera].</code>
-                </li>
-                <li>
-                  <strong>Keywords Técnicas e Proporção:</strong>
-                  <code class="ml-1 rounded px-1.5 py-0.5 font-mono" :class="isDark ? 'bg-stone-950 text-amber-300' : 'bg-stone-100 text-amber-900'">[estilo de render], [restrições], [aspect ratio].</code>
-                </li>
-              </ol>
-            </section>
           </div>
 
           <!-- Footer do Drawer -->
           <footer
-            class="flex items-center justify-between border-t px-6 py-4 shrink-0"
-            :class="isDark ? 'border-stone-800 bg-stone-900' : 'border-stone-200 bg-white'"
+            class="flex items-center justify-between border-t-[1.75px] px-6 py-4 shrink-0"
+            :class="isDark ? 'border-[#77766F]/40 bg-[#1F1F1C]' : 'border-[#282824] bg-[#FAF9F6]'"
           >
-            <span class="text-xs" :class="isDark ? 'text-stone-400' : 'text-stone-600'">
-              Alterne entre <strong>7 Blocos (Rápido)</strong> e <strong>12 Blocos (Granular)</strong> na barra superior.
+            <span class="text-xs" :class="isDark ? 'text-[#D8D0C3]' : 'text-[#77766F]'">
+              Alterne entre <strong>7 Blocos (Rápido)</strong> e <strong>12 Blocos (Granular)</strong> no cabeçalho.
             </span>
             <button
               type="button"
               @click="emit('close')"
-              class="rounded-md border px-4 py-2 text-xs font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
-              :class="
-                isDark
-                  ? 'border-stone-700 bg-stone-800 text-stone-100 hover:bg-stone-700'
-                  : 'border-stone-300 bg-stone-900 text-white hover:bg-stone-800'
-              "
+              class="arch-btn-secondary px-4 py-2 text-xs font-semibold"
             >
-              Fechar guia
+              Fechar Caderno
             </button>
           </footer>
         </aside>

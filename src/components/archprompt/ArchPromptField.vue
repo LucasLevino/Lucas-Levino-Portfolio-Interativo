@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import type { ArchFieldConfig } from '../../data/archprompt'
+import ArchIcon from './ArchIcon.vue'
 
 const props = defineProps<{
   config: ArchFieldConfig
@@ -20,7 +21,9 @@ const isFocused = ref(false)
 const showAllPresets = ref(false)
 
 const listboxId = computed(() => `preset-listbox-${props.config.id}`)
-const phaseNumberFormatted = computed(() => `0${props.config.phase}`)
+const phaseNumberFormatted = computed(() =>
+  props.config.phase === 0 ? 'REF' : `0${props.config.phase}`
+)
 const isFilled = computed(() => Boolean(props.modelValue.trim()))
 
 const filteredOptions = computed(() => {
@@ -60,33 +63,36 @@ const clearField = () => {
 <template>
   <article
     :id="`arch-field-${config.id}`"
-    class="rounded-lg border transition-colors duration-150"
+    class="rounded-[14px] border-[1.75px] transition-all duration-150"
     :class="[
       isFeatured ? 'p-5 md:p-6' : 'p-4 md:p-5',
       isDark
-        ? isFeatured
-          ? 'bg-stone-900 border-amber-500/40 shadow-sm'
-          : 'bg-stone-900/70 border-stone-800 hover:border-stone-700'
+        ? 'bg-[#1F1F1C] border-[#D8D0C3]/30 text-[#FAF9F6] shadow-[4px_4px_0px_#000000]'
         : isFeatured
-          ? 'bg-white border-amber-600/40 shadow-sm'
-          : 'bg-white border-stone-200 hover:border-stone-300 shadow-2xs'
+          ? 'bg-[#FAF9F6] border-[#282824] shadow-[4px_4px_0px_#282824]'
+          : 'bg-[#FAF9F6] border-[#282824] shadow-[3px_3px_0px_#282824]'
     ]"
     @keydown.escape="isOpen = false"
   >
     <!-- Header do Bloco -->
     <div class="flex items-start justify-between gap-3">
       <div class="flex items-start gap-3">
-        <!-- Índice Técnico Monocromático (Monospace + Ícone SVG sem caixa colorida arco-íris) -->
+        <!-- Índice Técnico Soft Neobrutalist -->
         <div
-          class="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border font-mono text-xs font-medium tabular-nums mt-0.5"
+          class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] border-[1.5px] font-mono text-xs font-semibold tabular-nums mt-0.5 transition-colors"
+          :style="
+            isFilled && !isDark
+              ? { backgroundColor: 'var(--ds-active-accent)', borderColor: '#282824', color: '#282824' }
+              : undefined
+          "
           :class="
             isFilled
               ? isDark
-                ? 'border-amber-500/40 bg-amber-500/10 text-amber-400'
-                : 'border-amber-600/40 bg-amber-50 text-amber-800'
+                ? 'border-[#D8B99A] bg-[#C98268]/25 text-[#FAF9F6]'
+                : 'shadow-[2px_2px_0px_#282824]'
               : isDark
-                ? 'border-stone-800 bg-stone-950 text-stone-400'
-                : 'border-stone-200 bg-stone-100 text-stone-600'
+                ? 'border-[#77766F]/40 bg-[#282824] text-[#D8D0C3]'
+                : 'border-[#282824] bg-[#F5F1E9] text-[#282824]'
           "
           aria-hidden="true"
         >
@@ -96,11 +102,11 @@ const clearField = () => {
         <div>
           <div class="flex flex-wrap items-center gap-2">
             <span
-              class="inline-flex items-center rounded-md border px-2 py-0.5 font-mono text-[11px] font-medium uppercase tracking-wide"
+              class="inline-flex items-center rounded-[8px] border px-2 py-0.5 font-mono text-[11px] font-medium uppercase tracking-wider"
               :class="
                 isDark
-                  ? 'border-stone-800 bg-stone-950 text-stone-300'
-                  : 'border-stone-200 bg-stone-100 text-stone-700'
+                  ? 'border-[#77766F]/40 bg-[#282824] text-[#D8D0C3]'
+                  : 'border-[#282824]/40 bg-[#E8E8E3] text-[#282824]'
               "
             >
               {{ config.phaseTitle }}
@@ -111,15 +117,15 @@ const clearField = () => {
               class="font-display font-semibold tracking-tight"
               :class="[
                 isFeatured ? 'text-base md:text-lg' : 'text-sm md:text-base',
-                isDark ? 'text-stone-100' : 'text-stone-900'
+                isDark ? 'text-[#FAF9F6]' : 'text-[#282824]'
               ]"
             >
               {{ config.label }}
             </label>
 
             <span
-              class="text-xs font-medium"
-              :class="isDark ? 'text-stone-400' : 'text-stone-600'"
+              class="font-mono text-xs"
+              :class="isDark ? 'text-[#D8D0C3]/70' : 'text-[#77766F]'"
             >
               · {{ config.labelPt }}
             </span>
@@ -127,7 +133,7 @@ const clearField = () => {
 
           <p
             class="mt-1 text-xs md:text-sm leading-relaxed max-w-prose"
-            :class="isDark ? 'text-stone-300' : 'text-stone-700'"
+            :class="isDark ? 'text-[#E8E8E3]/80' : 'text-[#77766F]'"
           >
             {{ config.description }}
           </p>
@@ -140,11 +146,11 @@ const clearField = () => {
           v-if="isFilled"
           type="button"
           @click="clearField"
-          class="rounded-md px-2 py-1 text-xs font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+          class="rounded-[8px] px-2 py-1 text-xs font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#282824]"
           :class="
             isDark
-              ? 'text-stone-400 hover:bg-stone-800 hover:text-stone-200'
-              : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900'
+              ? 'text-[#D8D0C3] hover:bg-[#282824] hover:text-[#FAF9F6]'
+              : 'text-[#77766F] hover:bg-[#E8E8E3] hover:text-[#282824]'
           "
         >
           Limpar
@@ -152,49 +158,31 @@ const clearField = () => {
 
         <span
           v-if="isFilled"
-          class="inline-flex items-center gap-1 rounded-md border px-2 py-0.5 font-mono text-[11px] font-medium"
+          class="inline-flex items-center gap-1 rounded-[8px] border-[1.5px] px-2 py-0.5 font-mono text-[11px] font-semibold"
           :class="
             isDark
-              ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400'
-              : 'border-emerald-600/30 bg-emerald-50 text-emerald-800'
+              ? 'border-[#A5B4A0]/50 bg-[#A5B4A0]/20 text-[#A5B4A0]'
+              : 'border-[#282824] bg-[#A5B4A0] text-[#282824]'
           "
         >
-          <svg aria-hidden="true" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
+          <ArchIcon name="check" :size="12" :stroke-width="2.2" />
           <span>OK</span>
         </span>
       </div>
     </div>
 
-    <!-- Nota Metodológica do Guia (Sem Emoji) -->
+    <!-- Nota Metodológica Editorial -->
     <div
-      class="mt-3 flex items-start gap-2 rounded-md border px-3 py-2 text-xs leading-relaxed"
+      class="mt-3 flex items-start gap-2 rounded-[10px] border px-3 py-2 text-xs leading-relaxed"
       :class="
         isDark
-          ? 'bg-stone-950/80 border-stone-800/90 text-stone-300'
-          : 'bg-stone-50 border-stone-200/90 text-stone-700'
+          ? 'bg-[#282824]/70 border-[#77766F]/30 text-[#E8E8E3]'
+          : 'bg-[#F5F1E9] border-[#282824]/30 text-[#282824]'
       "
     >
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 24 24"
-        width="15"
-        height="15"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        class="mt-0.5 shrink-0"
-        :class="isDark ? 'text-amber-400' : 'text-amber-700'"
-      >
-        <circle cx="12" cy="12" r="10" />
-        <path d="M12 16v-4" />
-        <path d="M12 8h.01" />
-      </svg>
+      <ArchIcon name="ruler" :size="15" class="mt-0.5 shrink-0 text-[#77766F]" />
       <span>
-        <strong class="font-semibold" :class="isDark ? 'text-stone-200' : 'text-stone-900'">Diretriz técnica:</strong>
+        <strong class="font-semibold">Cota metodológica:</strong>
         {{ config.guideTip }}
       </span>
     </div>
@@ -203,13 +191,13 @@ const clearField = () => {
     <div class="mt-3.5" role="group" :aria-label="`Sugestões rápidas para ${config.label}`">
       <div class="flex items-center justify-between mb-1.5">
         <span
-          class="text-xs font-medium"
-          :class="isDark ? 'text-stone-400' : 'text-stone-600'"
+          class="font-mono text-[11px] uppercase tracking-wider font-medium"
+          :class="isDark ? 'text-[#D8D0C3]/70' : 'text-[#77766F]'"
         >
           {{
             config.singleSelectChip
               ? 'Seleção direta (1 opção):'
-              : 'Termos técnicos combináveis (clique para adicionar ou remover):'
+              : 'Termos técnicos combináveis (clique para compor):'
           }}
         </span>
       </div>
@@ -221,67 +209,51 @@ const clearField = () => {
           type="button"
           :aria-pressed="isChipActive(chip.value)"
           @click="emit('toggle-chip', chip.value)"
-          class="inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+          class="inline-flex items-center gap-1.5 rounded-[8px] border-[1.5px] px-2.5 py-1 text-xs font-medium transition-all duration-120 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#282824]"
+          :style="
+            isChipActive(chip.value) && !isDark
+              ? { backgroundColor: 'var(--ds-active-accent)', borderColor: '#282824', color: '#282824' }
+              : undefined
+          "
           :class="
             isChipActive(chip.value)
               ? isDark
-                ? 'bg-amber-500/15 border-amber-500 text-amber-200'
-                : 'bg-amber-700 border-amber-700 text-white'
+                ? 'bg-[#C98268]/30 border-[#D8B99A] text-[#FAF9F6]'
+                : 'font-semibold shadow-[2px_2px_0px_#282824] -translate-y-[0.5px]'
               : isDark
-                ? 'bg-stone-950 border-stone-800 text-stone-300 hover:border-stone-600 hover:text-stone-100'
-                : 'bg-stone-50 border-stone-300/80 text-stone-700 hover:border-stone-400 hover:bg-stone-100'
+                ? 'bg-[#282824] border-[#77766F]/40 text-[#E8E8E3] hover:border-[#D8D0C3]'
+                : 'bg-[#F5F1E9] border-[#282824]/60 text-[#282824] hover:bg-[#E8E8E3] hover:border-[#282824]'
           "
           :title="`Termo em inglês: ${chip.value}`"
         >
-          <svg
-            v-if="isChipActive(chip.value)"
-            aria-hidden="true"
-            viewBox="0 0 24 24"
-            width="12"
-            height="12"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="shrink-0"
-          >
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
-          <svg
-            v-else
-            aria-hidden="true"
-            viewBox="0 0 24 24"
-            width="11"
-            height="11"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="shrink-0 opacity-60"
-          >
-            <path d="M5 12h14" />
-            <path d="M12 5v14" />
-          </svg>
+          <ArchIcon
+            :name="isChipActive(chip.value) ? 'check' : 'plus'"
+            :size="11"
+            :stroke-width="isChipActive(chip.value) ? 2.4 : 1.85"
+          />
           <span>{{ chip.label }}</span>
         </button>
       </div>
     </div>
 
-    <!-- Textarea com Combobox de Frases Curadas -->
+    <!-- Textarea com Combobox de Frases Curadas (Seção 8 — Campos de Formulário) -->
     <div class="relative mt-3.5 w-full">
       <div
-        class="relative rounded-md border transition-colors duration-150"
+        class="relative rounded-[10px] border-[1.5px] transition-all duration-150"
+        :style="
+          isFocused && !isDark
+            ? { boxShadow: '3px 3px 0px var(--ds-active-accent)' }
+            : undefined
+        "
         :class="[
-          isDark ? 'bg-stone-950' : 'bg-stone-50/60',
+          isDark ? 'bg-[#161614]' : 'bg-[#FAF9F6]',
           isFocused
             ? isDark
-              ? 'border-amber-500 ring-1 ring-amber-500/30'
-              : 'border-amber-700 ring-1 ring-amber-700/30'
+              ? 'border-[#D8B99A]'
+              : 'border-[#282824] bg-white'
             : isDark
-              ? 'border-stone-800'
-              : 'border-stone-300'
+              ? 'border-[#77766F]/50'
+              : 'border-[#282824]'
         ]"
       >
         <textarea
@@ -293,11 +265,11 @@ const clearField = () => {
           :placeholder="config.placeholder"
           :aria-describedby="`desc-${config.id}`"
           rows="2"
-          class="w-full min-h-[58px] p-3 pr-28 text-sm bg-transparent focus:outline-none resize-y leading-relaxed font-mono"
+          class="w-full min-h-[60px] p-3 pr-28 text-xs md:text-sm bg-transparent focus:outline-none resize-y leading-relaxed font-mono"
           :class="
             isDark
-              ? 'text-stone-100 placeholder:text-stone-500'
-              : 'text-stone-900 placeholder:text-stone-400'
+              ? 'text-[#FAF9F6] placeholder:text-[#77766F]'
+              : 'text-[#282824] placeholder:text-[#77766F]'
           "
         />
 
@@ -308,29 +280,20 @@ const clearField = () => {
           :aria-controls="listboxId"
           aria-haspopup="listbox"
           @click="toggleDropdown"
-          class="absolute right-2.5 top-2.5 inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+          class="absolute right-2.5 top-2.5 inline-flex items-center gap-1.5 rounded-[8px] border-[1.5px] px-2.5 py-1 text-xs font-semibold transition-all duration-120 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#282824]"
           :class="
             isDark
-              ? 'bg-stone-900 border-stone-700 text-stone-200 hover:bg-stone-800 hover:text-white'
-              : 'bg-white border-stone-300 text-stone-700 hover:bg-stone-100 hover:text-stone-900 shadow-2xs'
+              ? 'bg-[#282824] border-[#77766F] text-[#FAF9F6] hover:bg-[#383832]'
+              : 'bg-[#F5F1E9] border-[#282824] text-[#282824] shadow-[2px_2px_0px_#282824] hover:bg-[#E8E8E3] active:translate-x-[1px] active:translate-y-[1px] active:shadow-[1px_1px_0px_#282824]'
           "
         >
           <span>Frases</span>
-          <svg
-            aria-hidden="true"
-            viewBox="0 0 24 24"
-            width="14"
-            height="14"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+          <ArchIcon
+            name="chevron-down"
+            :size="13"
             class="transform transition-transform duration-150"
             :class="isOpen ? 'rotate-180' : ''"
-          >
-            <path d="m6 9 6 6 6-6" />
-          </svg>
+          />
         </button>
       </div>
 
@@ -343,26 +306,26 @@ const clearField = () => {
         <div class="fixed inset-0 z-30" @click="isOpen = false" aria-hidden="true"></div>
 
         <div
-          class="absolute z-40 w-full mt-1.5 rounded-lg border shadow-lg max-h-64 overflow-y-auto"
+          class="absolute z-40 w-full mt-2 rounded-[12px] border-[1.75px] max-h-64 overflow-y-auto"
           :class="
             isDark
-              ? 'bg-stone-900 border-stone-700 text-stone-100'
-              : 'bg-white border-stone-300 text-stone-900'
+              ? 'bg-[#1F1F1C] border-[#D8D0C3]/40 text-[#FAF9F6] shadow-[4px_4px_0px_#000000]'
+              : 'bg-[#FAF9F6] border-[#282824] text-[#282824] shadow-[4px_4px_0px_#282824]'
           "
         >
           <div
-            class="sticky top-0 z-10 flex items-center justify-between px-3.5 py-2 text-xs font-medium border-b"
+            class="sticky top-0 z-10 flex items-center justify-between px-3.5 py-2 text-xs font-mono border-b-[1.5px]"
             :class="
               isDark
-                ? 'bg-stone-900 border-stone-800 text-stone-400'
-                : 'bg-stone-50 border-stone-200 text-stone-600'
+                ? 'bg-[#282824] border-[#77766F]/40 text-[#D8D0C3]'
+                : 'bg-[#F5F1E9] border-[#282824] text-[#282824]'
             "
           >
-            <span>Frases técnicas prontas (Inglês + Tradução PT)</span>
+            <span>Repertório Técnico (EN + Tradução PT)</span>
             <button
               type="button"
               @click="isOpen = false"
-              class="rounded px-1.5 py-0.5 text-xs font-medium hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+              class="rounded px-1.5 py-0.5 text-xs font-semibold hover:underline focus-visible:outline-none"
             >
               Fechar (Esc)
             </button>
@@ -373,7 +336,7 @@ const clearField = () => {
             role="listbox"
             :aria-label="`Frases prontas para ${config.label}`"
             class="divide-y"
-            :class="isDark ? 'divide-stone-800' : 'divide-stone-200'"
+            :class="isDark ? 'divide-[#282824]' : 'divide-[#282824]/15'"
           >
             <li
               v-for="(option, index) in filteredOptions"
@@ -384,26 +347,30 @@ const clearField = () => {
               @click="selectPreset(option.value)"
               @keydown.enter.prevent="selectPreset(option.value)"
               @keydown.space.prevent="selectPreset(option.value)"
-              class="px-4 py-2.5 cursor-pointer transition-colors duration-150 focus:outline-none"
+              class="px-4 py-2.5 cursor-pointer transition-colors duration-120 focus:outline-none"
               :class="
                 isDark
-                  ? 'hover:bg-stone-800 focus:bg-stone-800'
-                  : 'hover:bg-amber-50/70 focus:bg-amber-50/70'
+                  ? 'hover:bg-[#282824] focus:bg-[#282824]'
+                  : 'hover:bg-[#F5F1E9] focus:bg-[#F5F1E9]'
               "
             >
               <div
                 class="font-mono text-xs md:text-sm font-medium"
-                :class="isDark ? 'text-stone-100' : 'text-stone-900'"
+                :class="isDark ? 'text-[#FAF9F6]' : 'text-[#282824]'"
               >
                 {{ option.value }}
               </div>
               <div
                 class="text-xs mt-1 flex items-center gap-1.5"
-                :class="isDark ? 'text-stone-400' : 'text-stone-600'"
+                :class="isDark ? 'text-[#D8D0C3]/75' : 'text-[#77766F]'"
               >
                 <span
-                  class="inline-block rounded px-1 py-0.2 font-mono text-[10px] uppercase"
-                  :class="isDark ? 'bg-stone-800 text-stone-300' : 'bg-stone-200 text-stone-700'"
+                  class="inline-block rounded px-1.5 py-0.2 font-mono text-[10px] font-semibold uppercase border"
+                  :class="
+                    isDark
+                      ? 'bg-[#282824] border-[#77766F]/40 text-[#D8D0C3]'
+                      : 'bg-[#E8E8E3] border-[#282824]/30 text-[#282824]'
+                  "
                 >
                   PT
                 </span>
