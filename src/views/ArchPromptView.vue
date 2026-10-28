@@ -1,26 +1,30 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { ARCH_CONTEXTS, type ArchContextId } from '../data/archprompt'
+import { ARCH_CONTEXTS, type QuickFieldId } from '../data/archprompt'
+import {
+  ARCH_ACCENT_TOKENS,
+  CONTEXT_PREDOMINANT_ACCENT,
+  ARCH_PROJECTS,
+  type ArchProjectCardData,
+  type ArchReferenceItem
+} from '../data/archDesignSystem'
 import { useArchPrompt, type PromptHistoryItem } from '../composables/useArchPrompt'
 import ArchIcon from '../components/archprompt/ArchIcon.vue'
 import ArchPromptField from '../components/archprompt/ArchPromptField.vue'
 import ArchPromptGuideModal from '../components/archprompt/ArchPromptGuideModal.vue'
 import ArchFloorPlanInteractive from '../components/archprompt/ArchFloorPlanInteractive.vue'
+import ArchReferenceGallery from '../components/archprompt/ArchReferenceGallery.vue'
 
 const emit = defineEmits<{
   (e: 'navigate-home'): void
 }>()
 
-const CONTEXT_ACCENT_MAP: Record<ArchContextId, { hex: string; softBg: string }> = {
-  exterior: { hex: '#C98268', softBg: 'rgba(201, 130, 104, 0.18)' },
-  interior: { hex: '#D8B99A', softBg: 'rgba(216, 185, 154, 0.24)' },
-  'interior-design': { hex: '#C7B4E8', softBg: 'rgba(199, 180, 232, 0.22)' },
-  lighting: { hex: '#D8B99A', softBg: 'rgba(216, 185, 154, 0.24)' },
-  environment: { hex: '#A5B4A0', softBg: 'rgba(165, 180, 160, 0.22)' },
-  furniture: { hex: '#C98268', softBg: 'rgba(201, 130, 104, 0.18)' },
-  'furniture-3d': { hex: '#F47760', softBg: 'rgba(244, 119, 96, 0.18)' },
-  'floor-plan': { hex: '#91B5C8', softBg: 'rgba(145, 181, 200, 0.22)' }
-}
+export type StudioViewTab = 'studio' | 'catalog'
+
+const activeViewTab = ref<StudioViewTab>('studio')
+const showProjectsCatalog = ref<boolean>(true)
+const activeProjectId = ref<string>('proj-01')
+const toastMessage = ref<string | null>(null)
 
 const {
   activeContextId,
@@ -63,7 +67,11 @@ const historyFilter = ref<'all' | 'favorites'>('all')
 const liveAnnouncement = ref('')
 
 const currentAccent = computed(() => {
-  return CONTEXT_ACCENT_MAP[activeContextId.value] || CONTEXT_ACCENT_MAP.exterior
+  if (activeViewTab.value === 'catalog') {
+    return ARCH_ACCENT_TOKENS.sage
+  }
+  const key = CONTEXT_PREDOMINANT_ACCENT[activeContextId.value] || 'terracotta'
+  return ARCH_ACCENT_TOKENS[key]
 })
 
 const filteredHistory = computed(() => {
@@ -81,13 +89,64 @@ const wordCount = computed(() => {
   return clean.split(/\s+/).length
 })
 
-const announce = (msg: string) => {
+const triggerToast = (msg: string) => {
+  toastMessage.value = msg
   liveAnnouncement.value = msg
+  setTimeout(() => {
+    if (toastMessage.value === msg) {
+      toastMessage.value = null
+    }
+  }, 3000)
 }
 
 const handleSelectContext = (ctxId: typeof activeContextId.value) => {
   selectContext(ctxId)
-  announce(`Contexto alterado para ${activeContext.value.label}.`)
+  liveAnnouncement.value = `Contexto alterado para ${activeContext.value.label}.`
+}
+
+const handleLoadProjectCard = (project: ArchProjectCardData) => {
+  activeProjectId.value = project.id
+  selectContext(project.contextId)
+  if (mode.value !== 'quick') {
+    switchMode('quick')
+  }
+  setFieldValue('imageRef', project.imageRef || '')
+  const fields: QuickFieldId[] = [
+    'style',
+    'materials',
+    'environment',
+    'foreground',
+    'lighting',
+    'mood',
+    'technical'
+  ]
+  for (const f of fields) {
+    setFieldValue(f, project.quickPrompt[f])
+  }
+  activeViewTab.value = 'studio'
+  triggerToast(`Projeto "${project.title}" carregado no gerador.`)
+}
+
+const handleApplyReferenceItem = (item: ArchReferenceItem) => {
+  selectContext(item.contextId)
+  if (mode.value !== 'quick') {
+    switchMode('quick')
+  }
+  setFieldValue('imageRef', item.imageRef || '')
+  const fields: QuickFieldId[] = [
+    'style',
+    'materials',
+    'environment',
+    'foreground',
+    'lighting',
+    'mood',
+    'technical'
+  ]
+  for (const f of fields) {
+    setFieldValue(f, item.quickPrompt[f])
+  }
+  activeViewTab.value = 'studio'
+  triggerToast(`Referência "${item.title}" aplicada ao gerador de prompts.`)
 }
 
 const handleSyncFloorPlan = (payload: {
@@ -114,7 +173,7 @@ const handleCopy = async () => {
     await navigator.clipboard.writeText(finalPrompt.value)
     isCopied.value = true
     saveToHistory(false)
-    announce('Prompt copiado para a área de transferência e salvo no histórico.')
+    triggerToast('Prompt copiado para a área de transferência e salvo no histórico.')
     setTimeout(() => {
       isCopied.value = false
     }, 2000)
@@ -126,14 +185,14 @@ const handleCopy = async () => {
 const handleSaveFavorite = () => {
   saveToHistory(true)
   historyFilter.value = 'favorites'
-  announce('Prompt adicionado aos favoritos.')
+  triggerToast('Prompt salvo nos Favoritos.')
 }
 
 const handleCopyHistoryItem = async (item: PromptHistoryItem) => {
   try {
     await navigator.clipboard.writeText(item.prompt)
     copiedHistoryId.value = item.id
-    announce(`Prompt ${item.title} copiado.`)
+    triggerToast(`Prompt "${item.title}" copiado.`)
     setTimeout(() => {
       if (copiedHistoryId.value === item.id) {
         copiedHistoryId.value = null
@@ -183,6 +242,29 @@ const isHalfWidthField = (fieldId: string): boolean => {
       {{ liveAnnouncement }}
     </div>
 
+    <!-- Notificação Flutuante -->
+    <Transition name="toast-slide">
+      <div
+        v-if="toastMessage"
+        role="status"
+        class="fixed bottom-5 right-5 z-50 flex items-center gap-3 rounded-[12px] border-[1.75px] border-[#282824] bg-[#FAF9F6] px-4 py-3 text-xs font-medium text-[#282824] shadow-[4px_4px_0px_#282824]"
+      >
+        <span
+          class="h-3 w-3 rounded-full border border-[#282824] shrink-0"
+          :style="{ backgroundColor: currentAccent.hex }"
+        ></span>
+        <span>{{ toastMessage }}</span>
+        <button
+          type="button"
+          @click="toastMessage = null"
+          class="ml-1 rounded p-0.5 text-[#77766F] hover:text-[#282824]"
+          aria-label="Fechar notificação"
+        >
+          <ArchIcon name="close" :size="14" />
+        </button>
+      </div>
+    </Transition>
+
     <!-- Top Studio Navbar -->
     <header
       class="sticky top-0 z-30 border-b-[1.75px] transition-colors duration-150"
@@ -192,7 +274,7 @@ const isHalfWidthField = (fieldId: string): boolean => {
           : 'bg-[#FAF9F6] border-[#282824]'
       "
     >
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-16 py-2 flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-3 min-w-0">
           <a
             href="/"
@@ -201,7 +283,7 @@ const isHalfWidthField = (fieldId: string): boolean => {
             title="Voltar ao portfólio principal de Lucas Levino"
           >
             <ArchIcon name="arrow-left" :size="14" />
-            <span>Lucas Levino</span>
+            <span class="hidden sm:inline">Lucas Levino</span>
           </a>
 
           <span
@@ -217,15 +299,70 @@ const isHalfWidthField = (fieldId: string): boolean => {
             >
               ARCHPROMPT
             </span>
-            <span class="text-xs hidden md:inline" :class="isDark ? 'text-[#D8D0C3]' : 'text-[#77766F]'">
-              Contexto ativo: <strong :class="isDark ? 'text-[#FAF9F6]' : 'text-[#282824]'">{{ activeContext.label }}</strong>
+            <span class="text-xs hidden lg:inline" :class="isDark ? 'text-[#D8D0C3]' : 'text-[#77766F]'">
+              Contexto: <strong :class="isDark ? 'text-[#FAF9F6]' : 'text-[#282824]'">{{ activeContext.label }}</strong>
             </span>
           </div>
         </div>
 
-        <nav aria-label="Controles do estúdio" class="flex items-center gap-2">
-          <!-- Seletor de Modo (7 vs 12 Blocos) -->
+        <nav aria-label="Navegação do estúdio" class="flex flex-wrap items-center gap-2">
+          <!-- Alternador: Estúdio de Prompts vs Catálogo de Referências -->
           <div
+            role="tablist"
+            aria-label="Visão do ArchiPrompt"
+            class="inline-flex rounded-[10px] border-[1.5px] p-0.5 gap-0.5"
+            :class="isDark ? 'bg-[#1F1F1C] border-[#77766F]/50' : 'bg-[#F5F1E9] border-[#282824]'"
+          >
+            <button
+              type="button"
+              role="tab"
+              :aria-selected="activeViewTab === 'studio'"
+              @click="activeViewTab = 'studio'"
+              class="inline-flex items-center gap-1.5 rounded-[7px] px-3 py-1 text-xs font-semibold transition-all duration-120"
+              :style="
+                activeViewTab === 'studio'
+                  ? { backgroundColor: currentAccent.hex, color: '#282824' }
+                  : undefined
+              "
+              :class="
+                activeViewTab === 'studio'
+                  ? 'border border-[#282824] shadow-[1.5px_1.5px_0px_#282824]'
+                  : isDark
+                    ? 'text-[#D8D0C3] hover:text-[#FAF9F6]'
+                    : 'text-[#77766F] hover:text-[#282824]'
+              "
+            >
+              <ArchIcon name="floor-plan" :size="14" />
+              <span>Estúdio de Prompts</span>
+            </button>
+
+            <button
+              type="button"
+              role="tab"
+              :aria-selected="activeViewTab === 'catalog'"
+              @click="activeViewTab = 'catalog'"
+              class="inline-flex items-center gap-1.5 rounded-[7px] px-3 py-1 text-xs font-semibold transition-all duration-120"
+              :style="
+                activeViewTab === 'catalog'
+                  ? { backgroundColor: currentAccent.hex, color: '#282824' }
+                  : undefined
+              "
+              :class="
+                activeViewTab === 'catalog'
+                  ? 'border border-[#282824] shadow-[1.5px_1.5px_0px_#282824]'
+                  : isDark
+                    ? 'text-[#D8D0C3] hover:text-[#FAF9F6]'
+                    : 'text-[#77766F] hover:text-[#282824]'
+              "
+            >
+              <ArchIcon name="image" :size="14" />
+              <span>Catálogo de Referências</span>
+            </button>
+          </div>
+
+          <!-- Seletor de Modo (7 vs 12 Blocos) visível no Estúdio -->
+          <div
+            v-if="activeViewTab === 'studio'"
             role="group"
             aria-label="Modo de detalhamento do template"
             class="inline-flex rounded-[10px] border-[1.5px] p-0.5"
@@ -253,7 +390,7 @@ const isHalfWidthField = (fieldId: string): boolean => {
                     : 'text-[#77766F] hover:text-[#282824]'
               "
             >
-              Rápido (7 Blocos)
+              7 Blocos
             </button>
             <button
               type="button"
@@ -273,7 +410,7 @@ const isHalfWidthField = (fieldId: string): boolean => {
                     : 'text-[#77766F] hover:text-[#282824]'
               "
             >
-              Avançado (12 Blocos)
+              12 Blocos
             </button>
           </div>
 
@@ -301,8 +438,19 @@ const isHalfWidthField = (fieldId: string): boolean => {
       </div>
     </header>
 
-    <!-- Conteúdo Principal -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 space-y-6">
+    <!-- ABA CATÁLOGO DE REFERÊNCIAS ARQUITETÔNICAS -->
+    <main
+      v-if="activeViewTab === 'catalog'"
+      class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8"
+    >
+      <ArchReferenceGallery
+        :is-dark="isDark"
+        @apply-reference-item="handleApplyReferenceItem"
+      />
+    </main>
+
+    <!-- ABA ESTÚDIO DE PROMPTS + CATÁLOGO RÁPIDO DE PROJETOS -->
+    <main v-else class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 space-y-6">
       <!-- Seção 1: Cabeçalho Assimétrico & Ações -->
       <section
         class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-end pb-5 border-b-[1.75px]"
@@ -355,6 +503,126 @@ const isHalfWidthField = (fieldId: string): boolean => {
           >
             <span>Limpar</span>
           </button>
+        </div>
+      </section>
+
+      <!-- Catálogo Rápido de Projetos & Estudos Arquitetônicos -->
+      <section aria-labelledby="projects-catalog-heading" class="space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <ArchIcon name="folder" :size="16" />
+            <h2 id="projects-catalog-heading" class="font-display text-base md:text-lg font-semibold">
+              Projetos de Referência Prontos para Carregar
+            </h2>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              @click="activeViewTab = 'catalog'"
+              class="arch-btn-secondary inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold"
+            >
+              <ArchIcon name="image" :size="13" />
+              <span>Abrir Catálogo Completo (6 Obras)</span>
+            </button>
+            <button
+              type="button"
+              @click="showProjectsCatalog = !showProjectsCatalog"
+              class="arch-btn-tertiary inline-flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-semibold"
+            >
+              <span>{{ showProjectsCatalog ? 'Ocultar' : 'Mostrar' }}</span>
+              <ArchIcon
+                name="chevron-down"
+                :size="13"
+                class="transform transition-transform"
+                :class="showProjectsCatalog ? 'rotate-180' : ''"
+              />
+            </button>
+          </div>
+        </div>
+
+        <div v-if="showProjectsCatalog" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <article
+            v-for="proj in ARCH_PROJECTS"
+            :key="proj.id"
+            class="rounded-[14px] border-[1.75px] flex flex-col justify-between overflow-hidden transition-all"
+            :class="
+              isDark
+                ? activeProjectId === proj.id
+                  ? 'bg-[#1F1F1C] border-[#D8B99A] shadow-[4px_4px_0px_#000000]'
+                  : 'bg-[#1F1F1C] border-[#77766F]/50'
+                : activeProjectId === proj.id
+                  ? 'bg-[#FAF9F6] border-[#282824] shadow-[4px_4px_0px_#282824]'
+                  : 'bg-[#FAF9F6] border-[#282824] shadow-[3px_3px_0px_#282824]'
+            "
+          >
+            <div>
+              <div class="p-3 pb-0">
+                <div class="relative rounded-[10px] border-[1.5px] border-[#282824] overflow-hidden aspect-[16/9] bg-[#E8E8E3]">
+                  <img
+                    :src="proj.photoUrl"
+                    :alt="proj.title"
+                    loading="lazy"
+                    class="w-full h-full object-cover"
+                  />
+                  <span
+                    class="absolute top-2 left-2 rounded-[6px] border border-[#282824] bg-[#FAF9F6] px-2 py-0.5 font-mono text-[10px] font-semibold text-[#282824]"
+                  >
+                    {{ proj.code }}
+                  </span>
+                  <span
+                    class="absolute bottom-2 right-2 rounded-[6px] border border-[#282824] px-2 py-0.5 font-mono text-[10px] font-semibold text-[#282824]"
+                    :style="{ backgroundColor: ARCH_ACCENT_TOKENS[proj.accentKey].hex }"
+                  >
+                    {{ proj.typology }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="p-4 space-y-2">
+                <div>
+                  <h3 class="font-display text-base font-semibold leading-snug">
+                    {{ proj.title }}
+                  </h3>
+                  <p class="font-mono text-[10px] text-[#77766F] mt-0.5">
+                    {{ proj.location }} · {{ proj.areaSqm }} · {{ proj.scale }}
+                  </p>
+                </div>
+
+                <p class="text-xs leading-relaxed line-clamp-2" :class="isDark ? 'text-[#E8E8E3]/80' : 'text-[#77766F]'">
+                  {{ proj.subtitle }}
+                </p>
+
+                <div class="flex flex-wrap gap-1 pt-0.5">
+                  <span
+                    v-for="mat in proj.materials.slice(0, 3)"
+                    :key="mat"
+                    class="rounded-[5px] border border-[#282824]/40 px-1.5 py-0.5 font-mono text-[9px]"
+                    :class="isDark ? 'bg-[#161614] text-[#D8D0C3]' : 'bg-[#F5F1E9] text-[#282824]'"
+                  >
+                    {{ mat }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="px-4 py-2.5 border-t-[1.5px] flex items-center justify-between gap-2"
+              :class="isDark ? 'border-[#77766F]/30 bg-[#161614]' : 'border-[#282824]/15 bg-[#F5F1E9]'"
+            >
+              <span class="font-mono text-[10px] text-[#77766F]">
+                {{ proj.stage }}
+              </span>
+              <button
+                type="button"
+                @click="handleLoadProjectCard(proj)"
+                class="rounded-[8px] border-[1.5px] border-[#282824] px-3 py-1 text-[11px] font-semibold text-[#282824] shadow-[2px_2px_0px_#282824] active:translate-x-[1px] active:translate-y-[1px] transition-all"
+                :style="{ backgroundColor: ARCH_ACCENT_TOKENS[proj.accentKey].hex }"
+              >
+                Carregar no Gerador
+              </button>
+            </div>
+          </article>
         </div>
       </section>
 
@@ -522,7 +790,7 @@ const isHalfWidthField = (fieldId: string): boolean => {
             </div>
           </div>
 
-          <!-- Grid de Campos (Incluindo o Bloco REF de Imagem(ns) de Referência Enviada(s) com o Prompt) -->
+          <!-- Grid de Campos -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div
               v-for="field in currentFields"
@@ -879,8 +1147,15 @@ const isHalfWidthField = (fieldId: string): boolean => {
       :class="isDark ? 'border-[#77766F]/40 bg-[#161614] text-[#D8D0C3]' : 'border-[#282824] bg-[#FAF9F6] text-[#282824]'"
     >
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
-        <p>ArchiPrompt Studio · 8 contextos especializados, diretrizes de imagem de referência e sistema de plantas baixas.</p>
+        <p>ArchiPrompt Studio · 8 contextos especializados, catálogo de referências e sistema de plantas baixas.</p>
         <nav aria-label="Links institucionais" class="flex items-center gap-5 font-semibold">
+          <button
+            type="button"
+            @click="activeViewTab = activeViewTab === 'catalog' ? 'studio' : 'catalog'"
+            class="hover:underline underline-offset-4"
+          >
+            {{ activeViewTab === 'catalog' ? 'Voltar ao Estúdio' : 'Catálogo de Referências' }}
+          </button>
           <button
             type="button"
             @click="isGuideOpen = true"
@@ -908,3 +1183,15 @@ const isHalfWidthField = (fieldId: string): boolean => {
     />
   </div>
 </template>
+
+<style scoped>
+.toast-slide-enter-active,
+.toast-slide-leave-active {
+  transition: all 0.2s ease;
+}
+.toast-slide-enter-from,
+.toast-slide-leave-to {
+  opacity: 0;
+  transform: translateY(12px);
+}
+</style>
