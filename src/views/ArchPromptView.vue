@@ -9,10 +9,14 @@ import {
   type ArchReferenceItem
 } from '../data/archDesignSystem'
 import { useArchPrompt, type PromptHistoryItem } from '../composables/useArchPrompt'
+import { useArchCanvas, CANVAS_MODELS, type CanvasModelId } from '../composables/useArchCanvas'
 import ArchIcon from '../components/archprompt/ArchIcon.vue'
 import ArchPromptField from '../components/archprompt/ArchPromptField.vue'
 import ArchPromptGuideModal from '../components/archprompt/ArchPromptGuideModal.vue'
 import ArchFloorPlanInteractive from '../components/archprompt/ArchFloorPlanInteractive.vue'
+import ArchTextureSheetInteractive from '../components/archprompt/ArchTextureSheetInteractive.vue'
+import ArchCanvasModule from '../components/archprompt/ArchCanvasModule.vue'
+import ArchConfigModal from '../components/archprompt/ArchConfigModal.vue'
 import ArchReferenceGallery from '../components/archprompt/ArchReferenceGallery.vue'
 
 const emit = defineEmits<{
@@ -65,6 +69,13 @@ const isGuideOpen = ref(false)
 const highlightVariables = ref(true)
 const historyFilter = ref<'all' | 'favorites'>('all')
 const liveAnnouncement = ref('')
+
+const {
+  config: canvasConfig,
+  isConfigModalOpen,
+  configuredProvidersCount,
+  selectModel: selectCanvasModel
+} = useArchCanvas()
 
 const currentAccent = computed(() => {
   if (activeViewTab.value === 'catalog') {
@@ -166,6 +177,60 @@ const handleSyncFloorPlan = (payload: {
   setFieldValue('lighting', payload.lighting)
   setFieldValue('mood', 'clear, organized, and architecturally legible')
   setFieldValue('technical', payload.technical)
+}
+
+const handleSyncTextureSheet = (payload: {
+  imageRef: string
+  style: string
+  materials: string
+  environment: string
+  foreground: string
+  lighting: string
+  mood: string
+  technical: string
+}) => {
+  setFieldValue('imageRef', payload.imageRef)
+  setFieldValue('style', payload.style)
+  setFieldValue('materials', payload.materials)
+  setFieldValue('environment', payload.environment)
+  setFieldValue('foreground', payload.foreground)
+  setFieldValue('lighting', payload.lighting)
+  setFieldValue('mood', payload.mood)
+  setFieldValue('technical', payload.technical)
+}
+
+const handleSyncImageDirective = (directive: string) => {
+  setFieldValue('imageRef', directive)
+  if (directive) {
+    triggerToast('Diretriz das imagens do Canvas sincronizada com o prompt!')
+  }
+}
+
+const handleSelect3dModelInBuilder = (modelId: CanvasModelId) => {
+  selectCanvasModel(modelId)
+  if (modelId === '3d.hunyuan') {
+    const hunyuanPreset = contextPresets.value.find(p => p.id === 'hunyuan-3d-mesh-asset')
+    if (hunyuanPreset) {
+      loadPreset(hunyuanPreset)
+    } else {
+      const currentTech = getFieldValue('technical')
+      if (!currentTech.toLowerCase().includes('3d.hunyuan')) {
+        setFieldValue(
+          'technical',
+          `${currentTech ? currentTech + ', ' : ''}3d.hunyuan ready asset, watertight 3D mesh topology, clean isolated silhouette, neutral studio lighting, 1:1`
+        )
+      }
+    }
+    triggerToast('Modelo "3d.hunyuan" selecionado e prompt otimizado para geração de ativo 3D!')
+  } else {
+    triggerToast(`Modelo alterado para ${modelId}.`)
+  }
+}
+
+const handleOpenTextureSheetSection = () => {
+  selectContext('texture-sheet')
+  loadReferenceExample()
+  triggerToast('Seção "Criar Ficha de Textura" ativada com prompt especializado PBR.')
 }
 
 const handleCopy = async () => {
@@ -414,6 +479,24 @@ const isHalfWidthField = (fieldId: string): boolean => {
             </button>
           </div>
 
+          <!-- Botão Configuração de APIs & JSON -->
+          <button
+            type="button"
+            @click="isConfigModalOpen = true"
+            class="arch-btn-secondary inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold"
+            title="Configurar Chaves de API (LocalStorage / Cookies) e Baixar/Subir .JSON"
+          >
+            <ArchIcon name="key" :size="14" />
+            <span class="hidden sm:inline">Config APIs (.JSON)</span>
+            <span class="sm:hidden">APIs</span>
+            <span
+              class="rounded-[5px] border border-[#282824] px-1.5 py-0.2 font-mono text-[10px] font-bold text-[#282824]"
+              :style="{ backgroundColor: configuredProvidersCount > 0 ? '#A5B4A0' : '#D8B99A' }"
+            >
+              {{ configuredProvidersCount }}
+            </span>
+          </button>
+
           <!-- Botão Guia Metodológico -->
           <button
             type="button"
@@ -478,6 +561,20 @@ const isHalfWidthField = (fieldId: string): boolean => {
 
         <!-- Painel de Ações Rápidas -->
         <div class="lg:col-span-5 flex flex-wrap lg:justify-end gap-2">
+          <button
+            type="button"
+            @click="handleOpenTextureSheetSection"
+            class="arch-btn-secondary inline-flex items-center gap-2 px-3 py-2 text-xs font-semibold"
+            :style="
+              activeContextId === 'texture-sheet'
+                ? { backgroundColor: '#D8B99A', color: '#282824' }
+                : undefined
+            "
+          >
+            <ArchIcon name="texture-sheet" :size="14" />
+            <span>Criar Ficha de Textura</span>
+          </button>
+
           <button
             type="button"
             @click="loadReferenceExample"
@@ -626,7 +723,7 @@ const isHalfWidthField = (fieldId: string): boolean => {
         </div>
       </section>
 
-      <!-- Seção 2: Seletor de Contexto Arquitetônico (8 Contextos) -->
+      <!-- Seção 2: Seletor de Contexto Arquitetônico (9 Contextos) -->
       <section aria-labelledby="context-selector-heading" class="space-y-2.5">
         <div class="flex items-center justify-between">
           <h2
@@ -636,14 +733,14 @@ const isHalfWidthField = (fieldId: string): boolean => {
             1. Selecione o Contexto da Cena (Adapta o Template e as Sugestões)
           </h2>
           <span class="font-mono text-xs hidden sm:inline" :class="isDark ? 'text-[#D8D0C3]' : 'text-[#77766F]'">
-            8 contextos especializados
+            9 contextos especializados (inclui Ficha de Textura PBR)
           </span>
         </div>
 
         <div
           role="tablist"
           aria-label="Contextos arquitetônicos"
-          class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5"
+          class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-9 gap-2.5"
         >
           <button
             v-for="ctx in ARCH_CONTEXTS"
@@ -736,13 +833,74 @@ const isHalfWidthField = (fieldId: string): boolean => {
 
       <!-- Seção 3: Grid Assimétrico Principal (7 Colunas Construtor / 5 Colunas Preview Compilado) -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        <!-- Coluna Esquerda (7 cols): Construtor de Especificação + Sistema Interativo de Plantas Baixas -->
+        <!-- Coluna Esquerda (7 cols): Construtor de Especificação + Sistemas Especializados -->
         <section aria-labelledby="builder-heading" class="lg:col-span-7 space-y-4">
           <ArchFloorPlanInteractive
             v-if="activeContextId === 'floor-plan'"
             :is-dark="isDark"
             @sync-floorplan="handleSyncFloorPlan"
           />
+
+          <ArchTextureSheetInteractive
+            v-if="activeContextId === 'texture-sheet'"
+            :is-dark="isDark"
+            @sync-texture-sheet="handleSyncTextureSheet"
+          />
+
+          <!-- Barra Compacta de Seleção de Modelo no Contexto 3D (Móveis / Objetos Arquitetônicos) com opção 3d.hunyuan -->
+          <div
+            v-if="activeContextId === 'furniture' || activeContextId === 'furniture-3d'"
+            class="flex flex-wrap items-center justify-between gap-2 rounded-[12px] border-[1.5px] px-3.5 py-2.5"
+            :class="
+              isDark
+                ? 'bg-[#1F1F1C] border-[#77766F]/50'
+                : 'bg-[#FAF9F6] border-[#282824] shadow-[2.5px_2.5px_0px_#282824]'
+            "
+          >
+            <div class="flex items-center gap-2">
+              <ArchIcon name="furniture-3d" :size="14" />
+              <span class="font-mono text-[11px] font-semibold uppercase">
+                Modelo Alvo 3D (Opcional):
+              </span>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-1.5">
+              <button
+                v-for="model in CANVAS_MODELS"
+                :key="`builder-3d-${model.id}`"
+                type="button"
+                :aria-pressed="canvasConfig.selectedModelId === model.id"
+                @click="handleSelect3dModelInBuilder(model.id)"
+                class="inline-flex items-center gap-1 rounded-[8px] border-[1.5px] px-2.5 py-1 font-mono text-[11px] font-semibold transition-all"
+                :style="
+                  canvasConfig.selectedModelId === model.id && !isDark
+                    ? {
+                        backgroundColor: model.id === '3d.hunyuan' ? '#F47760' : currentAccent.hex,
+                        borderColor: '#282824',
+                        color: '#282824'
+                      }
+                    : undefined
+                "
+                :class="
+                  canvasConfig.selectedModelId === model.id
+                    ? isDark
+                      ? 'bg-[#282824] border-[#FAF9F6] text-[#FAF9F6]'
+                      : 'shadow-[1.5px_1.5px_0px_#282824]'
+                    : isDark
+                      ? 'bg-[#161614] border-[#77766F]/50 text-[#D8D0C3] hover:border-[#FAF9F6]'
+                      : 'bg-[#F5F1E9] border-[#282824]/60 text-[#282824] hover:bg-[#E8E8E3]'
+                "
+              >
+                <span>{{ model.shortLabel }}</span>
+                <span
+                  v-if="model.id === '3d.hunyuan'"
+                  class="rounded border border-[#282824]/50 bg-[#FAF9F6] px-1 text-[9px] font-bold text-[#282824]"
+                >
+                  3D
+                </span>
+              </button>
+            </div>
+          </div>
 
           <!-- Barra de Status de Preenchimento -->
           <div
@@ -1004,6 +1162,17 @@ const isHalfWidthField = (fieldId: string): boolean => {
             </div>
           </div>
 
+          <!-- Inputs de Imagens + Módulo "Canvas" (Acima de Biblioteca Local) -->
+          <ArchCanvasModule
+            :is-dark="isDark"
+            :active-context-id="activeContextId"
+            :final-prompt="finalPrompt"
+            :accent-hex="currentAccent.hex"
+            @sync-image-directive="handleSyncImageDirective"
+            @open-config-modal="isConfigModalOpen = true"
+            @notify="triggerToast"
+          />
+
           <!-- Card de Histórico Local & Favoritos -->
           <section
             aria-labelledby="history-heading"
@@ -1180,6 +1349,14 @@ const isHalfWidthField = (fieldId: string): boolean => {
       :is-dark="isDark"
       @close="isGuideOpen = false"
       @apply-reference="loadReferenceExample"
+    />
+
+    <!-- Modal de Configuração de Chaves de API (LocalStorage / Cookies / .JSON) -->
+    <ArchConfigModal
+      :is-open="isConfigModalOpen"
+      :is-dark="isDark"
+      @close="isConfigModalOpen = false"
+      @notify="triggerToast"
     />
   </div>
 </template>

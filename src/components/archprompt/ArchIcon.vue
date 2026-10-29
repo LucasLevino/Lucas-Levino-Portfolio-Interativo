@@ -201,6 +201,73 @@ withDefaults(
       <path d="m6 9 6 6 6-6" />
     </template>
 
+    <!-- Contexto: Ficha de Textura / Swatch PBR -->
+    <template v-else-if="name === 'texture-sheet' || name === 'swatch'">
+      <rect width="18" height="18" x="3" y="3" rx="2" />
+      <path d="M3 9h18" />
+      <path d="M3 15h18" />
+      <path d="M9 3v18" />
+      <path d="M15 3v18" />
+    </template>
+
+    <!-- Canvas / Gerador IA -->
+    <template v-else-if="name === 'canvas' || name === 'sparkles'">
+      <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z" />
+      <path d="M5 3v4" /><path d="M3 5h4" />
+      <path d="M19 17v4" /><path d="M17 19h4" />
+    </template>
+
+    <!-- Upload (Subir JSON / Imagem) -->
+    <template v-else-if="name === 'upload'">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="17 8 12 3 7 8" />
+      <line x1="12" x2="12" y1="3" y2="15" />
+    </template>
+
+    <!-- Download (Baixar JSON / Imagem) -->
+    <template v-else-if="name === 'download'">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="7 10 12 15 17 10" />
+      <line x1="12" x2="12" y1="15" y2="3" />
+    </template>
+
+    <!-- Key (Chaves de API) -->
+    <template v-else-if="name === 'key'">
+      <circle cx="7.5" cy="15.5" r="5.5" />
+      <path d="m21 2-9.6 9.6" />
+      <path d="m15.5 7.5 3 3L22 7l-3-3" />
+    </template>
+
+    <!-- Trash / Excluir -->
+    <template v-else-if="name === 'trash'">
+      <path d="M3 6h18" />
+      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+    </template>
+
+    <!-- Palette -->
+    <template v-else-if="name === 'palette'">
+      <circle cx="13.5" cy="6.5" r=".5" fill="currentColor" />
+      <circle cx="17.5" cy="10.5" r=".5" fill="currentColor" />
+      <circle cx="8.5" cy="7.5" r=".5" fill="currentColor" />
+      <circle cx="6.5" cy="12.5" r=".5" fill="currentColor" />
+      <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" />
+    </template>
+
+    <!-- Ratio / Proporção -->
+    <template v-else-if="name === 'ratio'">
+      <rect width="18" height="14" x="3" y="5" rx="2" />
+      <path d="M7 9h3" /><path d="M7 9v3" />
+      <path d="M17 15h-3" /><path d="M17 15v-3" />
+    </template>
+
+    <!-- Box -->
+    <template v-else-if="name === 'box'">
+      <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+      <path d="m3.3 7 8.7 5 8.7-5" />
+      <path d="M12 22V12" />
+    </template>
+
     <template v-else>
       <circle cx="12" cy="12" r="9" />
       <path d="M12 8v4" /><path d="M12 16h.01" />

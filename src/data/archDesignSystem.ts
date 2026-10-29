@@ -125,7 +125,8 @@ export const CONTEXT_PREDOMINANT_ACCENT: Record<ArchContextId, ArchAccentKey> = 
   environment: 'sage',
   furniture: 'terracotta',
   'furniture-3d': 'coral',
-  'floor-plan': 'mineral-blue'
+  'floor-plan': 'mineral-blue',
+  'texture-sheet': 'sand'
 }
 
 export const ARCH_PROJECTS: ArchProjectCardData[] = [

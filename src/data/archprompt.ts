@@ -9,6 +9,7 @@ export type ArchContextId =
   | 'furniture'
   | 'furniture-3d'
   | 'floor-plan'
+  | 'texture-sheet'
 
 export type QuickFieldId =
   | 'style'
@@ -59,6 +60,8 @@ export type FieldIconName =
   | 'settings'
   | 'ratio'
   | 'sliders'
+  | 'swatch'
+  | 'grid'
 
 export type FieldAccent =
   | 'blue'
@@ -128,6 +131,7 @@ export interface ArchContextConfig {
     | 'furniture'
     | 'furniture-3d'
     | 'floor-plan'
+    | 'texture-sheet'
   connectors: ContextSentenceConnectors
   quickFields: ArchFieldConfig<QuickFieldId>[]
   advancedFields: ArchFieldConfig<AdvancedFieldId>[]
@@ -1092,6 +1096,7 @@ const FURNITURE_3D_QUICK_FIELDS: ArchFieldConfig<QuickFieldId>[] = [
     ...EXTERIOR_QUICK_FIELDS[6],
     placeholder: 'Ex: 3D product visualization, Octane and Corona Renderer, 85mm prime lens, zero distortion, 8k PBR materials, no text, 1:1',
     chips: [
+      { label: '3D.Hunyuan Ready (Malha & Silhueta Limpa)', value: '3d.hunyuan ready asset, watertight 3D mesh topology, clean isolated silhouette, neutral studio lighting without harsh cast shadows' },
       { label: '3D Product Visualization', value: 'Ultra-detailed 3D furniture product visualization' },
       { label: 'Lente 85mm Sem Distorção', value: '85mm studio prime lens, zero perspective distortion' },
       { label: 'Corona / Octane Studio Render', value: 'Corona and Octane studio render, ray-traced reflections' },
@@ -1235,6 +1240,154 @@ const FLOOR_PLAN_QUICK_FIELDS: ArchFieldConfig<QuickFieldId>[] = [
       { label: 'Sem Cotas ou Textos (no text, no dimensions)', value: 'no text labels, no dimension lines, no numbers' },
       { label: 'Bordas Nítidas (Crisp Edges)', value: 'ultra-sharp architectural edges, 8k resolution' },
       { label: 'Estilo Maquete Física (Physical Model)', value: 'architectural scale model aesthetic, balsa wood and matte white card' },
+      { label: '1:1', value: '1:1' },
+      { label: '16:9', value: '16:9' }
+    ]
+  }
+]
+
+// ============================================================================
+// 9. CONTEXTO: FICHA DE TEXTURA (PBR MATERIAL SPECIFICATION & SEAMLESS SWATCH)
+// ============================================================================
+const TEXTURE_SHEET_QUICK_FIELDS: ArchFieldConfig<QuickFieldId>[] = [
+  {
+    id: 'style',
+    phase: 1,
+    phaseTitle: 'Fase 1 · Formato da Ficha de Textura',
+    label: 'Texture Sheet & PBR Presentation Format',
+    labelPt: 'Formato da Ficha Técnica de Textura',
+    description: 'Defina se deseja uma Prancha Completa de Especificação PBR (Swatch + Esfera 3D + Macro), uma Textura Seamless 1:1 pura ou um Comparativo de Acabamentos.',
+    guideTip: 'Use o Configurador Interativo de Ficha de Textura acima para montar automaticamente o layout PBR e a escala física.',
+    icon: 'swatch',
+    accent: 'orange',
+    placeholder: 'Ex: architectural PBR material specification sheet and technical texture board featuring a flat-lay seamless swatch, 3D shader calibration sphere, and 45-degree macro relief view',
+    joinWithAnd: false,
+    options: [
+      { value: 'architectural PBR material specification sheet and technical texture board featuring a flat-lay seamless surface swatch, a 3D shader calibration sphere, and a 45-degree macro relief detail view', labelPt: 'Ficha Técnica de Textura Completa (Swatch Plano Seamless + Esfera de Reflexo 3D + Detalhe Macro 45°)' },
+      { value: 'orthographic 90-degree top-down seamless tileable architectural texture swatch with zero perspective distortion and uniform edge-to-edge continuity', labelPt: 'Textura Seamless 1:1 Pura (90° Top-Down sem distorção, pronta para V-Ray / Corona / Blender / SketchUp)' },
+      { value: 'architectural material sample board comparing four surface finishes side-by-side: raw split-face, honed matte, brushed open-pore, and polished', labelPt: 'Prancha Comparativa de 4 Acabamentos da mesma matéria-prima (Bruto, Levigado, Escovado e Polido)' },
+      { value: 'physical architectural sample card on a drafting table showing a cut material slab with exposed edge thickness, brass scale bar, and color swatches', labelPt: 'Amostra Física de Atelier (Placa com espessura de borda aparente, escala metálica e paleta cromática)' }
+    ],
+    chips: [
+      { label: 'Ficha Técnica PBR Completa (Swatch + Esfera 3D + Macro)', value: 'architectural PBR material specification sheet with flat-lay swatch, 3D shader sphere, and macro relief view' },
+      { label: 'Textura Seamless 1:1 Pura (Tileable 90°)', value: 'orthographic 90-degree top-down seamless tileable architectural texture map' },
+      { label: 'Comparativo de Acabamentos (Bruto / Levigado / Polido)', value: 'architectural material finish comparison board (raw, honed, brushed, and polished)' },
+      { label: 'Placa de Amostra Física com Borda Aparente', value: 'physical architectural material sample slab showing edge profile and thickness' }
+    ]
+  },
+  {
+    id: 'materials',
+    phase: 2,
+    phaseTitle: 'Fase 2 · Matéria-Prima, Veios & Mineralogia',
+    label: 'Primary Material & Surface Composition',
+    labelPt: 'Matéria-Prima, Veios, Poros & Cor Base (Albedo)',
+    description: 'Descreva com precisão a substância física, mineralogia, fibras, poros abertos, veios naturais e tonalidade (Albedo).',
+    guideTip: 'Detalhe a cor base (Albedo) e as variações orgânicas (ex: natural open pores, subtle calcite veins, quarter-sawn grain).',
+    icon: 'box',
+    accent: 'orange',
+    placeholder: 'Ex: raw unfilled Roman Travertine stone with organic porous cavities, warm ivory-sand mineral strata, and subtle directional vein-cut layers',
+    joinWithAnd: true,
+    options: [
+      { value: 'raw unfilled Roman Travertine stone with organic porous cavities, warm ivory-sand mineral strata, and directional vein-cut layers', labelPt: 'Travertino Romano Bruto sem resina com cavidades porosas orgânicas e veios direcionais em tom areia-marfim' },
+      { value: 'quarter-sawn Brazilian Freijó hardwood with warm golden-honey heartwood, fine straight grain pores, and natural satin oil finish', labelPt: 'Madeira Freijó Brasileira com cerne dourado-mel, poros retos naturais e acabamento em óleo acetinado' },
+      { value: 'architectural board-formed exposed concrete with subtle pine wood grain imprints, authentic air-pocket pinholes, and Tie-rod cone marks', labelPt: 'Concreto aparente ripado com marcação das fôrmas de pinus, micro-bolhas naturais e furos de tirante' },
+      { value: 'heavyweight ivory architectural bouclé upholstery fabric with looped yarn knots, multi-tonal warm cream wool fibers, and deep tactile weave', labelPt: 'Tecido Bouclé arquitetônico marfim de alta gramatura com nós de lã creme multitonal e trama profunda' }
+    ],
+    chips: [
+      { label: 'Travertino Romano Bruto (Poros Abertos)', value: 'raw unfilled Roman Travertine stone with natural porous cavities' },
+      { label: 'Madeira Freijó / Carvalho Natural', value: 'quarter-sawn natural Freijó timber with visible open-pore wood grain' },
+      { label: 'Concreto Aparente Ripado', value: 'board-formed architectural concrete with wood-grain formwork imprint' },
+      { label: 'Mármore Calacatta Viola', value: 'honed Calacatta Viola marble with dramatic brecciated burgundy-violet veining' },
+      { label: 'Tecido Bouclé / Linho Belga Cru', value: 'heavyweight tactile bouclé and raw Belgian linen weave' },
+      { label: 'Terracota Artesanal Queimada', value: 'handcrafted kiln-fired architectural terracotta clay with mineral speckles' },
+      { label: 'Aço Corten Oxidado / Latão Escovado', value: 'weathered Corten steel with warm rust patina and brushed aged brass' }
+    ]
+  },
+  {
+    id: 'environment',
+    phase: 3,
+    phaseTitle: 'Fase 3 · Paginação, Juntas & Escala Física',
+    label: 'Modulation, Grout Joints & Real-World Scale',
+    labelPt: 'Paginação, Juntas Secas & Escala Real (cm/mm)',
+    description: 'Defina se a superfície é contínua ou paginada (placas, ripas, espinha de peixe), espessura da junta e dimensão física representada.',
+    guideTip: 'Especificar a escala real (ex: 100x100cm real-world scale, 1.5mm hairline grout joint) garante proporção fiel dos veios.',
+    icon: 'grid',
+    accent: 'emerald',
+    placeholder: 'Ex: continuous seamless surface modulation representing a 100cm x 100cm real-world architectural area with precision 1.5mm shadow-gap joints',
+    joinWithAnd: true,
+    options: [
+      { value: 'continuous seamless surface modulation representing a 100cm x 100cm real-world physical scale with zero visible repetition', labelPt: 'Superfície contínua sem emendas representando 100x100cm em escala real sem repetição visível' },
+      { value: 'large-format 120cm x 120cm architectural slabs with ultra-thin 1.5mm rectified hairline mortar joints', labelPt: 'Placas de grande formato 120x120cm com junta seca retificada de 1.5mm' },
+      { value: 'vertical architectural slatted timber louvers with 30mm slat width, 15mm recessed black acoustic felt shadow gaps, and crisp chamfered edges', labelPt: 'Painel ripado vertical com ripas de 30mm, junta recuada de 15mm em feltro preto acústico e bordas chanfradas' }
+    ],
+    chips: [
+      { label: 'Superfície Contínua (Seamless 100x100cm)', value: 'seamless continuous surface representing 100cm x 100cm real-world scale' },
+      { label: 'Placas Retificadas Junta Seca 1.5mm', value: 'rectified large-format slabs with 1.5mm hairline joints' },
+      { label: 'Paginação Ripada (30mm + Junta Recuada)', value: 'slatted linear modulation with recessed shadow-gap joints' },
+      { label: 'Paginação Espinha de Peixe (Herringbone)', value: 'precision 45-degree chevron and herringbone parquet modulation' },
+      { label: 'Escala Macro Close-up (25x25cm)', value: 'macro close-up representing a 25cm x 25cm physical sample area' }
+    ]
+  },
+  {
+    id: 'foreground',
+    phase: 4,
+    phaseTitle: 'Fase 4 · Mapas PBR (Roughness, Normal & Displacement)',
+    label: 'PBR Micro-Relief & Specular Behavior',
+    labelPt: 'Comportamento PBR: Rugosidade, Relevo & Micro-Textura',
+    description: 'Instrua como a superfície reage fisicamente à luz: micro-rugosidade (Roughness), profundidade do relevo (Normal/Height) e reflexão especular.',
+    guideTip: 'Mencione "physically accurate PBR roughness, normal relief, and ambient occlusion" para leitura tridimensional dos poros.',
+    icon: 'layers',
+    accent: 'cyan',
+    placeholder: 'Ex: physically accurate PBR surface behavior with matte honed roughness (0.65), crisp normal-map micro-relief in pores, and realistic height displacement',
+    joinWithAnd: true,
+    options: [
+      { value: 'physically accurate PBR surface behavior featuring matte honed roughness, crisp normal-map micro-relief inside cavities, and realistic height displacement', labelPt: 'Comportamento PBR preciso com rugosidade fosca levigada, micro-relevo normal map nos poros e displacement realista' },
+      { value: 'side-by-side technical breakdown inset showing BaseColor Albedo, Normal Map, Roughness Map, and Height Displacement channels', labelPt: 'Sub-quadros técnicos exibindo os canais PBR: Albedo (Cor Base), Normal Map, Roughness e Displacement' }
+    ],
+    chips: [
+      { label: 'Acabamento Levigado Fosco (Honed Roughness 0.65)', value: 'matte honed surface finish with soft diffused specular response' },
+      { label: 'Relevo Bruto Profundo (High Displacement)', value: 'deep tactile chiseled relief with pronounced height displacement' },
+      { label: 'Acabamento Escovado Acetinado (Brushed Satin)', value: 'anisotropic brushed satin finish with directional micro-scratches' },
+      { label: 'Incluir Miniaturas dos Mapas PBR (Albedo/Normal/Roughness)', value: 'accompanied by technical PBR channel callouts (Albedo, Normal, Roughness, Height)' }
+    ]
+  },
+  {
+    id: 'lighting',
+    phase: 5,
+    phaseTitle: 'Fase 5A · Iluminação Calibrada de Laboratório (5500K)',
+    label: 'Calibrated D65 Grazing & Diffuse Lighting',
+    labelPt: 'Luz Calibrada Neutra (D65 5500K) + Luz Rasante de Relevo',
+    description: 'Iluminação neutra de estúdio para não alterar a cor real (Albedo), combinada com luz rasante suave para revelar a textura.',
+    guideTip: 'Evite golden-hour em fichas de textura para não distorcer a cor real do material. Prefira "calibrated D65 5500K neutral studio light".',
+    icon: 'sun',
+    accent: 'amber',
+    placeholder: 'Ex: calibrated D65 5500K neutral studio illumination with a subtle 30-degree grazing key light to reveal micro-topography without harsh shadows or color cast',
+    joinWithAnd: true,
+    options: [
+      { value: 'calibrated D65 5500K neutral studio illumination paired with a subtle 30-degree grazing light to reveal surface micro-topography without color cast', labelPt: 'Iluminação neutra calibrada D65 (5500K) com luz rasante a 30° para revelar o micro-relevo sem alterar a cor' },
+      { value: 'perfectly even flat-field Cross-Polarized diffuse lighting with zero vignetting and zero specular hotspots for seamless 3D tiling', labelPt: 'Iluminação plana de polarização cruzada perfeitamente uniforme sem vinheta e sem reflexos estourados (ideal para 3D)' }
+    ],
+    chips: [
+      { label: 'Luz Neutra Calibrada D65 (5500K Fiel à Cor)', value: 'calibrated D65 5500K neutral studio lighting with zero color cast' },
+      { label: 'Luz Rasante a 30° (Revela Poros e Relevo)', value: 'subtle 30-degree grazing side light revealing micro-topography' },
+      { label: 'Polarização Cruzada Uniforme (Sem Vinheta)', value: 'even cross-polarized flat-field illumination with no vignetting' }
+    ]
+  },
+  {
+    ...EXTERIOR_QUICK_FIELDS[5],
+    placeholder: 'Ex: technical, tactile, color-accurate, architectural, and specification-ready',
+    chips: [
+      { label: 'Fidelidade Cromática & Tátil', value: 'color-accurate, tactile, and physically authentic' },
+      { label: 'Padrão Biblioteca Quixel / Poliigon', value: 'studio-grade, clean, and specification-ready' }
+    ]
+  },
+  {
+    ...EXTERIOR_QUICK_FIELDS[6],
+    placeholder: 'Ex: 8k PBR architectural texture specification sheet, Substance 3D Designer & Quixel Megascans quality, macro lens, razor-sharp micro-detail, no text distortion, 1:1',
+    chips: [
+      { label: 'Qualidade Quixel Megascans / Substance 3D', value: '8K PBR material scan, Substance 3D Designer and Quixel Megascans quality' },
+      { label: '100% Seamless Tileable', value: 'seamless tileable texture, edge-to-edge continuity' },
+      { label: 'Lente Macro 100mm Sem Distorção', value: '100mm macro prime lens, zero barrel distortion, razor-sharp focus' },
       { label: '1:1', value: '1:1' },
       { label: '16:9', value: '16:9' }
     ]
@@ -2034,6 +2187,36 @@ export const ARCH_CONTEXTS: ArchContextConfig[] = [
           extraCommands: 'no text',
           aspectRatio: '1:1'
         }
+      },
+      {
+        id: 'hunyuan-3d-mesh-asset',
+        contextId: 'furniture-3d',
+        name: 'Asset p/ 3d.hunyuan (Malha 3D Limpa)',
+        badge: '3d.hunyuan',
+        description: 'Otimizado para geração de malha tridimensional no modelo 3d.hunyuan com silhueta isolada e iluminação neutra sem sombras projetadas.',
+        quick: {
+          style: 'a standalone sculptural architectural armchair in a clean three-quarter 3D asset view with unobstructed silhouette',
+          materials: 'solid natural Freijó hardwood frame and matte cognac saddle leather upholstery with crisp seam topology',
+          environment: 'an isolated pure white studio background (#FFFFFF) with zero background clutter for 3D mesh reconstruction',
+          foreground: 'watertight 3D geometry, clean beveled edges, uniform surface continuity, and 8K PBR diffuse and normal details',
+          lighting: 'even omnidirectional neutral studio lighting without harsh cast shadows or specular clipping',
+          mood: 'clean, studio-grade, and 3D-asset focused',
+          technical: '3d.hunyuan ready asset, watertight 3D mesh topology, clean isolated silhouette, 85mm orthodontic lens, zero perspective distortion, no text, 1:1'
+        },
+        advanced: {
+          archStyle: 'contemporary sculptural designer',
+          buildingType: 'standalone lounge armchair',
+          location: 'an isolated pure white studio background',
+          materials: 'oiled solid hardwood with rich natural wood grain and hand-stitched full-grain saddle leather',
+          environment: 'an isolated pure white studio background with soft contact shadow',
+          foreground: 'high-resolution 8K PBR roughness and normal maps',
+          lighting: 'three-point photographic studio lighting',
+          lightingDetail: 'soft ambient occlusion',
+          mood: 'clean, studio-grade, and product-focused',
+          renderStyle: '3d.hunyuan ready asset, watertight 3D mesh topology, clean isolated silhouette',
+          extraCommands: 'no text',
+          aspectRatio: '1:1'
+        }
       }
     ]
   },
@@ -2138,6 +2321,113 @@ export const ARCH_CONTEXTS: ArchContextConfig[] = [
           mood: 'refined, tactile, and client-presentation ready',
           renderStyle: 'Ultra-sharp architectural edges, 8k resolution',
           extraCommands: 'no text, no dimension lines',
+          aspectRatio: '1:1'
+        }
+      }
+    ]
+  },
+  {
+    id: 'texture-sheet',
+    label: 'Ficha de Textura',
+    subtitle: 'Prancha técnica de especificação de materiais, textura seamless 1:1 e mapas PBR (Albedo, Normal, Roughness)',
+    badge: 'PBR & Material Board',
+    icon: 'texture-sheet',
+    connectors: {
+      intro: 'Create an ',
+      materialsBridge: ', showcasing ',
+      environmentBridge: '. Configure the surface modulation and physical scale as ',
+      foregroundBridge: '. Highlight PBR surface properties including ',
+      lightingBridge: '. Illuminate the material sample using ',
+      moodBridge: '. Keep the technical presentation ',
+      advIntro: 'Create an architectural ',
+      advLocationBridge: ' formatted as a ',
+      advMaterialsBridge: ', showcasing ',
+      advEnvironmentBridge: '. Configure the surface modulation with ',
+      advForegroundBridge: '. Highlight PBR micro-relief and channels including ',
+      advLightingBridge: '. Illuminate the sample with ',
+      advLightingDetailBridge: ' and ',
+      advMoodBridge: '. Keep the material specification '
+    },
+    quickFields: TEXTURE_SHEET_QUICK_FIELDS,
+    advancedFields: createAdvancedFieldsForContext(
+      TEXTURE_SHEET_QUICK_FIELDS,
+      'Apresentação da Ficha / Textura',
+      'Família do Material',
+      'Escala Física & Modulação',
+      [
+        { label: 'Ficha Técnica PBR Completa (Swatch + Esfera 3D + Macro)', value: 'PBR material specification sheet with flat-lay swatch and 3D shader sphere' },
+        { label: 'Textura Seamless 1:1 Pura (90° Top-Down)', value: 'orthographic 90-degree seamless tileable PBR texture map' },
+        { label: 'Comparativo de Acabamentos (Bruto / Levigado / Polido)', value: 'multi-finish architectural material comparison board' }
+      ],
+      [
+        { label: 'Pedra Natural Arquitetônica', value: 'natural architectural stone slab' },
+        { label: 'Madeira Nobre / Marcenaria', value: 'architectural hardwood timber surface' },
+        { label: 'Concreto & Revestimento Mineral', value: 'cementitious and mineral architectural finish' },
+        { label: 'Tecido & Estofaria de Design', value: 'architectural upholstery textile weave' }
+      ],
+      [
+        { label: 'Amostra Real 100cm x 100cm Sem Emendas', value: '100cm x 100cm real-world physical scale with seamless continuity' },
+        { label: 'Placas Modulares com Junta Seca 1.5mm', value: 'modular architectural slabs with 1.5mm hairline shadow joints' }
+      ]
+    ),
+    presets: [
+      {
+        id: 'travertine-pbr-texture-sheet',
+        contextId: 'texture-sheet',
+        name: 'Ficha Técnica PBR: Travertino Romano Bruto',
+        badge: 'PBR Board 8K',
+        description: 'Prancha técnica completa com swatch seamless, esfera 3D de calibração, close-up macro 45° e canais PBR.',
+        quick: {
+          style: 'architectural PBR material specification sheet and technical texture board featuring a flat-lay seamless surface swatch, a 3D shader calibration sphere, and a 45-degree macro relief detail view',
+          materials: 'raw unfilled Roman Travertine stone with organic porous cavities, warm ivory-sand mineral strata, and directional vein-cut layers',
+          environment: 'continuous seamless surface modulation representing a 100cm x 100cm real-world physical scale with zero visible repetition',
+          foreground: 'physically accurate PBR surface behavior featuring matte honed roughness, crisp normal-map micro-relief inside cavities, and realistic height displacement, accompanied by technical PBR channel callouts (Albedo, Normal, Roughness, Height)',
+          lighting: 'calibrated D65 5500K neutral studio illumination paired with a subtle 30-degree grazing light to reveal surface micro-topography without color cast',
+          mood: 'color-accurate, tactile, and physically authentic',
+          technical: '8K PBR material scan, Substance 3D Designer and Quixel Megascans quality, 100mm macro prime lens, zero barrel distortion, razor-sharp focus, no text, 1:1'
+        },
+        advanced: {
+          archStyle: 'PBR material specification sheet with flat-lay swatch and 3D shader sphere',
+          buildingType: 'natural architectural stone slab',
+          location: '100cm x 100cm real-world physical scale with seamless continuity',
+          materials: 'raw unfilled Roman Travertine stone with natural porous cavities',
+          environment: 'seamless continuous surface representing 100cm x 100cm real-world scale',
+          foreground: 'matte honed surface finish with soft diffused specular response, accompanied by technical PBR channel callouts (Albedo, Normal, Roughness, Height)',
+          lighting: 'calibrated D65 5500K neutral studio lighting with zero color cast',
+          lightingDetail: 'realistic surface reflections',
+          mood: 'color-accurate, tactile, and physically authentic',
+          renderStyle: '8K PBR material scan, Substance 3D Designer and Quixel Megascans quality',
+          extraCommands: '100mm macro prime lens, zero barrel distortion, no text',
+          aspectRatio: '1:1'
+        }
+      },
+      {
+        id: 'freijo-slatted-seamless-tile',
+        contextId: 'texture-sheet',
+        name: 'Textura Seamless 1:1: Madeira Freijó Ripada',
+        badge: 'Seamless 3D',
+        description: 'Mapa ortogonal 90° perfeitamente ladrilhável (tileable) de painel ripado em madeira Freijó para uso direto em motores de render.',
+        quick: {
+          style: 'orthographic 90-degree top-down seamless tileable architectural texture swatch with zero perspective distortion and uniform edge-to-edge continuity',
+          materials: 'quarter-sawn Brazilian Freijó hardwood with warm golden-honey heartwood, fine straight grain pores, and natural satin oil finish',
+          environment: 'vertical architectural slatted timber louvers with 30mm slat width, 15mm recessed black acoustic felt shadow gaps, and crisp chamfered edges',
+          foreground: 'anisotropic brushed satin finish with directional micro-scratches and open-pore wood grain normal relief',
+          lighting: 'perfectly even flat-field Cross-Polarized diffuse lighting with zero vignetting and zero specular hotspots for seamless 3D tiling',
+          mood: 'studio-grade, clean, and specification-ready',
+          technical: '8K PBR material scan, seamless tileable texture, edge-to-edge continuity, 100mm macro prime lens, no text, 1:1'
+        },
+        advanced: {
+          archStyle: 'orthographic 90-degree seamless tileable PBR texture map',
+          buildingType: 'architectural hardwood timber surface',
+          location: 'modular architectural slabs with 1.5mm hairline shadow joints',
+          materials: 'quarter-sawn natural Freijó timber with visible open-pore wood grain',
+          environment: 'slatted linear modulation with recessed shadow-gap joints',
+          foreground: 'anisotropic brushed satin finish with directional micro-scratches',
+          lighting: 'even cross-polarized flat-field illumination with no vignetting',
+          lightingDetail: 'soft ambient occlusion',
+          mood: 'studio-grade, clean, and specification-ready',
+          renderStyle: '8K PBR material scan, seamless tileable texture, edge-to-edge continuity',
+          extraCommands: 'no text',
           aspectRatio: '1:1'
         }
       }
