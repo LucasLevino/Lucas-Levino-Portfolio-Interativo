@@ -358,7 +358,7 @@ export function useArchCanvas() {
   // Exportar JSON de Configuração
   const exportConfigToJson = (extraPayload?: Record<string, unknown>) => {
     const payload = {
-      app: 'ArchiPrompt Studio',
+      app: 'ArchStudio',
       exportedAt: new Date().toISOString(),
       config: config.value,
       ...extraPayload
@@ -370,7 +370,7 @@ export function useArchCanvas() {
     const a = document.createElement('a')
     const dateStamp = new Date().toISOString().slice(0, 10)
     a.href = url
-    a.download = `archprompt-config-${dateStamp}.json`
+    a.download = `archstudio-config-${dateStamp}.json`
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)

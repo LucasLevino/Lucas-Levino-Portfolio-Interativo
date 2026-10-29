@@ -161,7 +161,7 @@ const handleDownloadCanvasImage = () => {
   const a = document.createElement('a')
   a.href = activeCanvasItem.value.imageUrl
   const ext = activeCanvasItem.value.imageUrl.startsWith('data:image/svg') ? 'svg' : 'png'
-  a.download = `archprompt-${activeCanvasItem.value.modelId}-${Date.now()}.${ext}`
+  a.download = `archstudio-${activeCanvasItem.value.modelId}-${Date.now()}.${ext}`
   document.body.appendChild(a)
   a.click()
   document.body.removeChild(a)

@@ -266,9 +266,9 @@ export const portfolioData: Tab[] = [
     ]
   },
   {
-    id: 'archprompt',
-    title: 'ArchiPrompt Studio (IA)',
-    avatarText: 'AP',
+    id: 'archstudio',
+    title: 'ArchStudio (IA)',
+    avatarText: 'AS',
     avatarImage: AvatarArchPrompt,
     lastMessage: 'Gerador dinâmico de prompts arquitetônicos',
     unreadCount: 1,
@@ -285,7 +285,7 @@ export const portfolioData: Tab[] = [
       {
         type: 'text',
         id: 2,
-        text: 'Tenho sim! Desenvolvi o ArchiPrompt Studio, um laboratório interativo de engenharia de prompts voltado para visualização arquitetônica (ArchViz), design de interiores e modelagem 3D.',
+        text: 'Tenho sim! Desenvolvi o ArchStudio, um laboratório interativo de engenharia de prompts voltado para visualização arquitetônica (ArchViz), design de interiores e modelagem 3D.',
         sender: 'me',
         time: '13:11'
       },
@@ -299,15 +299,15 @@ export const portfolioData: Tab[] = [
       {
         type: 'ogCard',
         id: 4,
-        text: 'Clique no card abaixo ou acesse o atalho direto para abrir e testar o gerador agora:\nhttps://lucaslevino.com/archprompt',
+        text: 'Clique no card abaixo ou acesse o atalho direto para abrir e testar o gerador agora:\nhttps://lucaslevino.com/archstudio',
         sender: 'me',
         time: '13:13',
         ogCard: {
-          title: 'ArchiPrompt Studio — Gerador Dinâmico de Prompts Arquitetônicos',
+          title: 'ArchStudio — Gerador Dinâmico de Prompts Arquitetônicos',
           description: 'Construa prompts técnicos em 6 fases para Fachadas, Interiores, Iluminação IES, Móveis 3D e Plantas Baixas Interativas.',
           image: AvatarArchPrompt,
-          url: '/archprompt',
-          domain: 'lucaslevino.com/archprompt · Abrir Ambiente'
+          url: '/archstudio',
+          domain: 'lucaslevino.com/archstudio · Abrir Ambiente'
         }
       }
     ]

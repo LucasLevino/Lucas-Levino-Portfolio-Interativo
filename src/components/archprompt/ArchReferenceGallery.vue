@@ -363,13 +363,20 @@ const resetFilters = () => {
               </div>
             </div>
 
-            <div class="rounded-[12px] border-[1.5px] border-[#282824] bg-[#F5F1E9] p-4 space-y-2">
+            <div class="rounded-[12px] border-[1.5px] border-[#282824] bg-[#F5F1E9] p-4 space-y-2.5">
               <span class="font-mono text-[11px] font-semibold uppercase text-[#77766F]">
-                PROMPT COMPLETO DESTA REFERÊNCIA:
+                PROMPT DE RENDERIZAÇÃO DESTA REFERÊNCIA:
               </span>
               <p class="font-mono text-xs leading-relaxed text-[#282824]">
-                Render the architecture as a {{ inspectedItem.quickPrompt.style }}, {{ inspectedItem.imageRef }}, using {{ inspectedItem.quickPrompt.materials }}. Surround with {{ inspectedItem.quickPrompt.environment }}. Add {{ inspectedItem.quickPrompt.foreground }}. Use {{ inspectedItem.quickPrompt.lighting }}. Keep the scene {{ inspectedItem.quickPrompt.mood }}. {{ inspectedItem.quickPrompt.technical }}.
+                Render the architecture as a {{ inspectedItem.quickPrompt.style }}, using {{ inspectedItem.quickPrompt.materials }}. Surround with {{ inspectedItem.quickPrompt.environment }}. Add {{ inspectedItem.quickPrompt.foreground }}. Use {{ inspectedItem.quickPrompt.lighting }}. Keep the scene {{ inspectedItem.quickPrompt.mood }}. {{ inspectedItem.quickPrompt.technical }}.
               </p>
+              <div
+                v-if="inspectedItem.imageRef"
+                class="rounded-[8px] border border-[#282824]/30 bg-[#FAF9F6] px-3 py-2 font-mono text-[11px] text-[#282824]"
+              >
+                <strong class="uppercase text-[10px] text-[#77766F] block mb-0.5">Diretriz de Imagem (Separada do Render):</strong>
+                Reference image directive: {{ inspectedItem.imageRef }}.
+              </div>
             </div>
           </div>
 

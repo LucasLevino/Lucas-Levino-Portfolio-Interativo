@@ -47,7 +47,7 @@ const setStorageMode = (mode: StoragePersistenceMode) => {
 
 const handleExportJson = () => {
   exportConfigToJson()
-  emit('notify', 'Arquivo archprompt-config.json baixado com sucesso.')
+  emit('notify', 'Arquivo archstudio-config.json baixado com sucesso.')
 }
 
 const triggerFileSelect = () => {

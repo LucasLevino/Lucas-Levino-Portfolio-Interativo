@@ -10,12 +10,12 @@ const props = defineProps<{
 const { openLightbox } = useLightbox()
 
 const isInternalRoute = computed(() => {
-  return props.message.ogCard.url.startsWith('/archprompt')
+  return props.message.ogCard.url.startsWith('/archstudio') || props.message.ogCard.url.startsWith('/archprompt')
 })
 
 const handleImageClick = (e: MouseEvent) => {
   if (isInternalRoute.value) {
-    // Permite que o clique na imagem também abra a rota /archprompt diretamente
+    // Permite que o clique na imagem também abra a rota /archstudio diretamente
     return
   }
   e.preventDefault()

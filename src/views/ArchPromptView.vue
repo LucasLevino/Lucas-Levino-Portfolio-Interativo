@@ -36,7 +36,9 @@ const {
   contextPresets,
   selectContext,
   mode,
+  imageRef,
   currentFields,
+  referenceImageField,
   isDark,
   toggleTheme,
   isManualEdit,
@@ -62,6 +64,8 @@ const {
   deleteHistoryItem,
   restoreHistoryItem
 } = useArchPrompt()
+
+const showImageRefSection = ref(false)
 
 const isCopied = ref(false)
 const copiedHistoryId = ref<string | null>(null)
@@ -270,14 +274,19 @@ const handleCopyHistoryItem = async (item: PromptHistoryItem) => {
 
 const scrollToField = (fieldId?: string) => {
   if (!fieldId) return
-  const el = document.getElementById(`arch-field-${fieldId}`)
-  const textarea = document.getElementById(`textarea-${fieldId}`) as HTMLTextAreaElement | null
-  if (el) {
-    el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  if (fieldId === 'imageRef') {
+    showImageRefSection.value = true
   }
-  if (textarea) {
-    setTimeout(() => textarea.focus(), 200)
-  }
+  setTimeout(() => {
+    const el = document.getElementById(`arch-field-${fieldId}`)
+    const textarea = document.getElementById(`textarea-${fieldId}`) as HTMLTextAreaElement | null
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+    if (textarea) {
+      setTimeout(() => textarea.focus(), 180)
+    }
+  }, 40)
 }
 
 const isHalfWidthField = (fieldId: string): boolean => {
@@ -362,7 +371,7 @@ const isHalfWidthField = (fieldId: string): boolean => {
               class="rounded-[6px] border border-[#282824] px-2 py-0.5 font-mono text-xs font-semibold uppercase tracking-wider text-[#282824]"
               :style="{ backgroundColor: currentAccent.hex }"
             >
-              ARCHPROMPT
+              ARCHSTUDIO
             </span>
             <span class="text-xs hidden lg:inline" :class="isDark ? 'text-[#D8D0C3]' : 'text-[#77766F]'">
               Contexto: <strong :class="isDark ? 'text-[#FAF9F6]' : 'text-[#282824]'">{{ activeContext.label }}</strong>
@@ -374,7 +383,7 @@ const isHalfWidthField = (fieldId: string): boolean => {
           <!-- Alternador: Estúdio de Prompts vs Catálogo de Referências -->
           <div
             role="tablist"
-            aria-label="Visão do ArchiPrompt"
+            aria-label="Visão do ArchStudio"
             class="inline-flex rounded-[10px] border-[1.5px] p-0.5 gap-0.5"
             :class="isDark ? 'bg-[#1F1F1C] border-[#77766F]/50' : 'bg-[#F5F1E9] border-[#282824]'"
           >
@@ -549,7 +558,7 @@ const isHalfWidthField = (fieldId: string): boolean => {
           <h1
             class="font-display font-semibold tracking-tight leading-tight text-[clamp(1.65rem,1.35rem+1.4vw,2.5rem)]"
           >
-            ArchiPrompt Studio
+            ArchStudio
           </h1>
           <p
             class="text-sm md:text-base leading-relaxed max-w-prose"
@@ -948,7 +957,7 @@ const isHalfWidthField = (fieldId: string): boolean => {
             </div>
           </div>
 
-          <!-- Grid de Campos -->
+          <!-- Grid de Campos de Renderização (Fases 01 a 06) -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div
               v-for="field in currentFields"
@@ -959,10 +968,76 @@ const isHalfWidthField = (fieldId: string): boolean => {
                 :config="field"
                 :model-value="getFieldValue(field.id)"
                 :is-dark="isDark"
-                :is-featured="field.id === 'imageRef' || field.id === 'style' || field.id === 'archStyle'"
+                :is-featured="field.id === 'style' || field.id === 'archStyle'"
                 :is-chip-active="(chipVal: string) => isChipSelected(field.id, chipVal)"
                 @update:model-value="(val: string) => setFieldValue(field.id, val)"
                 @toggle-chip="(chipVal: string) => toggleChip(field.id, chipVal)"
+              />
+            </div>
+          </div>
+
+          <!-- Painel Separado e Colapsável: Diretriz de Imagem(ns) de Referência (Opcional) -->
+          <div
+            class="rounded-[14px] border-[1.75px] overflow-hidden"
+            :class="
+              isDark
+                ? 'bg-[#1F1F1C] border-[#77766F]/50 shadow-[3px_3px_0px_#000000]'
+                : 'bg-[#FAF9F6] border-[#282824] shadow-[3px_3px_0px_#282824]'
+            "
+          >
+            <div
+              class="flex flex-wrap items-center justify-between gap-2 px-4 py-3 cursor-pointer select-none"
+              :class="[
+                showImageRefSection || completionStats.hasImageRef ? 'border-b-[1.5px]' : '',
+                isDark ? 'bg-[#161614] border-[#77766F]/40' : 'bg-[#F5F1E9] border-[#282824]'
+              ]"
+              @click="showImageRefSection = !showImageRefSection"
+            >
+              <div class="flex flex-wrap items-center gap-2">
+                <ArchIcon name="image" :size="15" />
+                <span class="font-display text-xs md:text-sm font-semibold">
+                  Diretriz de Imagem(ns) Enviada(s) com o Prompt
+                </span>
+                <span
+                  class="rounded-[5px] border border-[#282824]/40 px-1.5 py-0.2 font-mono text-[10px] uppercase"
+                  :class="isDark ? 'bg-[#282824] text-[#D8D0C3]' : 'bg-[#E8E8E3] text-[#77766F]'"
+                >
+                  Separado do Render · Opcional
+                </span>
+                <span
+                  v-if="completionStats.hasImageRef"
+                  class="rounded-[6px] border border-[#282824] bg-[#A5B4A0] px-2 py-0.2 font-mono text-[10px] font-semibold text-[#282824]"
+                >
+                  Ativa
+                </span>
+              </div>
+
+              <button
+                type="button"
+                @click.stop="showImageRefSection = !showImageRefSection"
+                class="inline-flex items-center gap-1 rounded-[6px] border border-[#282824]/30 px-2.5 py-1 font-mono text-[10px] font-semibold"
+                :class="isDark ? 'text-[#D8D0C3] hover:text-[#FAF9F6]' : 'text-[#77766F] hover:text-[#282824]'"
+                :aria-expanded="showImageRefSection || completionStats.hasImageRef"
+              >
+                <span>{{ showImageRefSection || completionStats.hasImageRef ? 'Ocultar' : 'Configurar Diretriz' }}</span>
+                <ArchIcon
+                  name="chevron-down"
+                  :size="13"
+                  class="transform transition-transform"
+                  :class="showImageRefSection || completionStats.hasImageRef ? 'rotate-180' : ''"
+                />
+              </button>
+            </div>
+
+            <div v-if="showImageRefSection || completionStats.hasImageRef" class="p-3 md:p-4">
+              <ArchPromptField
+                :config="referenceImageField"
+                :model-value="getFieldValue('imageRef')"
+                :is-dark="isDark"
+                :is-featured="false"
+                :is-chip-active="(chipVal: string) => isChipSelected('imageRef', chipVal)"
+                @update:model-value="(val: string) => setFieldValue('imageRef', val)"
+                @toggle-chip="(chipVal: string) => toggleChip('imageRef', chipVal)"
               />
             </div>
           </div>
@@ -1059,63 +1134,106 @@ const isHalfWidthField = (fieldId: string): boolean => {
                 />
               </div>
 
-              <!-- Parágrafo Contínuo com <span> inline -->
-              <p
-                v-else
-                class="text-sm md:text-base leading-relaxed whitespace-pre-wrap break-words font-medium"
-                :class="isDark ? 'text-[#FAF9F6]' : 'text-[#282824]'"
-              >
-                <template v-for="(seg, idx) in promptSegments" :key="idx">
-                  <span v-if="seg.type === 'static'">{{ seg.text }}</span>
+              <!-- Parágrafo Contínuo do Render + Bloco Separado para Imagem de Referência -->
+              <div v-else class="space-y-4">
+                <p
+                  class="text-sm md:text-base leading-relaxed whitespace-pre-wrap break-words font-medium"
+                  :class="isDark ? 'text-[#FAF9F6]' : 'text-[#282824]'"
+                >
+                  <template v-for="(seg, idx) in promptSegments" :key="idx">
+                    <span v-if="seg.type === 'static'">{{ seg.text }}</span>
 
-                  <span
-                    v-else-if="seg.isPlaceholder && seg.isOptional"
-                    role="button"
-                    tabindex="0"
-                    @click="scrollToField(seg.fieldId)"
-                    @keydown.enter.prevent="scrollToField(seg.fieldId)"
-                    @keydown.space.prevent="scrollToField(seg.fieldId)"
-                    class="cursor-pointer rounded-[6px] border border-dashed border-[#282824]/60 bg-[#F5F1E9] px-1.5 py-0.5 mx-0.5 font-mono text-[11px] font-medium text-[#77766F] hover:border-[#282824] hover:text-[#282824] transition-colors"
-                    title="Opcional: Clique se você for anexar uma ou mais imagens junto com o prompt na IA"
-                  >{{ seg.text }}</span>
+                    <span
+                      v-else-if="seg.isPlaceholder"
+                      role="button"
+                      tabindex="0"
+                      @click="scrollToField(seg.fieldId)"
+                      @keydown.enter.prevent="scrollToField(seg.fieldId)"
+                      @keydown.space.prevent="scrollToField(seg.fieldId)"
+                      class="cursor-pointer rounded-[6px] border border-[#282824] px-1.5 py-0.5 mx-0.5 font-mono text-xs font-semibold text-[#282824] transition-opacity hover:opacity-85"
+                      :style="{ backgroundColor: currentAccent.hex }"
+                      :title="`Clique para preencher: ${seg.label}`"
+                    >{{ seg.text }}</span>
 
-                  <span
-                    v-else-if="seg.isPlaceholder"
-                    role="button"
-                    tabindex="0"
-                    @click="scrollToField(seg.fieldId)"
-                    @keydown.enter.prevent="scrollToField(seg.fieldId)"
-                    @keydown.space.prevent="scrollToField(seg.fieldId)"
-                    class="cursor-pointer rounded-[6px] border border-[#282824] px-1.5 py-0.5 mx-0.5 font-mono text-xs font-semibold text-[#282824] transition-opacity hover:opacity-85"
-                    :style="{ backgroundColor: currentAccent.hex }"
-                    :title="`Clique para preencher: ${seg.label}`"
-                  >{{ seg.text }}</span>
+                    <span
+                      v-else
+                      role="button"
+                      tabindex="0"
+                      @click="scrollToField(seg.fieldId)"
+                      @keydown.enter.prevent="scrollToField(seg.fieldId)"
+                      @keydown.space.prevent="scrollToField(seg.fieldId)"
+                      class="cursor-pointer transition-colors duration-120 rounded-[4px] px-0.5"
+                      :style="
+                        highlightVariables && !isDark
+                          ? {
+                              backgroundColor: currentAccent.softBg,
+                              textDecorationColor: '#282824'
+                            }
+                          : undefined
+                      "
+                      :class="
+                        highlightVariables
+                          ? 'underline decoration-2 underline-offset-4 font-semibold'
+                          : ''
+                      "
+                      :title="`${seg.label} — Clique para editar`"
+                    >{{ seg.text }}</span>
+                  </template>
+                </p>
 
-                  <span
-                    v-else
-                    role="button"
-                    tabindex="0"
-                    @click="scrollToField(seg.fieldId)"
-                    @keydown.enter.prevent="scrollToField(seg.fieldId)"
-                    @keydown.space.prevent="scrollToField(seg.fieldId)"
-                    class="cursor-pointer transition-colors duration-120 rounded-[4px] px-0.5"
-                    :style="
-                      highlightVariables && !isDark
-                        ? {
-                            backgroundColor: currentAccent.softBg,
-                            textDecorationColor: '#282824'
-                          }
-                        : undefined
-                    "
+                <!-- Container Separado para Diretriz de Imagem de Referência (Não mistura no bloco do Render) -->
+                <div
+                  v-if="imageRef.trim()"
+                  class="rounded-[10px] border-[1.5px] p-3 text-xs space-y-1.5"
+                  :class="
+                    isDark
+                      ? 'bg-[#161614] border-[#A5B4A0]/60 text-[#FAF9F6]'
+                      : 'bg-[#F5F1E9] border-[#282824] text-[#282824] shadow-[2px_2px_0px_#282824]'
+                  "
+                >
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-wider">
+                      <ArchIcon name="image" :size="12" />
+                      <span>Diretriz de Imagem Anexada (Separado do Render)</span>
+                    </span>
+                    <div class="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        @click="scrollToField('imageRef')"
+                        class="rounded px-1.5 py-0.5 font-mono text-[10px] font-semibold underline hover:opacity-80"
+                      >
+                        Editar
+                      </button>
+                      <button
+                        type="button"
+                        @click="setFieldValue('imageRef', '')"
+                        class="rounded px-1.5 py-0.5 font-mono text-[10px] font-semibold text-[#F47760] hover:underline"
+                      >
+                        Remover
+                      </button>
+                    </div>
+                  </div>
+                  <p class="font-mono text-[11px] leading-relaxed opacity-90">
+                    Reference image directive: {{ imageRef.trim() }}.
+                  </p>
+                </div>
+
+                <div v-else class="pt-1">
+                  <button
+                    type="button"
+                    @click="scrollToField('imageRef')"
+                    class="inline-flex items-center gap-1.5 rounded-[8px] border border-dashed px-2.5 py-1.5 font-mono text-[11px] font-medium transition-colors"
                     :class="
-                      highlightVariables
-                        ? 'underline decoration-2 underline-offset-4 font-semibold'
-                        : ''
+                      isDark
+                        ? 'border-[#77766F]/60 bg-[#161614] text-[#D8D0C3] hover:border-[#FAF9F6] hover:text-[#FAF9F6]'
+                        : 'border-[#282824]/50 bg-[#F5F1E9] text-[#77766F] hover:border-[#282824] hover:text-[#282824]'
                     "
-                    :title="`${seg.label} — Clique para editar`"
-                  >{{ seg.text }}</span>
-                </template>
-              </p>
+                  >
+                    <ArchIcon name="image" :size="13" />
+                    <span>+ Adicionar diretriz para imagem(ns) enviada(s) (Opcional)</span>
+                  </button>
+                </div>
+              </div>
 
               <!-- Metadados Técnicos do Prompt -->
               <div
@@ -1316,7 +1434,7 @@ const isHalfWidthField = (fieldId: string): boolean => {
       :class="isDark ? 'border-[#77766F]/40 bg-[#161614] text-[#D8D0C3]' : 'border-[#282824] bg-[#FAF9F6] text-[#282824]'"
     >
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
-        <p>ArchiPrompt Studio · 8 contextos especializados, catálogo de referências e sistema de plantas baixas.</p>
+        <p>ArchStudio · 8 contextos especializados, catálogo de referências e sistema de plantas baixas.</p>
         <nav aria-label="Links institucionais" class="flex items-center gap-5 font-semibold">
           <button
             type="button"

@@ -140,12 +140,12 @@ export function useArchPrompt() {
   })
 
   const currentFields = computed<ArchFieldConfig<string>[]>(() => {
-    const contextFields =
-      mode.value === 'quick'
-        ? activeContext.value.quickFields
-        : activeContext.value.advancedFields
-    return [REFERENCE_IMAGE_FIELD, ...contextFields]
+    return mode.value === 'quick'
+      ? activeContext.value.quickFields
+      : activeContext.value.advancedFields
   })
+
+  const referenceImageField = REFERENCE_IMAGE_FIELD
 
   const contextPresets = computed(() => {
     return activeContext.value.presets
@@ -199,7 +199,10 @@ export function useArchPrompt() {
   }
 
   const toggleChip = (fieldId: string, chipValue: string) => {
-    const fieldCfg = currentFields.value.find(f => f.id === fieldId)
+    const fieldCfg =
+      fieldId === 'imageRef'
+        ? REFERENCE_IMAGE_FIELD
+        : currentFields.value.find(f => f.id === fieldId)
     const currentRaw = getFieldValue(fieldId)
 
     if (fieldCfg?.singleSelectChip) {
@@ -252,37 +255,9 @@ export function useArchPrompt() {
     }
   }
 
-  // Construct structured segments dynamically based on activeContext connectors + imageRef
+  // Construct structured segments dynamically based on activeContext connectors (pure render prompt)
   const promptSegments = computed<PromptSegment[]>(() => {
     const conn = activeContext.value.connectors
-    const cleanImageRef = imageRef.value.trim().replace(/^[,\s]+|[.\s]+$/g, '')
-
-    const imageRefSegments: PromptSegment[] = cleanImageRef
-      ? [
-          { type: 'static', text: ', ' },
-          {
-            type: 'variable',
-            text: cleanImageRef,
-            fieldId: 'imageRef',
-            label: REFERENCE_IMAGE_FIELD.label,
-            phase: 0,
-            accent: REFERENCE_IMAGE_FIELD.accent,
-            isPlaceholder: false
-          }
-        ]
-      : [
-          { type: 'static', text: ' ', isOptional: true },
-          {
-            type: 'variable',
-            text: '[+ referenciar imagem(ns) enviada(s)]',
-            fieldId: 'imageRef',
-            label: REFERENCE_IMAGE_FIELD.label,
-            phase: 0,
-            accent: REFERENCE_IMAGE_FIELD.accent,
-            isPlaceholder: true,
-            isOptional: true
-          }
-        ]
 
     if (mode.value === 'quick') {
       const d = quickData.value
@@ -305,7 +280,6 @@ export function useArchPrompt() {
       return [
         { type: 'static', text: conn.intro },
         seg('style', 'style'),
-        ...imageRefSegments,
         { type: 'static', text: conn.materialsBridge },
         seg('materials', 'materials'),
         { type: 'static', text: conn.environmentBridge },
@@ -345,7 +319,6 @@ export function useArchPrompt() {
         seg('buildingType', 'subject'),
         { type: 'static', text: conn.advLocationBridge },
         seg('location', 'context'),
-        ...imageRefSegments,
         { type: 'static', text: conn.advMaterialsBridge },
         seg('materials', 'materials'),
         { type: 'static', text: conn.advEnvironmentBridge },
@@ -370,10 +343,14 @@ export function useArchPrompt() {
   })
 
   const templatePrompt = computed(() => {
-    return promptSegments.value
+    const coreRender = promptSegments.value
       .filter(s => !s.isOptional)
       .map(s => s.text)
       .join('')
+    const cleanImageRef = imageRef.value.trim().replace(/^[,\s]+|[.\s]+$/g, '')
+    if (!cleanImageRef) return coreRender
+    const capitalizedRef = cleanImageRef.charAt(0).toUpperCase() + cleanImageRef.slice(1)
+    return `${coreRender} Reference image directive: ${capitalizedRef}.`
   })
 
   const finalPrompt = computed(() => {
@@ -595,6 +572,7 @@ export function useArchPrompt() {
     quickData,
     advancedData,
     currentFields,
+    referenceImageField,
     isDark,
     toggleTheme,
     isManualEdit,

@@ -15,9 +15,9 @@ const formattedText = computed(() => {
   const urlRegex = /(https?:\/\/[^\s]+|mailto:[^\s]+)/g;
   return props.message.text.replace(urlRegex, (url) => {
     const displayUrl = url.startsWith('mailto:') ? url.replace('mailto:', '') : url;
-    const isLocalArchPrompt = url.endsWith('/archprompt');
-    const href = isLocalArchPrompt ? '/archprompt' : url;
-    const target = isLocalArchPrompt ? '_self' : '_blank';
+    const isLocalArchStudio = url.endsWith('/archstudio') || url.endsWith('/archprompt');
+    const href = isLocalArchStudio ? '/archstudio' : url;
+    const target = isLocalArchStudio ? '_self' : '_blank';
     return `<a href="${href}" target="${target}" rel="noopener noreferrer" class="text-[#027eb5] dark:text-[#53bdeb] hover:underline">${displayUrl}</a>`;
   });
 })

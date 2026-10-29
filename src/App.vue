@@ -10,8 +10,8 @@ const getNormalizedPath = () => {
 
 const currentPath = ref<string>(getNormalizedPath())
 
-const isArchPromptRoute = computed(() => {
-  return currentPath.value === '/archprompt'
+const isArchStudioRoute = computed(() => {
+  return currentPath.value === '/archstudio' || currentPath.value === '/archprompt'
 })
 
 const handlePopState = () => {
@@ -24,10 +24,10 @@ const navigateTo = (path: string) => {
 }
 
 watch(
-  isArchPromptRoute,
+  isArchStudioRoute,
   isArch => {
     if (isArch) {
-      document.title = 'ArchiPrompt Studio | Gerador de Prompts Arquitetônicos — Lucas Levino'
+      document.title = 'ArchStudio | Gerador de Prompts Arquitetônicos — Lucas Levino'
     } else {
       document.title = 'Lucas Levino | Especialista e Arquiteto de Software'
     }
@@ -45,6 +45,6 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <ArchPromptView v-if="isArchPromptRoute" @navigate-home="navigateTo('/')" />
+  <ArchPromptView v-if="isArchStudioRoute" @navigate-home="navigateTo('/')" />
   <PortfolioView v-else />
 </template>
