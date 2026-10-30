@@ -148,6 +148,15 @@ export interface GuidePhaseInfo {
   accent: FieldAccent
 }
 
+export interface GuideWorkflowInfo {
+  id: string
+  badge: string
+  title: string
+  summary: string
+  howToUse: string
+  promptRuleEn: string
+}
+
 export const GUIDE_PHASES: GuidePhaseInfo[] = [
   {
     phase: 1,
@@ -156,7 +165,7 @@ export const GUIDE_PHASES: GuidePhaseInfo[] = [
     originalText:
       '"Render the architecture as a refined contemporary luxury residence in a natural forest hillside setting..."',
     whatItDoes:
-      'Define a ação ("Render"), o sujeito principal (fachada, interior, luminotécnica, móvel 3D ou planta baixa) e o contexto espacial.',
+      'Define a ação ("Render"), o sujeito principal (fachada, interior, demolição virtual, virtual staging, móvel 3D ou planta baixa) e o contexto espacial.',
     placement:
       'Sempre no início. Os modelos de geração de imagem dão maior peso semântico às primeiras palavras do prompt.',
     accent: 'blue'
@@ -164,11 +173,11 @@ export const GUIDE_PHASES: GuidePhaseInfo[] = [
   {
     phase: 2,
     tag: 'MÉDIO · ESTRUTURA E TEXTURA',
-    title: 'Fase 2: Materialidade e Acabamentos',
+    title: 'Fase 2: Materialidade, Swatches PBR e Re-Skin',
     originalText:
       '"...using warm off-white masonry, natural timber, large floor-to-ceiling glass, and dark metal frames."',
     whatItDoes:
-      'Dá textura, cor e substância física ao sujeito principal (alvenaria, concreto, marcenaria, tecidos, pedras ou metais).',
+      'Dá textura, cor e substância física ao sujeito principal (concreto aparente, travertino bruto, madeira Freijó, bouclé) ou executa o Re-Skin Cirúrgico com Footprint Lock a partir do Slot 3.',
     placement:
       'Logo após definir o sujeito principal, para que a IA aplique esses materiais diretamente à estrutura recém-criada.',
     accent: 'orange'
@@ -176,50 +185,119 @@ export const GUIDE_PHASES: GuidePhaseInfo[] = [
   {
     phase: 3,
     tag: 'MICRO · ENTORNO OU LAYOUT',
-    title: 'Fase 3: Paisagismo, Enquadramento ou Layout',
+    title: 'Fase 3: Paisagismo, Enquadramento ou Casca Demolida',
     originalText:
       '"Surround the house with mature pine trees, layered grasses, shrubs, and subtle planting."',
     whatItDoes:
-      'No externo, define o paisagismo; no interno/design, define a arquitetura envolvente e distribuição; em móveis 3D, o fundo de estúdio.',
+      'No externo, define o paisagismo; no interno, define o invólucro arquitetônico (ou paredes brancas/canos de PVC aparentes na Demolição Virtual); no PBR, define a bancada sem grids rígidos.',
     placement:
       'Após a materialidade da construção, estabelecendo o contexto ambiental imediato.',
     accent: 'emerald'
   },
   {
     phase: 4,
-    tag: 'PROFUNDIDADE · PRIMEIRO PLANO E DETALHES',
-    title: 'Fase 4: Elementos de Composição (Foreground)',
+    tag: 'PROFUNDIDADE · PRIMEIRO PLANO & ESCALA HUMANA',
+    title: 'Fase 4: Foreground, Pessoas com Motion Blur e Escala Botânica',
     originalText:
-      '"Add a calm natural pond in the foreground with realistic reflections, soft ripples, shoreline stones, and a small rustic wooden rowboat."',
+      '"Add a calm natural pond in the foreground... or a subtle human figure at 70-85% translucent opacity with photographic motion blur."',
     whatItDoes:
-      'Cria sensação tridimensional de profundidade em camadas (frente, meio e fundo) ou destaca detalhes táteis em close-up.',
+      'Cria profundidade em camadas, adiciona figuras humanas translúcidas (70–85% opacidade + motion blur) que não roubam atenção da arquitetura, ou insere um ramo botânico para escala em moodboards PBR.',
     placement:
       'Após o entorno geral, direcionando o olhar do observador desde o primeiro plano até o ponto focal.',
     accent: 'cyan'
   },
   {
     phase: 5,
-    tag: 'ATMOSFERA · LUZ E CLIMA',
-    title: 'Fase 5: Iluminação, Clima e Atmosfera',
+    tag: 'ATMOSFERA · LUZ, RESET DE SOMBRAS & LUMINOTÉCNICA',
+    title: 'Fase 5: Iluminação, Estudos Isolados e Luz Central Única',
     originalText:
-      '"Use warm late-afternoon golden-hour light filtering through the trees, with soft cinematic shadows and subtle interior glow. Keep the scene peaceful, luxurious, natural, and architecture-focused."',
+      '"Erase all existing shadows from the original image and relight with warm Golden Hour light... or simulate a single central ceiling bulb with all indirect lights off."',
     whatItDoes:
-      'A luz define o fotorrealismo. Temperatura de cor (2700K–6500K), golden-hour, sombras suaves e o "mood" orientam a paleta de cores.',
+      'Controla temperatura de cor (2700K–6500K), estudos isolados de clima (apagando as sombras da imagem original para a nova luz ditar o sombreamento) e a simulação didática de Luz Central Única.',
     placement:
       'Do meio para o fim. Depois que a IA "construiu" a cena física, você instrui como iluminá-la e qual emoção transmitir.',
     accent: 'amber'
   },
   {
     phase: 6,
-    tag: 'COMANDOS FINAIS · QUALIDADE E SAÍDA',
-    title: 'Fase 6: Parâmetros Técnicos e Estilo de Renderização',
+    tag: 'TRAVAS DE SEGURANÇA · PRESERVAÇÃO & ANTI-CGI',
+    title: 'Fase 6: Preservação Total, Proteção de Luz e Trava Anti-CGI',
     originalText:
-      '"Ultra-realistic architectural visualization, soft global illumination, detailed vegetation, no text, 1:1."',
+      '"Preserve 100% of original architecture, materials, and proportions. Do not invent new light sources. Do not look like a 3D render, CGI, VFX, video game, or digital art."',
     whatItDoes:
-      'Atuam como modificadores de qualidade (V-Ray, Corona, Unreal 5, 8K, PBR), restrições (no text) e proporção (1:1, 16:9, 4:5).',
+      'Aplica modificadores técnicos (Corona, V-Ray, 8K), travas de Preservação Total (proibindo adicionar/remover/redimensionar), proteção do projeto luminotécnico original e o Negative Prompt automático contra estética digital/CGI.',
     placement:
-      'Sempre no final. Funcionam como instruções técnicas estritas de pós-processamento e formatação.',
+      'Sempre no final (Fase 06). Atua como contrato técnico estrito de pós-processamento e blindagem geométrica.',
     accent: 'purple'
+  }
+]
+
+export const GUIDE_ADVANCED_WORKFLOWS: GuideWorkflowInfo[] = [
+  {
+    id: 'analyze-reference',
+    badge: 'Canvas · IA Vision',
+    title: 'Analisar Referência (Decodificação Automática em Blocos)',
+    summary:
+      'Lê imagens enviadas pelo cliente nos slots do Canvas e decodifica móveis, materiais, composição espacial e iluminação.',
+    howToUse:
+      'Anexe 1 a 3 imagens em "Inputs de Imagens", clique em "Analisar Referência" e o ArchStudio preencherá automaticamente os blocos [style], [materials], [environment], [foreground], [lighting], [mood] e [technical].',
+    promptRuleEn:
+      'Decodes furniture, surface finishes, spatial framing, and lighting temperature into the 6 architectural phases.'
+  },
+  {
+    id: 'reverse-style',
+    badge: 'Autoral · 4 Pilares',
+    title: 'Engenharia Reversa de Estilo (Pilares Visuais do Autor)',
+    summary:
+      'Analisa fotos de projetos anteriores do próprio arquiteto/escritório para extrair sua assinatura projetual.',
+    howToUse:
+      'Abra "Engenharia Reversa de Estilo", envie fotos do seu portfólio e clique em "Extrair Pilares Visuais" (Geometria, Paleta de Cores, Materiais e Escolhas de Design) para aplicá-los em novas gerações ou no Virtual Staging.',
+    promptRuleEn:
+      'Extracts Author Visual Pillars: (1) Architectural Geometry, (2) Color Palette, (3) Signature Materials, (4) Design & Joinery Choices.'
+  },
+  {
+    id: 'virtual-demolition-staging',
+    badge: 'Reforma · 2 Etapas',
+    title: 'Demolição Virtual (Seca / Molhada c/ PVC) + Virtual Staging',
+    summary:
+      'Limpa fotos de levantamento para criar o "antes" em osso e em seguida mobilia com o estilo do arquiteto.',
+    howToUse:
+      'Use o preset "Demolição Virtual — Área Seca" (paredes brancas e piso cinza) ou "Área Molhada" (remove bancadas/louças e exibe canos de PVC aparentes de água/esgoto). Em seguida, acione o "Virtual Staging" respeitando a perspectiva original.',
+    promptRuleEn:
+      'Dry: strip all furniture leaving white walls and gray floor. Wet: remove counters/sanitary ware leaving exposed PVC plumbing stub-out pipes.'
+  },
+  {
+    id: 'surgical-reskin',
+    badge: 'Slot 1 + Slot 3',
+    title: 'Re-Skin Cirúrgico com Trava de Pegada (Footprint Lock)',
+    summary:
+      'Substitui exclusivamente um revestimento ou acabamento mantendo 100% da geometria e sem vazar textura para outros móveis.',
+    howToUse:
+      'Suba a foto/render base no Slot 1 (Geometry Master) e a amostra do material no Slot 3 (Texture Source). Clique em "Re-Skin Cirúrgico" ou selecione o preset correspondente em Interior.',
+    promptRuleEn:
+      'Use Slot 1 strictly as Geometry Master and Slot 3 as Texture Source with strict Footprint Lock so the new material never bleeds onto adjacent elements.'
+  },
+  {
+    id: 'lighting-studies',
+    badge: 'Luminotécnica',
+    title: 'Estudos de Luz Isolados (Reset de Sombras) & Luz Central Única',
+    summary:
+      'Testa climas solares apagando sombras antigas ou demonstra ao cliente o impacto da falta de iluminação indireta.',
+    howToUse:
+      'No contexto Iluminação, escolha "Estudo Isolado de Iluminação (Reset de Sombras)" para que a nova luz dite o sombreamento, ou "Simulação de Luz Central Única" para apagar sancas/LEDs e deixar apenas uma lâmpada forte no teto.',
+    promptRuleEn:
+      'Mandatory: completely erase and neutralize all existing shadows from the original image so the new light source exclusively dictates shadow casting.'
+  },
+  {
+    id: 'physical-moodboard-safety',
+    badge: 'PBR & Segurança Fase 06',
+    title: 'Moodboard Físico Top-Down, Pessoas Motion Blur e Trava Anti-CGI',
+    summary:
+      'Gera moodboards táteis sem grid rígido, escala humana translúcida e blindagem contra aspecto artificial de videogame/CGI.',
+    howToUse:
+      'Em Ficha de Textura, ative "Moodboard Físico (s/ Grid + Planta)". Nos blocos finais, ative "Preservação Total (100%)", "Proteger Projeto de Iluminação Original" e mantenha a "Trava Anti-CGI (Fase 06)" ligada.',
+    promptRuleEn:
+      'Strictly forbid rigid grids + include organic botanical element for scale + human figure at 70-85% opacity with motion blur + Do not look like a 3D render, CGI, VFX, video game, or digital art.'
   }
 ]
 
@@ -334,7 +412,12 @@ const EXTERIOR_QUICK_FIELDS: ArchFieldConfig<QuickFieldId>[] = [
       { label: 'Barco Rústico', value: 'a small rustic wooden rowboat' },
       { label: 'Piscina Borda Infinita', value: 'sleek infinity pool reflecting the sky' },
       { label: 'Caminho de Pedras', value: 'stepping stone pathway through low grasses' },
-      { label: 'Asfalto Molhado', value: 'wet asphalt with mirror reflections' }
+      { label: 'Asfalto Molhado', value: 'wet asphalt with mirror reflections' },
+      {
+        label: 'Pessoa c/ Motion Blur (70–85% Opacidade)',
+        value:
+          'a single subtle human figure in motion captured with long-exposure shutter drag, semi-translucent at 70% to 85% opacity with natural photographic motion blur for architectural scale without stealing focus'
+      }
     ]
   },
   {
@@ -352,7 +435,19 @@ const EXTERIOR_QUICK_FIELDS: ArchFieldConfig<QuickFieldId>[] = [
     options: [
       { value: 'warm late-afternoon golden-hour light filtering through the trees, with soft cinematic shadows and subtle interior glow', labelPt: 'Luz dourada de fim de tarde filtrada pelas árvores, sombras suaves e brilho interno' },
       { value: 'moody overcast morning sky with soft diffused ambient lighting and warm inviting interior lights', labelPt: 'Manhã nublada dramática com luz difusa e interior aquecido' },
-      { value: 'deep twilight blue-hour illumination with glowing warm architectural LED strips', labelPt: 'Hora azul do crepúsculo com fitas de LED arquitetônicas quentes' }
+      { value: 'deep twilight blue-hour illumination with glowing warm architectural LED strips', labelPt: 'Hora azul do crepúsculo com fitas de LED arquitetônicas quentes' },
+      {
+        value:
+          'isolated golden-hour lighting study: completely erase and neutralize all existing cast shadows from the original reference image, allowing the new warm low-angle golden-hour sunlight to exclusively dictate all shadow directions and atmospheric warmth',
+        labelPt:
+          'Estudo Isolado Golden Hour (Apagar Sombras Originais e Recalcular Luz Dourada)'
+      },
+      {
+        value:
+          'isolated blue-hour twilight study: completely erase and neutralize all existing cast shadows from the original reference image, allowing the new deep twilight sky and warm 2700K interior glow to exclusively dictate all shadows and reflections',
+        labelPt:
+          'Estudo Isolado Blue Hour (Apagar Sombras Originais e Recalcular Crepúsculo)'
+      }
     ],
     chips: [
       { label: 'Golden Hour Filtrada', value: 'warm late-afternoon golden-hour light filtering through the trees' },
@@ -360,7 +455,17 @@ const EXTERIOR_QUICK_FIELDS: ArchFieldConfig<QuickFieldId>[] = [
       { label: 'Brilho Interno Sutil', value: 'subtle interior glow' },
       { label: 'Blue Hour (Crepúsculo)', value: 'deep blue-hour twilight lighting' },
       { label: 'Manhã Nublada Difusa', value: 'moody overcast sky with soft diffused lighting' },
-      { label: 'Sol de Meio-Dia Nítido', value: 'bright midday sun with sharp architectural shadows' }
+      { label: 'Sol de Meio-Dia Nítido', value: 'bright midday sun with sharp architectural shadows' },
+      {
+        label: 'Estudo Isolado: Golden Hour (Apagar Sombras Originais)',
+        value:
+          'completely erase and neutralize all existing shadows from the original image, relighting the scene exclusively with warm golden-hour sunlight that dictates all new shadow casting'
+      },
+      {
+        label: 'Estudo Isolado: Blue Hour (Apagar Sombras Originais)',
+        value:
+          'completely erase and neutralize all existing shadows from the original image, relighting the scene exclusively with deep blue-hour twilight that dictates all new shadow casting'
+      }
     ]
   },
   {
@@ -413,6 +518,21 @@ const EXTERIOR_QUICK_FIELDS: ArchFieldConfig<QuickFieldId>[] = [
       { label: '8K Photorealistic', value: '8k resolution, photorealistic' },
       { label: 'V-Ray / Corona Render', value: 'V-Ray and Corona Renderer' },
       { label: 'Lente 24mm Tilt-Shift', value: '24mm tilt-shift lens' },
+      {
+        label: 'Trava de Preservação Total (100% Original)',
+        value:
+          'strictly preserve 100% of the original architecture, materials, and proportions, explicitly forbidding adding, removing, or resizing any element while enhancing photorealism'
+      },
+      {
+        label: 'Proteger Iluminação Original',
+        value:
+          'strictly forbid inventing new light sources, enhancing photorealism only through accurate light behavior and smooth shadow transitions based on existing project lights'
+      },
+      {
+        label: 'Anti-CGI / Anti-Estética Digital',
+        value:
+          'do not look like a 3D render, CGI, VFX, video game, or digital art'
+      },
       { label: 'Sem Texto (no text)', value: 'no text' },
       { label: '1:1', value: '1:1' },
       { label: '16:9', value: '16:9' },
@@ -526,7 +646,12 @@ const INTERIOR_QUICK_FIELDS: ArchFieldConfig<QuickFieldId>[] = [
       { label: 'Mesa de Centro em Travertino', value: 'a monolithic travertine coffee table' },
       { label: 'Tapete de Lã Natural', value: 'a textured hand-woven wool rug' },
       { label: 'Ilha Monolítica em Pedra', value: 'a sculptural monolithic stone island' },
-      { label: 'Poltrona Assinada em Couro', value: 'an iconic cognac leather lounge chair' }
+      { label: 'Poltrona Assinada em Couro', value: 'an iconic cognac leather lounge chair' },
+      {
+        label: 'Pessoa c/ Motion Blur (70–85% Opacidade)',
+        value:
+          'a single subtle human figure in motion with 70% to 85% translucent opacity and natural long-exposure motion blur, adding human scale without distracting from the architecture'
+      }
     ]
   },
   {
@@ -543,14 +668,36 @@ const INTERIOR_QUICK_FIELDS: ArchFieldConfig<QuickFieldId>[] = [
     joinWithAnd: true,
     options: [
       { value: 'soft late-afternoon golden sunlight streaming through floor-to-ceiling windows, casting long shadows across the floor, paired with warm 2700K recessed LED cove lighting', labelPt: 'Sol dourado de fim de tarde entrando pelas janelas com sombras longas e iluminação indireta 2700K' },
-      { value: 'diffused overcast daylight from overhead skylights balanced with warm architectural wall washers and subtle cabinet backlighting', labelPt: 'Luz natural difusa zenital equilibrada com wall washers quentes e iluminação embutida na marcenaria' }
+      { value: 'diffused overcast daylight from overhead skylights balanced with warm architectural wall washers and subtle cabinet backlighting', labelPt: 'Luz natural difusa zenital equilibrada com wall washers quentes e iluminação embutida na marcenaria' },
+      {
+        value:
+          'isolated lighting mood study: completely erase and neutralize all existing cast shadows from the original image, allowing the new golden-hour window light to exclusively dictate all interior shadow casting',
+        labelPt:
+          'Estudo de Iluminação Isolado (Apagar Sombras da Foto Original + Nova Luz Golden Hour)'
+      },
+      {
+        value:
+          'turn off all indirect cove lights, wall sconces, and accent lamps, illuminating the room exclusively with a single harsh bare bulb in the center of the ceiling, flattening textures and washing out spatial depth',
+        labelPt:
+          'Simulação Didática: Luz Central Única no Teto (Apagar Luzes Indiretas e Mostrar Perda de Textura)'
+      }
     ],
     chips: [
       { label: 'Sol Lateral pelas Janelas', value: 'warm sunlight streaming through the windows' },
       { label: 'Cortinas de Linho Translúcidas', value: 'filtered through sheer linen curtains' },
       { label: 'Sancas de LED 2700K', value: 'warm 2700K recessed LED cove lighting' },
       { label: 'Luz Zenital Difusa', value: 'soft diffused zenithal skylight illumination' },
-      { label: 'Sombras Suaves no Piso', value: 'soft dappled shadows across the floor' }
+      { label: 'Sombras Suaves no Piso', value: 'soft dappled shadows across the floor' },
+      {
+        label: 'Estudo Isolado (Apagar Sombras Originais)',
+        value:
+          'completely erase all existing shadows from the original photo so the new lighting exclusively dictates shadow direction'
+      },
+      {
+        label: 'Simular Luz Central Única (Sem Luminotécnica)',
+        value:
+          'turn off all indirect lighting and use only a single harsh central ceiling light bulb, flattening surface textures'
+      }
     ]
   },
   EXTERIOR_QUICK_FIELDS[5],
@@ -1266,13 +1413,24 @@ const TEXTURE_SHEET_QUICK_FIELDS: ArchFieldConfig<QuickFieldId>[] = [
       { value: 'architectural PBR material specification sheet and technical texture board featuring a flat-lay seamless surface swatch, a 3D shader calibration sphere, and a 45-degree macro relief detail view', labelPt: 'Ficha Técnica de Textura Completa (Swatch Plano Seamless + Esfera de Reflexo 3D + Detalhe Macro 45°)' },
       { value: 'orthographic 90-degree top-down seamless tileable architectural texture swatch with zero perspective distortion and uniform edge-to-edge continuity', labelPt: 'Textura Seamless 1:1 Pura (90° Top-Down sem distorção, pronta para V-Ray / Corona / Blender / SketchUp)' },
       { value: 'architectural material sample board comparing four surface finishes side-by-side: raw split-face, honed matte, brushed open-pore, and polished', labelPt: 'Prancha Comparativa de 4 Acabamentos da mesma matéria-prima (Bruto, Levigado, Escovado e Polido)' },
-      { value: 'physical architectural sample card on a drafting table showing a cut material slab with exposed edge thickness, brass scale bar, and color swatches', labelPt: 'Amostra Física de Atelier (Placa com espessura de borda aparente, escala metálica e paleta cromática)' }
+      { value: 'physical architectural sample card on a drafting table showing a cut material slab with exposed edge thickness, brass scale bar, and color swatches', labelPt: 'Amostra Física de Atelier (Placa com espessura de borda aparente, escala metálica e paleta cromática)' },
+      {
+        value:
+          '90-degree top-down physical architectural moodboard on an atelier worktable with physical material swatches arranged naturally with casual organic overlaps, strictly forbidding rigid geometric grids, accompanied by a fresh organic botanical branch in the corner to provide physical scale',
+        labelPt:
+          'Moodboard Físico Top-Down (Amostras Sobrepostas s/ Grid Perfeito + Planta para Escala)'
+      }
     ],
     chips: [
       { label: 'Ficha Técnica PBR Completa (Swatch + Esfera 3D + Macro)', value: 'architectural PBR material specification sheet with flat-lay swatch, 3D shader sphere, and macro relief view' },
       { label: 'Textura Seamless 1:1 Pura (Tileable 90°)', value: 'orthographic 90-degree top-down seamless tileable architectural texture map' },
       { label: 'Comparativo de Acabamentos (Bruto / Levigado / Polido)', value: 'architectural material finish comparison board (raw, honed, brushed, and polished)' },
-      { label: 'Placa de Amostra Física com Borda Aparente', value: 'physical architectural material sample slab showing edge profile and thickness' }
+      { label: 'Placa de Amostra Física com Borda Aparente', value: 'physical architectural material sample slab showing edge profile and thickness' },
+      {
+        label: 'Moodboard Físico Top-Down (Orgânico s/ Grid + Planta)',
+        value:
+          'top-down physical architectural moodboard with naturally overlapping material swatches on a workbench, strictly no rigid grids, with an organic botanical leaf for scale'
+      }
     ]
   },
   {
@@ -1527,13 +1685,24 @@ function createAdvancedFieldsForContext(
       options: [
         { value: 'soft cinematic shadows and subtle warm glow', labelPt: 'Sombras cinematográficas suaves e brilho quente sutil' },
         { value: 'crisp architectural shadows and realistic surface reflections', labelPt: 'Sombras arquitetônicas nítidas e reflexos de superfície realistas' },
-        { value: 'volumetric light rays and gentle ambient occlusion', labelPt: 'Feixes de luz volumétricos e oclusão de ambiente suave' }
+        { value: 'volumetric light rays and gentle ambient occlusion', labelPt: 'Feixes de luz volumétricos e oclusão de ambiente suave' },
+        {
+          value:
+            'completely erase all cast shadows from the original image so the new lighting exclusively dictates all shadow casting and falloff',
+          labelPt:
+            'Apagar Sombras da Imagem Original (Permitir que a Nova Luz Dite o Sombreamento)'
+        }
       ],
       chips: [
         { label: 'Sombras Cinematográficas', value: 'soft cinematic shadows' },
         { label: 'Brilho Quente Sutil', value: 'subtle warm glow' },
         { label: 'Reflexos Realistas', value: 'realistic surface reflections' },
-        { label: 'Ambient Occlusion Suave', value: 'soft ambient occlusion' }
+        { label: 'Ambient Occlusion Suave', value: 'soft ambient occlusion' },
+        {
+          label: 'Apagar Sombras Originais (Reset de Sombra)',
+          value:
+            'completely erase all cast shadows from the original image so the new lighting dictates all shadow casting'
+        }
       ]
     },
     {
@@ -1569,21 +1738,70 @@ function createAdvancedFieldsForContext(
     {
       id: 'extraCommands',
       phase: 6,
-      phaseTitle: 'Fase 6B · Câmera & Restrições',
-      label: 'Camera & Negative Rules',
-      labelPt: 'Lente & Restrições (Prompt Negativo)',
-      description: 'Lente fotográfica e elementos banidos da geração.',
-      guideTip: 'Inclua "no text" para evitar textos ou marcas d’água indesejadas.',
+      phaseTitle: 'Fase 6B · Câmera, Travas & Restrições',
+      label: 'Camera, Preservation Locks & Negative Rules',
+      labelPt: 'Lente, Travas de Segurança & Prompt Negativo',
+      description: 'Lente fotográfica, travas de preservação geométrica/luminotécnica e elementos banidos.',
+      guideTip: 'Use as travas de Preservação Total e Proteção de Iluminação Original para impedir que a IA invente elementos ou lâmpadas.',
       icon: 'sliders',
       accent: 'purple',
-      placeholder: 'Ex: no text, no watermark',
+      placeholder: 'Ex: strictly preserve 100% of original architecture, no text, do not look like CGI',
       joinWithAnd: false,
       options: [
         { value: 'no text', labelPt: 'Sem texto (no text)' },
         { value: 'eye-level view, 24mm tilt-shift lens, no people, no text', labelPt: 'Nível do olhar, lente 24mm tilt-shift, sem pessoas, sem texto' },
-        { value: 'no text labels, no dimension lines, no watermark', labelPt: 'Sem rótulos de texto, sem linhas de cota, sem marca d’água' }
+        { value: 'no text labels, no dimension lines, no watermark', labelPt: 'Sem rótulos de texto, sem linhas de cota, sem marca d’água' },
+        {
+          value:
+            'strictly preserve 100% of the original architecture, materials, and proportions; explicitly forbid adding, removing, or resizing any element while enhancing photorealism, no text',
+          labelPt:
+            'Trava de Preservação Total: Preservar 100% da arquitetura, materiais e proporções (proibir adicionar/remover/redimensionar)'
+        },
+        {
+          value:
+            'strictly forbid inventing or adding new light sources; enhance photorealism exclusively through accurate physical light behavior and smooth shadow transitions based on the existing project lighting, no text',
+          labelPt:
+            'Proteger Projeto de Iluminação Original: Proibir luzes inventadas (usar apenas comportamento real das luzes existentes)'
+        },
+        {
+          value:
+            'include a single subtle human figure with 70% to 85% translucent opacity and long-exposure motion blur for scale without distracting from the architecture, no text',
+          labelPt:
+            'Inserir Pessoa com Motion Blur (70% a 85% de opacidade e desfoque de movimento sutil)'
+        },
+        {
+          value:
+            'strictly preserve 100% of the original architecture and existing lighting project, do not look like a 3D render, CGI, VFX, video game, or digital art, no text',
+          labelPt:
+            'Combo Segurança Máxima: Preservação Total + Proteger Luz Original + Negative Anti-CGI'
+        }
       ],
       chips: [
+        {
+          label: '🔒 Preservação Total (100% Arquitetura/Proporções)',
+          value:
+            'strictly preserve 100% of the original architecture, materials, and proportions, explicitly forbidding adding, removing, or resizing any element'
+        },
+        {
+          label: '💡 Proteger Iluminação Original (Sem Luzes Inventadas)',
+          value:
+            'strictly forbid inventing new light sources, enhancing photorealism only through accurate light behavior and smooth shadow transitions based on existing project lights'
+        },
+        {
+          label: '🚫 Anti-CGI (Não parecer 3D/CGI/VFX/Game)',
+          value:
+            'do not look like a 3D render, CGI, VFX, video game, or digital art'
+        },
+        {
+          label: '🚶 Pessoa c/ Motion Blur (70–85% Opacidade)',
+          value:
+            'subtle human figure at 70% to 85% translucent opacity with photographic motion blur'
+        },
+        {
+          label: '🎯 Footprint Lock (Trava de Pegada de Textura)',
+          value:
+            'strictly enforce Footprint Lock so the new material fills the exact original surface area without bleeding onto adjacent furniture'
+        },
         { label: 'Sem Texto (no text)', value: 'no text' },
         { label: 'Sem Pessoas (no people)', value: 'no people' },
         { label: 'Sem Cotas (no dimension lines)', value: 'no dimension lines' },
@@ -1812,6 +2030,126 @@ export const ARCH_CONTEXTS: ArchContextConfig[] = [
           extraCommands: '35mm editorial lens, no text',
           aspectRatio: '4:5'
         }
+      },
+      {
+        id: 'virtual-demolition-dry-room',
+        contextId: 'interior',
+        name: 'Demolição Virtual: Área Seca (Sala / Quarto)',
+        badge: 'Demolição Seca',
+        description: 'Limpa completamente salas e quartos a partir de fotos de levantamento, removendo móveis/decorações e deixando paredes brancas e contrapiso cinza.',
+        quick: {
+          style: 'completely emptied and stripped interior room shell prepared for renovation, strictly preserving the exact room geometry, ceiling height, doors, windows, and camera perspective from the survey photo',
+          materials: 'clean matte white plastered walls and a raw leveled gray concrete screed subfloor with zero baseboards or decorative trims',
+          environment: 'completely bare architectural structural envelope with all loose furniture, curtains, lighting fixtures, paintings, and decorations 100% removed',
+          foreground: 'an unobstructed empty gray concrete floor plane in the foreground showing the true spatial footprint of the room',
+          lighting: 'even natural daylight entering through the existing window openings with soft neutral shadows on the bare white walls and gray floor',
+          mood: 'clean, neutral, architectural survey shell, and ready for staging',
+          technical: 'Photorealistic architectural site survey photography, 100% preservation of original wall geometry and perspective, no furniture, no decor, do not look like CGI, no text, 4:5'
+        },
+        advanced: {
+          archStyle: 'minimalist contemporary',
+          buildingType: 'double-height living room',
+          location: 'panoramic forest views',
+          materials: 'clean matte white plastered walls and raw leveled gray concrete screed subfloor',
+          environment: 'completely bare structural envelope with all furniture, curtains, and decorations 100% removed',
+          foreground: 'unobstructed empty gray concrete floor plane showing the true room footprint',
+          lighting: 'even natural daylight entering through the existing window openings',
+          lightingDetail: 'soft ambient occlusion',
+          mood: 'clean, neutral, and architecturally legible',
+          renderStyle: 'Photorealistic architectural renovation survey photography, 8k resolution',
+          extraCommands: 'strictly preserve 100% of the original architecture, walls, windows, and proportions, remove all furniture and decor, no text',
+          aspectRatio: '4:5'
+        }
+      },
+      {
+        id: 'virtual-demolition-wet-area',
+        contextId: 'interior',
+        name: 'Demolição Virtual: Área Molhada (Banheiro / Cozinha)',
+        badge: 'Demolição Molhada',
+        description: 'Remove bancadas, louças e marcenaria de banheiros e cozinhas, substituindo-os por canos de PVC aparentes que simulam pontos de água e esgoto de obra bruta.',
+        quick: {
+          style: 'stripped-down raw construction bathroom or kitchen shell after virtual demolition, strictly preserving the exact wall geometry, window openings, and camera perspective',
+          materials: 'bare rough-plastered cementitious masonry walls, raw gray concrete subfloor, and exposed brown and white PVC plumbing stub-out pipes',
+          environment: 'all countertops, cabinets, sinks, toilets, sanitary ware, and wall tiles completely removed and replaced by small exposed PVC water supply and drainage stub-out pipes capped on the bare walls simulating a newly finished raw construction shell',
+          foreground: 'clean unobstructed raw gray concrete screed floor and exposed wall plumbing points in exact technical positions',
+          lighting: 'neutral diffused work-site daylight entering through the existing aperture with realistic ambient occlusion in wall corners',
+          mood: 'raw construction shell, authentic civil engineering state, and technically accurate',
+          technical: 'Photorealistic architectural construction survey photography, exposed PVC plumbing stub-outs on bare walls, strictly preserve original room geometry, no cabinets, no fixtures, no text, 4:5'
+        },
+        advanced: {
+          archStyle: 'monolithic brutalist',
+          buildingType: 'spa bathroom',
+          location: 'private zen courtyard views',
+          materials: 'bare rough-plastered masonry walls, raw gray concrete subfloor, and exposed PVC plumbing stub-out pipes',
+          environment: 'all countertops, sanitary ware, and millwork removed and replaced by small exposed PVC water supply and drainage pipes on the bare walls',
+          foreground: 'unobstructed raw gray concrete subfloor and capped PVC plumbing points',
+          lighting: 'neutral diffused daylight entering through the existing window opening',
+          lightingDetail: 'soft ambient occlusion',
+          mood: 'raw construction shell and technically accurate',
+          renderStyle: 'Photorealistic architectural construction survey photography, 8k resolution',
+          extraCommands: 'strictly preserve 100% of the original wall geometry and perspective, remove all countertops and sanitary fixtures, no text',
+          aspectRatio: '4:5'
+        }
+      },
+      {
+        id: 'virtual-staging-architect-style',
+        contextId: 'interior',
+        name: 'Virtual Staging (Pós-Demolição + Estilo do Autor)',
+        badge: 'Virtual Staging',
+        description: 'Mobilia o ambiente vazio (gerado na Demolição Virtual) respeitando rigorosamente a perspectiva da foto original e os pilares visuais do arquiteto.',
+        quick: {
+          style: 'virtually staged contemporary architectural interior built strictly inside the empty demolished room shell, preserving 100% of the original camera perspective, wall boundaries, and window openings',
+          materials: 'warm wide-plank natural Freijó wood flooring, soft off-white limewash walls, bespoke architectural joinery, and honed travertine stone accents following the architect visual pillars',
+          environment: 'harmoniously proportioned furniture layout furnished inside the existing architectural envelope without altering any structural wall, beam, or window frame',
+          foreground: 'a low-profileivory bouclé sofa, organic solid-wood coffee table, and hand-woven wool rug anchored accurately to the original floor perspective grid',
+          lighting: 'natural directional daylight matching the existing window orientation, enhanced with warm 2700K indirect architectural lighting',
+          mood: 'curated, cohesive, architectural, and photorealistic',
+          technical: 'Virtual Staging architectural photography, 100% structural and perspective lock to Image 1 shell, authored design style, do not look like CGI, no text, 4:5'
+        },
+        advanced: {
+          archStyle: 'minimalist contemporary',
+          buildingType: 'double-height living room',
+          location: 'panoramic forest views',
+          materials: 'wide-plank natural timber flooring, warm limewash walls, and honed travertine accents',
+          environment: 'curated furniture layout placed strictly within the existing architectural room shell',
+          foreground: 'low-profile bouclé sofa, solid-wood coffee table, and textured wool area rug',
+          lighting: 'natural daylight matching the existing window openings with warm 2700K indirect glow',
+          lightingDetail: 'soft cinematic shadows and subtle warm glow',
+          mood: 'peaceful, luxurious, natural, and architecture-focused',
+          renderStyle: 'Photorealistic Virtual Staging interior photography, Corona Renderer, 8k',
+          extraCommands: 'strictly preserve 100% of the original room shell geometry and camera perspective from Image 1, do not look like CGI, no text',
+          aspectRatio: '4:5'
+        }
+      },
+      {
+        id: 'surgical-material-reskin',
+        contextId: 'interior',
+        name: 'Re-Skin Cirúrgico (Slot 1 Geometria + Slot 3 Textura)',
+        badge: 'Footprint Lock',
+        description: 'Usa o Slot 1 como trava geométrica (Geometry Master) e o Slot 3 como fonte de textura (Texture Source) com Trava de Pegada (Footprint Lock).',
+        quick: {
+          style: 'surgical architectural material re-skin using Image 1 (Slot 1) strictly as the Geometry Master and Image 3 (Slot 3) strictly as the Texture Source',
+          materials: 'exact physical surface material, grain, albedo color, and PBR roughness extracted from Image 3 (Slot 3) mapped with perspective accuracy onto the target surface of Image 1',
+          environment: '100% preserved surrounding room architecture, adjacent furniture, and spatial composition from Image 1 with zero structural modification',
+          foreground: 'strictly enforced Footprint Lock ensuring the new material from Slot 3 fills the exact original surface boundary without bleeding or spilling onto adjacent furniture, walls, or floors',
+          lighting: 'strictly preserve the original lighting project, contact shadows, and ambient occlusion from Image 1 interacting physically with the new surface material',
+          mood: 'precision material specification, photorealistic, and seamlessly integrated',
+          technical: 'Surgical Material Re-Skin with strict Footprint Lock, 100% Geometry Master lock on Slot 1, exact PBR Texture Source from Slot 3, do not look like CGI, no text, 4:5'
+        },
+        advanced: {
+          archStyle: 'minimalist contemporary',
+          buildingType: 'double-height living room',
+          location: 'panoramic forest views',
+          materials: 'exact surface texture, grain, and finish extracted from Image 3 (Slot 3 Texture Source)',
+          environment: '100% preserved architectural geometry and layout from Image 1 (Slot 1 Geometry Master)',
+          foreground: 'strictly enforced Footprint Lock containing the new material within its exact original surface boundary without bleeding onto other furniture',
+          lighting: 'original project lighting and natural shadow transitions preserved from Image 1',
+          lightingDetail: 'realistic surface reflections',
+          mood: 'seamlessly integrated and photorealistic',
+          renderStyle: 'Photorealistic architectural material re-skin, 8k PBR precision',
+          extraCommands: 'strictly preserve 100% of the original architecture, materials, and proportions, strictly enforce Footprint Lock, do not look like CGI, no text',
+          aspectRatio: '4:5'
+        }
       }
     ]
   },
@@ -1961,6 +2299,66 @@ export const ARCH_CONTEXTS: ArchContextConfig[] = [
           mood: 'dramatic and cinematic',
           renderStyle: 'Corona Renderer, full path-traced global illumination, physically accurate IES photometric lighting profiles',
           extraCommands: 'no text',
+          aspectRatio: '16:9'
+        }
+      },
+      {
+        id: 'isolated-lighting-study-shadow-reset',
+        contextId: 'lighting',
+        name: 'Estudo de Iluminação Isolado (Reset de Sombras)',
+        badge: 'Shadow Reset',
+        description: 'Altera exclusivamente o clima solar (Golden Hour / Blue Hour) apagando 100% das sombras da imagem original para que a nova luz dite o sombreamento.',
+        quick: {
+          style: 'isolated architectural lighting study preserving 100% of the original building geometry, materials, and camera angle while transforming exclusively the lighting climate',
+          materials: 'existing project surfaces reacting with physically accurate specular reflections and micro-relief to the new light direction',
+          environment: 'completely erase and neutralize all existing cast shadows from the original image, removing any baked-in directional shading prior to relighting',
+          foreground: 'newly calculated volumetric shadows and realistic contact occlusion dictated exclusively by the new primary light source',
+          lighting: 'warm low-angle Golden Hour sunlight (or deep Blue Hour twilight) acting as the sole directive for all new shadow casting, bounce light, and atmospheric glow',
+          mood: 'cinematic, physically accurate, and climatically transformed',
+          technical: 'Isolated relighting study with complete original shadow erasure, 100% geometry preservation lock, physically based global illumination, do not look like CGI, no text, 16:9'
+        },
+        advanced: {
+          archStyle: 'layered museum-grade architectural',
+          buildingType: 'living gallery interior',
+          location: 'deep blue-hour twilight',
+          materials: 'existing architectural materials preserved with accurate specular response',
+          environment: 'completely erase all existing cast shadows from the original image before applying the new lighting',
+          foreground: 'freshly calculated directional shadows dictated exclusively by the new lighting setup',
+          lighting: 'warm late-afternoon golden-hour light or deep blue-hour twilight',
+          lightingDetail: 'completely erase all cast shadows from the original image so the new lighting exclusively dictates all shadow casting and falloff',
+          mood: 'dramatic and cinematic',
+          renderStyle: 'Corona Renderer, full path-traced global illumination, physically accurate relighting',
+          extraCommands: 'strictly preserve 100% of the original architecture, materials, and proportions, do not look like CGI, no text',
+          aspectRatio: '16:9'
+        }
+      },
+      {
+        id: 'single-central-bulb-simulation',
+        contextId: 'lighting',
+        name: 'Simulação: Luz Central Única (Sem Luminotécnica)',
+        badge: 'Didático Cliente',
+        description: 'Apaga todas as luzes indiretas e usa apenas uma forte lâmpada central no teto, demonstrando ao cliente como as texturas desaparecem sem projeto luminotécnico.',
+        quick: {
+          style: 'didactic architectural lighting comparison showing the space without a lighting design project, illuminated exclusively by a single harsh central ceiling light bulb',
+          materials: 'architectural stone, timber, and fabrics appearing washed-out, flat, and lifeless due to the absence of grazing light and indirect illumination',
+          environment: 'all indirect ceiling coves, linear LED profiles, wall washers, sconces, and floor lamps completely turned off and absent',
+          foreground: 'harsh downward glare in the center of the room with unflattering hard-edged shadows under furniture and dark unlit corners',
+          lighting: 'a single harsh 6000K bare overhead bulb positioned in the exact center of the ceiling, flattening all surface textures and erasing spatial depth',
+          mood: 'flat, clinical, uninviting, and lacking architectural depth',
+          technical: 'Realistic interior lighting simulation demonstrating single central ceiling bulb glare and texture loss, 100% geometry preservation, no indirect lighting, no text, 16:9'
+        },
+        advanced: {
+          archStyle: 'dramatic chiaroscuro architectural',
+          buildingType: 'living gallery interior',
+          location: 'pure nighttime darkness',
+          materials: 'stone and wood surfaces appearing flat and washed-out without grazing illumination',
+          environment: 'all indirect ceiling cove lighting, wall washers, and accent lamps turned off, using only a single central ceiling bulb',
+          foreground: 'harsh central floor glare and unflattering shadows under furniture',
+          lighting: 'single harsh bare overhead light bulb in the center of the ceiling',
+          lightingDetail: 'flattened surface textures and dark unlit room corners',
+          mood: 'flat, clinical, and lacking spatial depth',
+          renderStyle: 'Photorealistic architectural lighting comparison render, 8k',
+          extraCommands: 'strictly preserve 100% of the original architecture, turn off all indirect lighting, no text',
           aspectRatio: '16:9'
         }
       }
@@ -2430,6 +2828,36 @@ export const ARCH_CONTEXTS: ArchContextConfig[] = [
           extraCommands: 'no text',
           aspectRatio: '1:1'
         }
+      },
+      {
+        id: 'physical-topdown-moodboard-pbr',
+        contextId: 'texture-sheet',
+        name: 'Moodboard Físico Top-Down (Amostras Sobrepostas + Planta)',
+        badge: 'Moodboard Físico',
+        description: 'Amostras físicas de texturas organizadas naturalmente com sobreposições sobre bancada, proibindo grids perfeitos e incluindo elemento botânico para escala.',
+        quick: {
+          style: '90-degree top-down physical architectural moodboard on an atelier workbench featuring tactile material swatches arranged naturally with casual organic overlaps, strictly forbidding rigid geometric grids',
+          materials: 'cut slab of raw unfilled Roman Travertine stone, brushed Brazilian Freijó hardwood block, folded ivory bouclé fabric swatch, oxidized bronze metal plate, and limewash plaster sample',
+          environment: 'natural asymmetric atelier composition with overlapping physical samples casting real contact shadows on a neutral stone countertop, strictly no digital split-screen or perfect grid alignment',
+          foreground: 'a fresh organic botanical olive branch or tropical leaf resting naturally in the corner of the moodboard to provide real-world physical scale and organic contrast',
+          lighting: 'soft natural side-window atelier daylight at 5500K casting gentle physical drop shadows between overlapping material layers',
+          mood: 'tactile, artisanal, curated atelier presentation, and physically authentic',
+          technical: 'Top-down 90-degree flat-lay architectural moodboard photography, 8K macro detail, strictly no rigid grids, organic botanical element for scale, do not look like CGI, no text, 1:1'
+        },
+        advanced: {
+          archStyle: 'PBR material specification sheet with flat-lay swatch and 3D shader sphere',
+          buildingType: 'natural architectural stone slab',
+          location: '100cm x 100cm real-world physical scale with seamless continuity',
+          materials: 'overlapping physical swatches of raw Roman Travertine, Freijó timber, ivory bouclé textile, and brushed bronze',
+          environment: 'natural non-grid composition on an atelier workbench with casual overlaps, strictly forbidding rigid geometric grids',
+          foreground: 'an organic botanical leaf branch placed in the corner to provide physical scale and realistic contact shadows',
+          lighting: 'soft natural side-window daylight revealing tactile thickness and surface relief',
+          lightingDetail: 'soft ambient occlusion',
+          mood: 'color-accurate, tactile, and physically authentic',
+          renderStyle: '8K top-down flat-lay architectural moodboard photography, macro prime lens',
+          extraCommands: 'strictly forbid rigid grids, include organic botanical plant element for scale, do not look like CGI, no text',
+          aspectRatio: '1:1'
+        }
       }
     ]
   }
@@ -2507,6 +2935,24 @@ export const REFERENCE_IMAGE_FIELD: ArchFieldConfig<'imageRef'> = {
         'incorporating the exact furniture pieces, lighting fixtures, and decor objects shown in the attached reference images into the scene',
       labelPt:
         'Mobiliário / Objetos de Referência: Inserir no ambiente as peças de mobiliário e luminárias exatas das imagens enviadas'
+    },
+    {
+      value:
+        'Surgical Material Re-Skin: use Image 1 (Slot 1) strictly as the Geometry Master and Image 3 (Slot 3) strictly as the Texture Source, enforcing strict Footprint Lock so the new material fills the exact original surface area without bleeding onto adjacent furniture',
+      labelPt:
+        'Re-Skin Cirúrgico (Slot 1 Geometry Master + Slot 3 Texture Source + Trava de Pegada Footprint Lock)'
+    },
+    {
+      value:
+        'Virtual Demolition (Dry Area): strip and remove 100% of furniture, curtains, and decor from the attached survey photo, leaving clean white plastered walls and a raw gray concrete floor while preserving exact room geometry',
+      labelPt:
+        'Demolição Virtual (Área Seca): Remover todos os móveis e decorações da foto, deixando paredes brancas e piso cinza'
+    },
+    {
+      value:
+        'Virtual Demolition (Wet Area): remove all countertops, sanitary ware, and cabinetry from the attached bathroom/kitchen photo, replacing them with small exposed PVC plumbing stub-out pipes on bare walls',
+      labelPt:
+        'Demolição Virtual (Área Molhada): Remover bancadas/louças/marcenaria e exibir canos de PVC aparentes na parede bruta'
     }
   ],
   chips: [
@@ -2514,6 +2960,26 @@ export const REFERENCE_IMAGE_FIELD: ArchFieldConfig<'imageRef'> = {
       label: 'Seguir Geometria/Câmera da Imagem (Print 3D / Croqui)',
       value:
         'strictly following the exact architectural geometry, proportions, and camera angle from the attached reference image'
+    },
+    {
+      label: '🎯 Re-Skin Cirúrgico (Slot 1 Geometria + Slot 3 Textura + Footprint Lock)',
+      value:
+        'use Image 1 (Slot 1) strictly as Geometry Master and Image 3 (Slot 3) as Texture Source with strict Footprint Lock so the material never bleeds onto other furniture'
+    },
+    {
+      label: '🧱 Demolição Virtual Seca (Paredes Brancas + Piso Cinza)',
+      value:
+        'remove all furniture and decor from the attached photo, leaving clean white walls and a raw gray concrete floor while preserving exact room geometry'
+    },
+    {
+      label: '🚰 Demolição Virtual Molhada (Sem Louças + Canos PVC Aparentes)',
+      value:
+        'remove all countertops, sanitary ware, and cabinets from the attached photo, replacing them with exposed PVC water and sewage stub-out pipes on bare walls'
+    },
+    {
+      label: '🛋️ Virtual Staging (Mobiliar Foto Demolida c/ Estilo do Autor)',
+      value:
+        'virtually stage and furnish the empty demolished room from Image 1 strictly preserving its camera perspective, walls, and openings'
     },
     {
       label: 'Imagem 1 (Geometria/Base) + Imagem 2 (Estilo/Materiais)',

@@ -22,7 +22,12 @@ const emit = defineEmits<{
   ): void
 }>()
 
-type SheetLayoutType = 'pbr-board' | 'seamless-tile' | 'finish-comparison' | 'sample-slab'
+type SheetLayoutType =
+  | 'pbr-board'
+  | 'seamless-tile'
+  | 'finish-comparison'
+  | 'sample-slab'
+  | 'physical-moodboard'
 type RoughnessPreset = 'honed-matte' | 'raw-chiseled' | 'brushed-satin' | 'polished-gloss'
 type ModulationType = 'seamless-continuous' | 'slabs-1.5mm' | 'slatted-30mm' | 'herringbone'
 type PhysicalScale = '100x100cm' | '120x120cm' | '50x50cm' | '25x25cm-macro'
@@ -123,7 +128,9 @@ const buildAndEmitTexturePrompt = () => {
     'finish-comparison':
       'architectural material sample board comparing four surface finishes side-by-side: raw split-face, honed matte, brushed open-pore, and polished',
     'sample-slab':
-      'physical architectural sample card on a minimalist drafting table showing a cut material slab with exposed edge thickness, scale bar, and color swatches'
+      'physical architectural sample card on a minimalist drafting table showing a cut material slab with exposed edge thickness, scale bar, and color swatches',
+    'physical-moodboard':
+      '90-degree top-down physical architectural moodboard on an atelier workbench featuring physical material swatches arranged naturally with casual organic overlaps, strictly forbidding rigid geometric grids or digital split-screen layouts'
   }
 
   const roughnessMap: Record<RoughnessPreset, string> = {
@@ -149,17 +156,30 @@ const buildAndEmitTexturePrompt = () => {
       ? 'extracting and recreating the exact surface material, grain, color albedo, and tactile micro-relief from the attached reference image into a clean seamless PBR specification sheet'
       : ''
 
+  const isMoodboard = layoutType.value === 'physical-moodboard'
+
   const style = layoutMap[layoutType.value]
-  const materials = mat.materialsEn
-  const environment = modulationMap[modulation.value]
-  const foreground = `physically accurate PBR surface behavior with ${roughnessMap[roughness.value]}, ${mat.pbrNotesEn}${pbrChannelsSuffix}`
+  const materials = isMoodboard
+    ? `${mat.materialsEn}, layered naturally alongside complementary tactile swatches of brushed timber, raw linen bouclé fabric, and aged bronze`
+    : mat.materialsEn
+  const environment = isMoodboard
+    ? `natural asymmetric composition on an architectural atelier workbench with casually overlapping physical swatches (${physicalScale.value} scale), strictly forbidding perfect geometric grids`
+    : modulationMap[modulation.value]
+  const foreground = isMoodboard
+    ? `an organic botanical olive branch and fresh green leaf resting naturally on the corner of the workbench to provide physical scale, paired with ${roughnessMap[roughness.value]} and realistic contact shadows between overlapping swatches`
+    : `physically accurate PBR surface behavior with ${roughnessMap[roughness.value]}, ${mat.pbrNotesEn}${pbrChannelsSuffix}`
   const lighting =
     layoutType.value === 'seamless-tile'
       ? 'perfectly even flat-field cross-polarized D65 5500K diffuse lighting with zero vignetting and zero specular hotspots for seamless 3D tiling'
-      : 'calibrated D65 5500K neutral studio illumination paired with a subtle 30-degree grazing light to reveal surface micro-topography without color cast'
-  const mood = 'color-accurate, tactile, physically authentic, and specification-ready'
-  const technical =
-    '8K PBR material scan, Substance 3D Designer and Quixel Megascans quality, 100mm macro prime lens, zero barrel distortion, razor-sharp focus, no text, 1:1'
+      : isMoodboard
+        ? 'soft natural side-window atelier daylight at 5500K casting gentle physical drop shadows between the overlapping material samples and botanical foliage'
+        : 'calibrated D65 5500K neutral studio illumination paired with a subtle 30-degree grazing light to reveal surface micro-topography without color cast'
+  const mood = isMoodboard
+    ? 'tactile, artisanal, organic atelier curation, and physically authentic'
+    : 'color-accurate, tactile, physically authentic, and specification-ready'
+  const technical = isMoodboard
+    ? 'Top-down 90-degree flat-lay architectural moodboard photography, 8K macro detail, strictly no rigid grids, organic plant element for scale, do not look like CGI, no text, 1:1'
+    : '8K PBR material scan, Substance 3D Designer and Quixel Megascans quality, 100mm macro prime lens, zero barrel distortion, razor-sharp focus, no text, 1:1'
 
   emit('sync-texture-sheet', {
     imageRef,
@@ -223,24 +243,42 @@ watch(
         </h3>
       </div>
 
-      <label
-        class="inline-flex items-center gap-2 rounded-[10px] border-[1.5px] px-3 py-1.5 text-xs font-semibold cursor-pointer select-none"
-        :class="
-          includePbrChannelsInset
-            ? 'border-[#282824] bg-[#A5B4A0] text-[#282824] shadow-[2px_2px_0px_#282824]'
-            : isDark
-              ? 'border-[#77766F]/50 bg-[#161614] text-[#D8D0C3]'
-              : 'border-[#282824] bg-[#F5F1E9] text-[#282824]'
-        "
-      >
-        <input
-          v-model="includePbrChannelsInset"
-          type="checkbox"
-          class="sr-only"
-        />
-        <ArchIcon :name="includePbrChannelsInset ? 'check' : 'plus'" :size="12" />
-        <span>Incluir Mapas PBR (Albedo/Normal/Roughness)</span>
-      </label>
+      <div class="flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          @click="layoutType = layoutType === 'physical-moodboard' ? 'pbr-board' : 'physical-moodboard'"
+          class="inline-flex items-center gap-1.5 rounded-[10px] border-[1.5px] px-3 py-1.5 text-xs font-semibold transition-all"
+          :class="
+            layoutType === 'physical-moodboard'
+              ? 'border-[#282824] bg-[#C98268] text-[#282824] shadow-[2px_2px_0px_#282824]'
+              : isDark
+                ? 'border-[#77766F]/50 bg-[#161614] text-[#D8D0C3] hover:border-[#FAF9F6]'
+                : 'border-[#282824] bg-[#F5F1E9] text-[#282824] hover:bg-[#E8E8E3]'
+          "
+        >
+          <ArchIcon name="trees" :size="13" />
+          <span>Moodboard Físico Top-Down (s/ Grid + Planta)</span>
+        </button>
+
+        <label
+          class="inline-flex items-center gap-2 rounded-[10px] border-[1.5px] px-3 py-1.5 text-xs font-semibold cursor-pointer select-none"
+          :class="
+            includePbrChannelsInset
+              ? 'border-[#282824] bg-[#A5B4A0] text-[#282824] shadow-[2px_2px_0px_#282824]'
+              : isDark
+                ? 'border-[#77766F]/50 bg-[#161614] text-[#D8D0C3]'
+                : 'border-[#282824] bg-[#F5F1E9] text-[#282824]'
+          "
+        >
+          <input
+            v-model="includePbrChannelsInset"
+            type="checkbox"
+            class="sr-only"
+          />
+          <ArchIcon :name="includePbrChannelsInset ? 'check' : 'plus'" :size="12" />
+          <span>Incluir Mapas PBR (Albedo/Normal/Roughness)</span>
+        </label>
+      </div>
     </div>
 
     <!-- Seletor Rápido de Matéria-Prima Base (6 Amostras Táteis) -->
@@ -309,6 +347,7 @@ watch(
           <option value="seamless-tile">Textura Seamless 1:1 Pura (90° Tileable)</option>
           <option value="finish-comparison">Comparativo 4 Acabamentos</option>
           <option value="sample-slab">Placa de Amostra Física c/ Borda</option>
+          <option value="physical-moodboard">Moodboard Físico Top-Down (s/ Grid + Planta)</option>
         </select>
       </div>
 

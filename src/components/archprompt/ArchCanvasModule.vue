@@ -17,6 +17,19 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'sync-image-directive', directive: string): void
+  (
+    e: 'apply-decoded-blocks',
+    payload: {
+      style: string
+      materials: string
+      environment: string
+      foreground: string
+      lighting: string
+      mood: string
+      technical: string
+      imageRef?: string
+    }
+  ): void
   (e: 'open-config-modal'): void
   (e: 'notify', message: string): void
 }>()
@@ -32,6 +45,13 @@ const {
   generationError,
   selectedModel,
   hasActiveApiKeyForSelectedModel,
+  isAnalyzingReference,
+  lastDecodedReference,
+  isReverseEngineering,
+  authorStyleProfile,
+  batchSelectedModels,
+  batchResults,
+  isBatchGenerating,
   selectModel,
   setSlotImageFile,
   setSlotImageUrl,
@@ -40,6 +60,11 @@ const {
   buildCombinedImageDirective,
   exportConfigToJson,
   importConfigFromJson,
+  analyzeReferenceImages,
+  extractAuthorStyleProfile,
+  clearAuthorStyleProfile,
+  toggleBatchModel,
+  generateBatchOnCanvas,
   generateOnCanvas,
   deleteCanvasItem
 } = useArchCanvas()
@@ -47,10 +72,14 @@ const {
 const activeSlotIdForUrl = ref<string | null>(null)
 const dragOverSlotId = ref<string | null>(null)
 const showImageInputs = ref<boolean>(false)
+const showStyleReversePanel = ref<boolean>(false)
 const showCanvasModule = ref<boolean>(false)
+const showBatchPanel = ref<boolean>(false)
 const showInlineQuickConfig = ref<boolean>(false)
 const compareWithInput = ref<boolean>(false)
 const quickJsonInputRef = ref<HTMLInputElement | null>(null)
+const authorNameInput = ref<string>(authorStyleProfile.value?.authorName || 'Estúdio Autoral')
+const portfolioUploadedUrls = ref<string[]>([])
 
 const handleSelectModel = (modelId: CanvasModelId) => {
   selectModel(modelId)
@@ -180,6 +209,158 @@ const handleQuickJsonImport = async (e: Event) => {
     input.value = ''
   }
 }
+
+const handleAnalyzeReference = async () => {
+  if (filledImageSlots.value.length === 0) {
+    emit('notify', 'Anexe pelo menos 1 imagem nos slots abaixo antes de clicar em Analisar Referência.')
+    showImageInputs.value = true
+    return
+  }
+
+  const decoded = await analyzeReferenceImages(props.activeContextId)
+  if (decoded) {
+    const directive = buildCombinedImageDirective()
+    emit('apply-decoded-blocks', {
+      style: decoded.style,
+      materials: decoded.materials,
+      environment: decoded.environment,
+      foreground: decoded.foreground,
+      lighting: decoded.lighting,
+      mood: decoded.mood,
+      technical: decoded.technical,
+      imageRef: directive
+    })
+    emit('notify', 'Imagem decodificada! Os blocos de Estilo, Materiais, Luz e Técnica foram preenchidos.')
+  }
+}
+
+const handleApplySurgicalReskinWorkflow = () => {
+  const slot1 = imageSlots.value.find(s => s.id === 'img-1')
+  const slot3 = imageSlots.value.find(s => s.id === 'img-3')
+  if (slot1) {
+    slot1.directiveEn =
+      'use Slot 1 strictly as the master architectural geometry, preserving 100% of the structural footprint, volume, and element dimensions'
+  }
+  if (slot3) {
+    slot3.directiveEn =
+      'extract the exact material texture, surface grain, and reflectance from Slot 3 and apply it surgically onto the target surface without altering any spatial footprint'
+  }
+  const combinedDirective = buildCombinedImageDirective()
+  emit('apply-decoded-blocks', {
+    style:
+      'surgical material re-skin study maintaining the exact existing architectural design, proportions, and layout',
+    materials:
+      'surgical replacement of the target finish using the exact material sample from Slot 3 with physically accurate roughness, micro-relief, and seamless UV alignment',
+    environment:
+      'strictly preserve all surrounding architectural context, walls, openings, and ceiling details untouched',
+    foreground:
+      'footprint lock active: do not move, resize, add, or remove any existing furniture or structural elements',
+    lighting:
+      'protect the original lighting project: maintain the exact existing light sources, color temperature, and contact shadows',
+    mood: 'clinical architectural material study with authentic real-world physical behavior',
+    technical:
+      '100% preservation of original architecture and proportions, surgical material swap only, do not look like a 3D render, CGI, VFX, video game, or digital art',
+    imageRef:
+      combinedDirective ||
+      'use Image 1 strictly as Geometry Master and Image 3 as Material/Texture Source with strict Footprint Lock'
+  })
+  emit('notify', 'Workflow Re-Skin Cirúrgico ativado (Slot 1 Geometria + Slot 3 Textura + Footprint Lock)!')
+}
+
+const handleApplyVirtualStagingWorkflow = () => {
+  const profile = authorStyleProfile.value
+  const directive =
+    'perform a virtual demolition first (stripping away outdated furniture and clutter down to the clean shell while keeping structural walls and windows intact), then execute a complete Virtual Staging with the author architectural style'
+  const slot1 = imageSlots.value.find(s => s.id === 'img-1')
+  if (slot1) {
+    slot1.directiveEn = directive
+  }
+  emit('apply-decoded-blocks', {
+    style: profile
+      ? `${profile.quickBlocks.style} (${profile.authorName} signature virtual staging)`
+      : 'contemporary warm minimalism virtual staging with bespoke architectural joinery and curated designer furniture',
+    materials: profile
+      ? profile.quickBlocks.materials
+      : 'natural freijó wood millwork, honed travertine stone, brushed bronze accents, and organic bouclé upholstery',
+    environment:
+      'renovated architectural shell after virtual demolition preserving the exact structural walls, ceiling height, and window openings of the original photo',
+    foreground: profile
+      ? profile.quickBlocks.foreground
+      : 'ergonomically arranged designer furniture layout respecting circulation paths, spatial depth, and architectural focal points',
+    lighting:
+      'balanced natural daylight entering through the original windows combined with warm 2700K architectural cove and accent lighting',
+    mood: 'high-end architectural transformation ready for client presentation, tactile and welcoming',
+    technical:
+      'two-stage Virtual Demolition + Virtual Staging workflow, strict structural preservation of walls/openings, photorealistic ArchViz photography',
+    imageRef: buildCombinedImageDirective() || directive
+  })
+  emit('notify', 'Workflow Virtual Staging (Demolição Virtual + Reforma Autoral) aplicado aos blocos!')
+}
+
+const handlePortfolioFilesUpload = async (e: Event) => {
+  const input = e.target as HTMLInputElement
+  const files = input.files
+  if (!files || files.length === 0) return
+  const loaded: string[] = []
+  const slotIds = ['img-1', 'img-2', 'img-3']
+  let idx = 0
+  for (const file of Array.from(files).slice(0, 6)) {
+    if (!file.type.startsWith('image/')) continue
+    if (idx < slotIds.length) {
+      await setSlotImageFile(slotIds[idx]!, file)
+      idx++
+    }
+    const dataUrl = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => resolve(String(reader.result || ''))
+      reader.onerror = () => reject(new Error('Erro ao ler imagem'))
+      reader.readAsDataURL(file)
+    })
+    loaded.push(dataUrl)
+  }
+  portfolioUploadedUrls.value = [...portfolioUploadedUrls.value, ...loaded].slice(0, 6)
+  input.value = ''
+  emit('notify', `${loaded.length} foto(s) de projetos anteriores carregadas para Engenharia Reversa.`)
+}
+
+const handleExtractAuthorStyle = async () => {
+  const res = await extractAuthorStyleProfile({
+    authorName: authorNameInput.value,
+    portfolioDataUrls: portfolioUploadedUrls.value
+  })
+  if (res) {
+    emit(
+      'notify',
+      `Pilares Visuais de "${res.authorName}" extraídos com sucesso! Você já pode aplicá-los ao prompt.`
+    )
+  }
+}
+
+const handleApplyAuthorProfileToBlocks = () => {
+  const p = authorStyleProfile.value
+  if (!p) return
+  emit('apply-decoded-blocks', {
+    style: p.quickBlocks.style,
+    materials: p.quickBlocks.materials,
+    environment: p.quickBlocks.environment,
+    foreground: p.quickBlocks.foreground,
+    lighting: p.quickBlocks.lighting,
+    mood: p.quickBlocks.mood,
+    technical: `${p.quickBlocks.technical}, ${p.visualPillarsPromptEn}`
+  })
+  emit('notify', `Pilares Visuais de "${p.authorName}" aplicados nos blocos do prompt!`)
+}
+
+const handleTriggerBatchGenerate = async (forceSimulation = false) => {
+  const results = await generateBatchOnCanvas({
+    prompt: props.finalPrompt,
+    contextId: props.activeContextId,
+    forceSimulation
+  })
+  if (results.length > 0) {
+    emit('notify', `Teste em Lote concluído em ${results.length} motores de IA simultaneamente!`)
+  }
+}
 </script>
 
 <template>
@@ -227,6 +408,16 @@ const handleQuickJsonImport = async (e: Event) => {
           <button
             v-if="filledImageSlots.length > 0"
             type="button"
+            :disabled="isAnalyzingReference"
+            @click="handleAnalyzeReference"
+            class="rounded-[6px] border border-[#282824] bg-[#C98268] px-2 py-0.5 font-mono text-[10px] font-semibold text-[#282824] shadow-[1.5px_1.5px_0px_#282824] hover:opacity-95 disabled:opacity-50"
+            title="Decodificar imagem enviada com IA e preencher automaticamente todos os blocos do prompt"
+          >
+            {{ isAnalyzingReference ? 'Analisando...' : 'Analisar Referência' }}
+          </button>
+          <button
+            v-if="filledImageSlots.length > 0"
+            type="button"
             @click="syncDirectivesToPrompt"
             class="rounded-[6px] border border-[#282824] bg-[#FAF9F6] px-2 py-0.5 font-mono text-[10px] font-semibold text-[#282824] hover:bg-[#E8E8E3]"
             title="Aplicar diretrizes das imagens anexadas ao prompt compilado"
@@ -263,6 +454,170 @@ const handleQuickJsonImport = async (e: Event) => {
         <p class="text-[11px] leading-relaxed" :class="isDark ? 'text-[#D8D0C3]' : 'text-[#77766F]'">
           Anexe até 3 imagens de referência (croqui/planta, referência de luz ou amostra de textura/móvel 3D). Você pode <strong>arrastar</strong>, <strong>clicar para enviar</strong>, <strong>colar (Ctrl+V)</strong> ou usar <strong>URL</strong>.
         </p>
+
+        <!-- Barra de Workflows Inteligentes: Analisar Referência + Re-Skin Cirúrgico + Virtual Staging + Engenharia Reversa -->
+        <div
+          class="rounded-[10px] border-[1.5px] p-2.5 space-y-2"
+          :class="isDark ? 'border-[#77766F]/40 bg-[#161614]' : 'border-[#282824] bg-[#F5F1E9]'"
+        >
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <span class="font-mono text-[10px] font-semibold uppercase tracking-wider" :class="isDark ? 'text-[#D8D0C3]' : 'text-[#282824]'">
+              Workflows de Decodificação &amp; Intervenção Cirúrgica:
+            </span>
+            <button
+              type="button"
+              @click="showStyleReversePanel = !showStyleReversePanel"
+              class="font-mono text-[10px] font-semibold underline underline-offset-2"
+              :class="isDark ? 'text-[#D8B99A]' : 'text-[#282824]'"
+            >
+              {{ showStyleReversePanel ? 'Fechar Engenharia Reversa' : 'Engenharia Reversa de Estilo (Autor)' }}
+            </button>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-1.5">
+            <button
+              type="button"
+              :disabled="isAnalyzingReference"
+              @click="handleAnalyzeReference"
+              class="rounded-[7px] border-[1.5px] border-[#282824] bg-[#C98268] px-2.5 py-1 font-mono text-[10px] font-semibold text-[#282824] shadow-[1.5px_1.5px_0px_#282824] hover:opacity-95 disabled:opacity-50"
+            >
+              {{ isAnalyzingReference ? 'Decodificando Imagem...' : '🔍 Analisar Referência (Preencher Blocos)' }}
+            </button>
+
+            <button
+              type="button"
+              @click="handleApplySurgicalReskinWorkflow"
+              class="rounded-[7px] border-[1.5px] border-[#282824] bg-[#D8B99A] px-2.5 py-1 font-mono text-[10px] font-semibold text-[#282824] shadow-[1.5px_1.5px_0px_#282824] hover:opacity-95"
+              title="Slot 1 como Mestre de Geometria + Slot 3 como Fonte de Textura + Footprint Lock"
+            >
+              🧱 Re-Skin Cirúrgico (Slot 1 + Slot 3 + Footprint Lock)
+            </button>
+
+            <button
+              type="button"
+              @click="handleApplyVirtualStagingWorkflow"
+              class="rounded-[7px] border-[1.5px] border-[#282824] bg-[#A5B4A0] px-2.5 py-1 font-mono text-[10px] font-semibold text-[#282824] shadow-[1.5px_1.5px_0px_#282824] hover:opacity-95"
+              title="Demolição Virtual (limpeza do espaço) seguida de Virtual Staging com o estilo do arquiteto"
+            >
+              🛋️ Virtual Staging (Demolição + Estilo Autoral)
+            </button>
+          </div>
+
+          <!-- Resultado da Decodificação ("Analisar Referência") -->
+          <div
+            v-if="lastDecodedReference"
+            class="mt-2 rounded-[8px] border border-[#282824]/40 p-2.5 text-[11px] space-y-1"
+            :class="isDark ? 'bg-[#1F1F1C] text-[#FAF9F6]' : 'bg-[#FAF9F6] text-[#282824]'"
+          >
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-mono text-[10px] font-bold uppercase text-[#C98268]">
+                ✓ Referência Decodificada em Blocos
+              </span>
+              <button
+                type="button"
+                @click="lastDecodedReference = null"
+                class="font-mono text-[9px] text-[#77766F] hover:underline"
+              >
+                Ocultar
+              </button>
+            </div>
+            <p class="text-[11px] leading-snug">{{ lastDecodedReference.summaryPt }}</p>
+          </div>
+
+          <!-- Painel de Engenharia Reversa de Estilo ("Pilares Visuais do Autor") -->
+          <div
+            v-if="showStyleReversePanel"
+            class="mt-2 rounded-[9px] border-[1.5px] p-3 space-y-2.5"
+            :class="isDark ? 'border-[#D8B99A]/60 bg-[#1F1F1C]' : 'border-[#282824] bg-[#FAF9F6]'"
+          >
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h4 class="font-display text-xs font-semibold">
+                  Engenharia Reversa de Estilo (Pilares Visuais do Autor)
+                </h4>
+                <p class="text-[10px] text-[#77766F]">
+                  Envie fotos de projetos anteriores (ou use os slots abaixo) para extrair Geometria, Paleta de Cores, Materiais e Escolhas de Design do escritório.
+                </p>
+              </div>
+              <span
+                v-if="authorStyleProfile"
+                class="rounded border border-[#282824] bg-[#A5B4A0] px-1.5 py-0.5 font-mono text-[9px] font-semibold text-[#282824]"
+              >
+                Perfil Ativo: {{ authorStyleProfile.authorName }}
+              </span>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+              <input
+                v-model="authorNameInput"
+                type="text"
+                placeholder="Nome do Estúdio / Arquiteto"
+                class="arch-input flex-1 min-w-[160px] px-2.5 py-1 font-mono text-[11px]"
+              />
+              <label
+                for="portfolio-style-upload"
+                class="arch-btn-secondary cursor-pointer inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold"
+              >
+                <ArchIcon name="upload" :size="12" />
+                <span>Fotos do Portfólio ({{ portfolioUploadedUrls.length }})</span>
+              </label>
+              <input
+                id="portfolio-style-upload"
+                type="file"
+                accept="image/*"
+                multiple
+                class="hidden"
+                @change="handlePortfolioFilesUpload"
+              />
+              <button
+                type="button"
+                :disabled="isReverseEngineering"
+                @click="handleExtractAuthorStyle"
+                class="arch-btn-primary px-2.5 py-1 text-[11px] font-semibold disabled:opacity-50"
+              >
+                {{ isReverseEngineering ? 'Extraindo Pilares...' : 'Extrair Pilares Visuais' }}
+              </button>
+            </div>
+
+            <div
+              v-if="authorStyleProfile"
+              class="rounded-[8px] border border-[#282824]/30 p-2.5 space-y-1.5 text-[11px]"
+              :class="isDark ? 'bg-[#161614]' : 'bg-[#F5F1E9]'"
+            >
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 font-mono text-[10px]">
+                <div><strong>1. Geometria:</strong> {{ authorStyleProfile.geometryPillarPt }}</div>
+                <div><strong>2. Paleta:</strong> {{ authorStyleProfile.colorPalettePillarPt }}</div>
+                <div><strong>3. Materiais:</strong> {{ authorStyleProfile.materialsPillarPt }}</div>
+                <div><strong>4. Design:</strong> {{ authorStyleProfile.designChoicesPillarPt }}</div>
+              </div>
+              <div class="flex flex-wrap items-center justify-between gap-2 pt-1.5 border-t border-[#282824]/15">
+                <div class="flex flex-wrap items-center gap-1.5">
+                  <button
+                    type="button"
+                    @click="handleApplyAuthorProfileToBlocks"
+                    class="rounded-[6px] border border-[#282824] bg-[#C98268] px-2 py-0.5 font-mono text-[10px] font-semibold text-[#282824]"
+                  >
+                    Aplicar Pilares ao Prompt
+                  </button>
+                  <button
+                    type="button"
+                    @click="handleApplyVirtualStagingWorkflow"
+                    class="rounded-[6px] border border-[#282824] bg-[#A5B4A0] px-2 py-0.5 font-mono text-[10px] font-semibold text-[#282824]"
+                  >
+                    Virtual Staging c/ Este Estilo
+                  </button>
+                </div>
+                <button
+                  type="button"
+                  @click="clearAuthorStyleProfile"
+                  class="font-mono text-[10px] text-[#F47760] hover:underline"
+                >
+                  Limpar Perfil
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <div class="grid grid-cols-1 gap-2.5">
           <div
@@ -618,29 +973,47 @@ const handleQuickJsonImport = async (e: Event) => {
           />
         </div>
 
-        <!-- Proporção + Botões de Geração -->
+        <!-- Proporção + Botões de Geração + Testes em Lote -->
         <div class="flex flex-wrap items-center justify-between gap-2">
-          <div class="inline-flex items-center gap-1 rounded-[8px] border-[1.5px] p-0.5" :class="isDark ? 'border-[#77766F]/50 bg-[#161614]' : 'border-[#282824] bg-[#F5F1E9]'">
+          <div class="flex items-center gap-1.5">
+            <div class="inline-flex items-center gap-1 rounded-[8px] border-[1.5px] p-0.5" :class="isDark ? 'border-[#77766F]/50 bg-[#161614]' : 'border-[#282824] bg-[#F5F1E9]'">
+              <button
+                v-for="ratio in (['1:1', '16:9', '4:5', '9:16'] as const)"
+                :key="ratio"
+                type="button"
+                @click="config.aspectRatio = ratio"
+                class="rounded-[5px] px-2 py-0.5 font-mono text-[10px] font-semibold transition-all"
+                :class="
+                  config.aspectRatio === ratio
+                    ? 'bg-[#282824] text-[#FAF9F6]'
+                    : 'text-[#77766F] hover:text-[#282824]'
+                "
+              >
+                {{ ratio }}
+              </button>
+            </div>
+
             <button
-              v-for="ratio in (['1:1', '16:9', '4:5', '9:16'] as const)"
-              :key="ratio"
               type="button"
-              @click="config.aspectRatio = ratio"
-              class="rounded-[5px] px-2 py-0.5 font-mono text-[10px] font-semibold transition-all"
+              @click="showBatchPanel = !showBatchPanel"
+              class="rounded-[8px] border-[1.5px] px-2.5 py-1 font-mono text-[10px] font-semibold transition-all"
               :class="
-                config.aspectRatio === ratio
-                  ? 'bg-[#282824] text-[#FAF9F6]'
-                  : 'text-[#77766F] hover:text-[#282824]'
+                showBatchPanel
+                  ? 'border-[#282824] bg-[#C98268] text-[#282824] shadow-[1.5px_1.5px_0px_#282824]'
+                  : isDark
+                    ? 'border-[#77766F]/50 bg-[#161614] text-[#D8D0C3]'
+                    : 'border-[#282824] bg-[#F5F1E9] text-[#282824]'
               "
+              title="Disparar o mesmo prompt em múltiplos motores simultaneamente para comparar iluminação e consistência"
             >
-              {{ ratio }}
+              ⚡ Testes em Lote ({{ batchSelectedModels.length }})
             </button>
           </div>
 
           <div class="flex items-center gap-2 flex-1 sm:flex-initial justify-end">
             <button
               type="button"
-              :disabled="isGenerating"
+              :disabled="isGenerating || isBatchGenerating"
               @click="handleTriggerGenerate(true)"
               class="arch-btn-secondary px-2.5 py-2 text-xs font-semibold disabled:opacity-50"
               title="Gerar prancha técnica simulada no Canvas sem consumir créditos de API"
@@ -650,7 +1023,7 @@ const handleQuickJsonImport = async (e: Event) => {
 
             <button
               type="button"
-              :disabled="isGenerating"
+              :disabled="isGenerating || isBatchGenerating"
               @click="handleTriggerGenerate(false)"
               class="arch-btn-primary inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold disabled:opacity-50"
               :style="selectedModel.is3D ? { backgroundColor: '#F47760' } : undefined"
@@ -666,6 +1039,89 @@ const handleQuickJsonImport = async (e: Event) => {
                 }}
               </span>
             </button>
+          </div>
+        </div>
+
+        <!-- Painel de Testes em Lote (Batch Testing em Múltiplos Motores Simultâneos) -->
+        <div
+          v-if="showBatchPanel"
+          class="rounded-[10px] border-[1.5px] p-3 space-y-2.5"
+          :class="isDark ? 'border-[#C98268]/60 bg-[#161614]' : 'border-[#282824] bg-[#F5F1E9] shadow-[2px_2px_0px_#282824]'"
+        >
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h4 class="font-display text-xs font-semibold">
+                Testes em Lote (Comparação Multi-Motor Simultânea)
+              </h4>
+              <p class="text-[10px] text-[#77766F]">
+                Selecione os motores abaixo para disparar o mesmo prompt compilado em paralelo e comparar luz, materiais e consistência lado a lado.
+              </p>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button
+                type="button"
+                :disabled="isBatchGenerating"
+                @click="handleTriggerBatchGenerate(true)"
+                class="arch-btn-secondary px-2.5 py-1 font-mono text-[10px] font-semibold disabled:opacity-50"
+              >
+                Preview Lote
+              </button>
+              <button
+                type="button"
+                :disabled="isBatchGenerating"
+                @click="handleTriggerBatchGenerate(false)"
+                class="rounded-[7px] border-[1.5px] border-[#282824] bg-[#C98268] px-2.5 py-1 font-mono text-[10px] font-semibold text-[#282824] shadow-[1.5px_1.5px_0px_#282824] disabled:opacity-50"
+              >
+                {{ isBatchGenerating ? 'Renderizando Lote...' : `Disparar Lote (${batchSelectedModels.length} IAs)` }}
+              </button>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-1.5">
+            <button
+              v-for="model in CANVAS_MODELS"
+              :key="`batch-${model.id}`"
+              type="button"
+              @click="toggleBatchModel(model.id)"
+              class="rounded-[6px] border px-2 py-0.5 font-mono text-[10px] font-semibold transition-all"
+              :class="
+                batchSelectedModels.includes(model.id)
+                  ? 'border-[#282824] bg-[#A5B4A0] text-[#282824]'
+                  : isDark
+                    ? 'border-[#77766F]/40 bg-[#1F1F1C] text-[#77766F]'
+                    : 'border-[#282824]/40 bg-[#FAF9F6] text-[#77766F]'
+              "
+            >
+              {{ batchSelectedModels.includes(model.id) ? '✓ ' : '+ ' }}{{ model.shortLabel }}
+            </button>
+          </div>
+
+          <!-- Grade de Comparação Lado a Lado do Lote -->
+          <div
+            v-if="batchResults.length > 1"
+            class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2 border-t border-[#282824]/15"
+          >
+            <div
+              v-for="bItem in batchResults"
+              :key="`batch-res-${bItem.id}`"
+              @click="activeCanvasItem = bItem"
+              class="cursor-pointer rounded-[8px] border-[1.5px] overflow-hidden transition-all"
+              :class="
+                activeCanvasItem?.id === bItem.id
+                  ? 'border-[#C98268] ring-2 ring-[#C98268]/60'
+                  : isDark
+                    ? 'border-[#77766F]/40 bg-[#1F1F1C]'
+                    : 'border-[#282824] bg-[#FAF9F6]'
+              "
+            >
+              <div class="aspect-square bg-[#161614] overflow-hidden">
+                <img :src="bItem.imageUrl" :alt="bItem.modelLabel" class="h-full w-full object-cover" />
+              </div>
+              <div class="px-2 py-1 flex items-center justify-between text-[9px] font-mono">
+                <span class="font-bold truncate">{{ bItem.modelId }}</span>
+                <span class="text-[#77766F]">{{ bItem.isSimulated ? 'Preview' : 'API Real' }}</span>
+              </div>
+            </div>
           </div>
         </div>
 

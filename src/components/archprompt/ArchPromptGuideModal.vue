@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
-import { GUIDE_PHASES } from '../../data/archprompt'
+import { GUIDE_PHASES, GUIDE_ADVANCED_WORKFLOWS } from '../../data/archprompt'
 import ArchIcon from './ArchIcon.vue'
 
 const props = defineProps<{
@@ -138,7 +138,7 @@ onUnmounted(() => {
               </div>
 
               <div
-                class="rounded-[10px] border-[1.5px] p-4 font-mono text-xs md:text-sm leading-relaxed"
+                class="rounded-[10px] border-[1.5px] p-4 font-mono text-xs md:text-sm leading-relaxed space-y-2.5"
                 :class="
                   isDark
                     ? 'bg-[#161614] border-[#77766F]/40 text-[#E8E8E3]'
@@ -153,12 +153,23 @@ onUnmounted(() => {
                   <span class="font-bold underline decoration-[#C98268] decoration-2">[03 MICRO]</span>
                   Surround the house with mature pine trees, layered grasses, shrubs, and subtle planting.
                   <span class="font-bold underline decoration-[#C98268] decoration-2">[04 1º PLANO]</span>
-                  Add a calm natural pond in the foreground with realistic reflections, soft ripples, shoreline stones, and a small rustic wooden rowboat.
-                  <span class="font-bold underline decoration-[#C98268] decoration-2">[05 LUZ & CLIMA]</span>
+                  Add a calm natural pond in the foreground with realistic reflections, soft ripples, shoreline stones, and a subtle human figure at 70-85% translucent opacity with photographic motion blur.
+                  <span class="font-bold underline decoration-[#C98268] decoration-2">[05 LUZ &amp; CLIMA]</span>
                   Use warm late-afternoon golden-hour light filtering through the trees, with soft cinematic shadows and subtle interior glow. Keep the scene peaceful, luxurious, natural, and architecture-focused.
-                  <span class="font-bold underline decoration-[#C98268] decoration-2">[06 TÉCNICO]</span>
-                  Ultra-realistic architectural visualization, soft global illumination, detailed vegetation, no text, 1:1.
+                  <span class="font-bold underline decoration-[#C98268] decoration-2">[06 TÉCNICO &amp; SEGURANÇA]</span>
+                  Ultra-realistic architectural visualization, soft global illumination, detailed vegetation, preserve 100% of original architecture, no text, 1:1. Do not look like a 3D render, CGI, VFX, video game, or digital art.
                 </p>
+                <div
+                  class="rounded-[8px] border border-dashed px-3 py-2 text-[11px]"
+                  :class="
+                    isDark
+                      ? 'border-[#A5B4A0]/50 bg-[#1F1F1C] text-[#D8D0C3]'
+                      : 'border-[#282824]/50 bg-[#FAF9F6] text-[#282824]'
+                  "
+                >
+                  <strong class="uppercase">[BLOCO SEPARADO · DIRETRIZ DE IMAGEM ANEXADA]</strong>
+                  Reference image directive: use Image 1 (Slot 1) strictly as Geometry Master and Image 3 (Slot 3) as Texture Source with strict Footprint Lock.
+                </div>
               </div>
             </section>
 
@@ -172,7 +183,7 @@ onUnmounted(() => {
                   class="text-sm mt-1 max-w-prose leading-relaxed"
                   :class="isDark ? 'text-[#E8E8E3]/80' : 'text-[#77766F]'"
                 >
-                  Modelos de difusão atribuem maior peso semântico aos tokens iniciais. Por isso, a narrativa parte da escala <strong>Macro</strong> (sujeito e implantação), passa pela escala <strong>Média</strong> (materialidade) e <strong>Micro</strong> (paisagismo e primeiro plano), e finaliza com iluminação e parâmetros técnicos.
+                  Modelos de difusão atribuem maior peso semântico aos tokens iniciais. Por isso, a narrativa parte da escala <strong>Macro</strong> (sujeito e implantação), passa pela escala <strong>Média</strong> (materialidade) e <strong>Micro</strong> (paisagismo e primeiro plano), e finaliza com iluminação, travas de preservação e o sufixo Anti-CGI na <strong>Fase 06</strong>.
                 </p>
               </div>
 
@@ -243,6 +254,93 @@ onUnmounted(() => {
                   </dl>
                 </article>
               </div>
+            </section>
+
+            <!-- 2. Workflows Avançados, Intervenções Cirúrgicas & Segurança -->
+            <section class="space-y-4">
+              <div>
+                <h3 class="font-display text-lg font-semibold">
+                  2. Workflows Avançados, Intervenções Cirúrgicas &amp; Travas de Segurança
+                </h3>
+                <p
+                  class="text-sm mt-1 max-w-prose leading-relaxed"
+                  :class="isDark ? 'text-[#E8E8E3]/80' : 'text-[#77766F]'"
+                >
+                  Recursos especializados do ArchStudio para decodificar imagens de clientes, extrair os pilares visuais do escritório, realizar demolições virtuais, substituir materiais cirurgicamente e comparar múltiplos motores de IA lado a lado.
+                </p>
+              </div>
+
+              <div class="grid grid-cols-1 gap-3.5">
+                <article
+                  v-for="wf in GUIDE_ADVANCED_WORKFLOWS"
+                  :key="wf.id"
+                  class="rounded-[12px] border-[1.75px] p-4 space-y-2"
+                  :class="
+                    isDark
+                      ? 'bg-[#1F1F1C] border-[#77766F]/40'
+                      : 'bg-[#FAF9F6] border-[#282824] shadow-[3px_3px_0px_#282824]'
+                  "
+                >
+                  <div class="flex flex-wrap items-center justify-between gap-2">
+                    <h4 class="font-display font-semibold text-sm md:text-base">
+                      {{ wf.title }}
+                    </h4>
+                    <span
+                      class="rounded-[6px] border border-[#282824] bg-[#D8B99A] px-2 py-0.5 font-mono text-[10px] font-semibold uppercase text-[#282824]"
+                    >
+                      {{ wf.badge }}
+                    </span>
+                  </div>
+
+                  <p class="text-xs leading-relaxed" :class="isDark ? 'text-[#E8E8E3]/85' : 'text-[#77766F]'">
+                    {{ wf.summary }}
+                  </p>
+
+                  <p class="text-xs leading-relaxed">
+                    <strong>Como usar:</strong>
+                    <span :class="isDark ? 'text-[#D8D0C3]' : 'text-[#282824]'"> {{ wf.howToUse }}</span>
+                  </p>
+
+                  <div
+                    class="rounded-[8px] border px-3 py-1.5 font-mono text-[11px]"
+                    :class="
+                      isDark
+                        ? 'bg-[#161614] border-[#77766F]/40 text-[#A5B4A0]'
+                        : 'bg-[#F5F1E9] border-[#282824]/30 text-[#282824]'
+                    "
+                  >
+                    {{ wf.promptRuleEn }}
+                  </div>
+                </article>
+              </div>
+            </section>
+
+            <!-- 3. Papel dos 3 Slots Multimodais & Testes em Lote -->
+            <section
+              class="rounded-[14px] border-[1.75px] p-5 space-y-3"
+              :class="
+                isDark
+                  ? 'bg-[#1F1F1C] border-[#77766F]/50'
+                  : 'bg-[#FAF9F6] border-[#282824] shadow-[3px_3px_0px_#282824]'
+              "
+            >
+              <h3 class="font-display text-base md:text-lg font-semibold">
+                3. Papel dos 3 Slots de Imagem &amp; Testes em Lote (Batch Testing)
+              </h3>
+              <ul class="space-y-1.5 text-xs leading-relaxed" :class="isDark ? 'text-[#E8E8E3]/85' : 'text-[#282824]'">
+                <li>
+                  <strong>IMG 01 · Base / Geometria (Geometry Master):</strong> Croqui, print do SketchUp/Revit, planta baixa ou foto de levantamento. Atua como trava estrutural de perspectiva e volumetria.
+                </li>
+                <li>
+                  <strong>IMG 02 · Estilo / Luz (Atmosphere Reference):</strong> Referência de clima luminotécnico (Golden Hour, Blue Hour, sanca 2700K) e direção artística.
+                </li>
+                <li>
+                  <strong>IMG 03 · Material / Objeto 3D (Texture Source):</strong> Amostra de revestimento para <em>Re-Skin Cirúrgico</em> com <em>Footprint Lock</em> ou referência de peça de mobiliário para o <code>3d.hunyuan</code>.
+                </li>
+                <li>
+                  <strong>⚡ Testes em Lote (Batch Testing):</strong> No módulo Canvas, selecione múltiplos motores (<code>gemini.imagen</code>, <code>gpt-image-1</code>, <code>flux.pro</code>, <code>3d.hunyuan</code>) e clique em <strong>Disparar Lote</strong> para comparar lado a lado a fidelidade de luz e materiais.
+                </li>
+              </ul>
             </section>
           </div>
 

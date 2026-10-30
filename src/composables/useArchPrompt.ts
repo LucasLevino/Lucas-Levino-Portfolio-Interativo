@@ -39,6 +39,8 @@ export interface PromptHistoryItem {
 
 const HISTORY_STORAGE_KEY = 'lucaslevino_archprompt_history_v1'
 const THEME_STORAGE_KEY = 'lucaslevino_archprompt_theme_v2'
+export const ANTI_DIGITAL_AESTHETIC_SUFFIX =
+  'Do not look like a 3D render, CGI, VFX, video game, or digital art.'
 
 const createEmptyQuickData = (): QuickPromptData => ({
   style: '',
@@ -99,6 +101,7 @@ export function useArchPrompt() {
   const isManualEdit = ref(false)
   const manualPromptText = ref('')
   const activePresetId = ref<string | null>(null)
+  const enforceAntiDigitalSuffix = ref<boolean>(true)
 
   const loadInitialTheme = (): boolean => {
     try {
@@ -348,9 +351,18 @@ export function useArchPrompt() {
       .map(s => s.text)
       .join('')
     const cleanImageRef = imageRef.value.trim().replace(/^[,\s]+|[.\s]+$/g, '')
-    if (!cleanImageRef) return coreRender
-    const capitalizedRef = cleanImageRef.charAt(0).toUpperCase() + cleanImageRef.slice(1)
-    return `${coreRender} Reference image directive: ${capitalizedRef}.`
+    const withImageRef = cleanImageRef
+      ? `${coreRender} Reference image directive: ${cleanImageRef.charAt(0).toUpperCase() + cleanImageRef.slice(1)}.`
+      : coreRender
+
+    if (
+      enforceAntiDigitalSuffix.value &&
+      !withImageRef.toLowerCase().includes('do not look like a 3d render') &&
+      !withImageRef.toLowerCase().includes('do not look like cgi')
+    ) {
+      return `${withImageRef} ${ANTI_DIGITAL_AESTHETIC_SUFFIX}`
+    }
+    return withImageRef
   })
 
   const finalPrompt = computed(() => {
@@ -578,6 +590,7 @@ export function useArchPrompt() {
     isManualEdit,
     manualPromptText,
     activePresetId,
+    enforceAntiDigitalSuffix,
     promptSegments,
     templatePrompt,
     finalPrompt,

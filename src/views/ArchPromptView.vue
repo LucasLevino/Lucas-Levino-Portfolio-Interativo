@@ -44,6 +44,7 @@ const {
   isManualEdit,
   manualPromptText,
   activePresetId,
+  enforceAntiDigitalSuffix,
   promptSegments,
   finalPrompt,
   completionStats,
@@ -207,6 +208,31 @@ const handleSyncImageDirective = (directive: string) => {
   setFieldValue('imageRef', directive)
   if (directive) {
     triggerToast('Diretriz das imagens do Canvas sincronizada com o prompt!')
+  }
+}
+
+const handleApplyDecodedBlocks = (payload: {
+  style: string
+  materials: string
+  environment: string
+  foreground: string
+  lighting: string
+  mood: string
+  technical: string
+  imageRef?: string
+}) => {
+  if (mode.value !== 'quick') {
+    switchMode('quick')
+  }
+  setFieldValue('style', payload.style)
+  setFieldValue('materials', payload.materials)
+  setFieldValue('environment', payload.environment)
+  setFieldValue('foreground', payload.foreground)
+  setFieldValue('lighting', payload.lighting)
+  setFieldValue('mood', payload.mood)
+  setFieldValue('technical', payload.technical)
+  if (payload.imageRef !== undefined) {
+    setFieldValue('imageRef', payload.imageRef)
   }
 }
 
@@ -1235,9 +1261,9 @@ const isHalfWidthField = (fieldId: string): boolean => {
                 </div>
               </div>
 
-              <!-- Metadados Técnicos do Prompt -->
+              <!-- Metadados Técnicos do Prompt + Trava Anti-CGI (Fase 06) -->
               <div
-                class="mt-6 pt-3 border-t-[1.5px] flex items-center justify-between font-mono text-[11px] tabular-nums"
+                class="mt-6 pt-3 border-t-[1.5px] flex flex-wrap items-center justify-between gap-2 font-mono text-[11px] tabular-nums"
                 :class="
                   isDark
                     ? 'border-[#77766F]/40 text-[#D8D0C3]'
@@ -1245,7 +1271,24 @@ const isHalfWidthField = (fieldId: string): boolean => {
                 "
               >
                 <span>{{ wordCount }} palavras · {{ finalPrompt.length }} caracteres</span>
-                <span>Clique em um trecho para focar</span>
+                <div class="flex items-center gap-2">
+                  <button
+                    type="button"
+                    @click="enforceAntiDigitalSuffix = !enforceAntiDigitalSuffix"
+                    class="rounded-[6px] border px-2 py-0.5 font-mono text-[10px] font-semibold transition-all"
+                    :class="
+                      enforceAntiDigitalSuffix
+                        ? 'border-[#282824] bg-[#A5B4A0] text-[#282824]'
+                        : isDark
+                          ? 'border-[#77766F]/50 bg-[#161614] text-[#77766F]'
+                          : 'border-[#282824]/40 bg-[#F5F1E9] text-[#77766F]'
+                    "
+                    title="Anexa automaticamente na Fase 06: Do not look like a 3D render, CGI, VFX, video game, or digital art."
+                  >
+                    {{ enforceAntiDigitalSuffix ? '✓ Trava Anti-CGI (Fase 06)' : '+ Trava Anti-CGI' }}
+                  </button>
+                  <span class="hidden sm:inline">Clique em um trecho para focar</span>
+                </div>
               </div>
             </div>
 
@@ -1287,6 +1330,7 @@ const isHalfWidthField = (fieldId: string): boolean => {
             :final-prompt="finalPrompt"
             :accent-hex="currentAccent.hex"
             @sync-image-directive="handleSyncImageDirective"
+            @apply-decoded-blocks="handleApplyDecodedBlocks"
             @open-config-modal="isConfigModalOpen = true"
             @notify="triggerToast"
           />
