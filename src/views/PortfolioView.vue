@@ -104,12 +104,13 @@ const handleSend = (text: string) => {
   }, 1500) // Delay da msg 1
 }
 
+// Ao abrir uma conversa, começa pelo topo para não perder o contexto das primeiras mensagens.
 watch(() => activeTab.value.id, async () => {
   await nextTick()
   if (chatScrollArea.value) {
-    chatScrollArea.value.scrollTop = chatScrollArea.value.scrollHeight
+    chatScrollArea.value.scrollTop = 0
   }
-}, { immediate: true }) 
+}, { immediate: true })
 </script>
 
 <template>
@@ -141,7 +142,11 @@ watch(() => activeTab.value.id, async () => {
             @click="selectTab(tab.id)" />
 
           <div v-if="filteredTabs.length === 0" class="p-6 text-center text-sm text-wa-text-secondary">
-            Nenhuma conversa encontrada.
+            Nenhuma conversa encontrada para "{{ searchQuery }}".
+            <button type="button" @click="searchQuery = ''"
+              class="mt-2 block mx-auto font-medium text-wa-primary hover:underline dark:text-wa-primary-dark">
+              Limpar pesquisa
+            </button>
           </div>
         </nav>
       </aside>

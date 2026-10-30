@@ -1,14 +1,40 @@
 # Lucas Levino - Portfolio
 
-> Desenvolvedor Full Stack, Engenheiro da Computação e Cofundador da Sitemakers.
+> Desenvolvedor Full Stack, Engenheiro da Computação e Cofundador da Sitemakers, em Cuiabá-MT.
 
-This is the portfolio of Lucas Levino, a Full Stack Developer, Software Architect, and Computer Engineer based in Cuiabá, Brazil. He specializes in Vue 3, Laravel, React, Flutter, and SEO.
+Lucas Levino é Desenvolvedor Full Stack, Arquiteto de Software e Engenheiro da Computação
+(formado pela UNIC), baseado em Cuiabá, Mato Grosso, Brasil. Atua como Especialista de
+Desenvolvimento na TVCA e é cofundador da Sitemakers, agência de criação de sites
+profissionais, SEO, otimização de performance e conversão digital.
+
+## Stack
+
+- Frontend & Mobile: React.js, Vue 3, Flutter, WordPress — foco em Core Web Vitals, performance e SEO.
+- Backend & Infra: Laravel, Node.js, PostgreSQL, Redis, Docker.
+- Estratégia & Inovação: inteligência artificial em processos de negócio e dados para conversão digital.
+
+## Trajetória
+
+Óticas Paris Vision (2019, e-commerce/VTEX) → Lab Metrics (2020, Dev Frontend & Mobile) →
+Webgru → TVCA (Especialista desde 2022). Projetos em destaque: Sitemakers (agência de SEO e
+desenvolvimento web que cofundou), Digipasse (plataforma de credenciamento e passes digitais
+para eventos, feita na Sitemakers), plataforma SaaS Eventmakers (Laravel/Vue 3), New Intercâmbios,
+Martinelli, Anna+, Educare-MT e Delta Seguros.
+
+## Destaques
+
+- 1º lugar no 1º Prêmio de Jornalismo do Governo de Mato Grosso (categoria Internet, dez/2025).
+- ArchStudio: laboratório interativo de engenharia de prompts para visualização arquitetônica,
+  design de interiores e modelagem 3D — https://lucaslevino.com/archstudio
 
 ## Links
 
 - [LinkedIn](https://www.linkedin.com/in/lucas-levino)
 - [GitHub](https://github.com/LucasLevino)
 - [Portfolio](https://lucaslevino.com/)
+- [ArchStudio](https://lucaslevino.com/archstudio)
+- [Sitemakers](https://sitemakers.agency/)
+- [Digipasse](https://digipasse.com.br/)
 
 ## Contact
 

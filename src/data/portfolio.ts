@@ -116,7 +116,7 @@ export const portfolioData: Tab[] = [
     title: 'Trajetória & Projetos',
     avatarText: 'PR',
     avatarImage: AvatarProjetos,
-    lastMessage: 'Vtex, Lab Metrics, Webgru, TVCA...',
+    lastMessage: 'Sitemakers, Digipasse, VTEX, TVCA...',
     unreadCount: 1,
     time: '12:00',
     isRead: false,
@@ -159,10 +159,37 @@ export const portfolioData: Tab[] = [
       {
         type: 'iframe',
         id: 8,
-        text: 'E, por fim, o protótipo de design feito para a Delta Seguros.',
+        text: 'Também fiz o protótipo de design para a Delta Seguros.',
         sender: 'me',
         time: '12:05',
         iframe: 'https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Fproto%2FRMoTZCqQQK96V3aZvPUSP8%2FDelta%3Fnode-id%3D14%253A1518%26viewport%3D800%252C414%252C0.19536884129047394%26scaling%3Dscale-down-width'
+      },
+      { type: 'text', id: 9, text: 'Mas o que mais me orgulha hoje são dois produtos no ar: a Sitemakers, agência que cofundei, e o Digipasse, plataforma que desenvolvemos nela. 👇', sender: 'me', time: '12:06' },
+      {
+        type: 'ogCard',
+        id: 10,
+        text: '',
+        sender: 'me',
+        time: '12:06',
+        ogCard: {
+          title: 'Sitemakers — Agência de SEO e Dev Web',
+          description: 'Agência que cofundei: sites, portais de notícias, e-commerces e sistemas sob medida em WordPress, Laravel e Vue/Nuxt, com foco em SEO e Core Web Vitals.',
+          url: 'https://sitemakers.agency/',
+          domain: 'sitemakers.agency'
+        }
+      },
+      {
+        type: 'ogCard',
+        id: 11,
+        text: '',
+        sender: 'me',
+        time: '12:07',
+        ogCard: {
+          title: 'Digipasse — Credenciamento Digital para Eventos',
+          description: 'Plataforma que desenvolvemos na Sitemakers: credenciamento e passe digital por QR code (sem app), controle de lotes e CRM de convidados para eventos corporativos.',
+          url: 'https://digipasse.com.br/',
+          domain: 'digipasse.com.br'
+        }
       }
     ]
   },
@@ -270,7 +297,7 @@ export const portfolioData: Tab[] = [
     title: 'ArchStudio (IA)',
     avatarText: 'AS',
     avatarImage: AvatarArchPrompt,
-    lastMessage: 'Gerador dinâmico de prompts arquitetônicos',
+    lastMessage: 'Monte prompts de IA para arquitetura em segundos',
     unreadCount: 1,
     time: 'Novo',
     isRead: false,
@@ -285,29 +312,29 @@ export const portfolioData: Tab[] = [
       {
         type: 'text',
         id: 2,
-        text: 'Tenho sim! Desenvolvi o ArchStudio, um laboratório interativo de engenharia de prompts voltado para visualização arquitetônica (ArchViz), design de interiores e modelagem 3D.',
+        text: 'Tenho sim, e dá pra abrir e testar agora mesmo, sem instalar nada. ✨ É o ArchStudio. Você descreve a cena que imagina e sai com um prompt pronto para visualização arquitetônica (ArchViz), interiores e modelagem 3D.',
         sender: 'me',
         time: '13:11'
       },
       {
         type: 'text',
         id: 3,
-        text: 'Ele estrutura o prompt em 6 fases técnicas (do Macro ao Micro) e adapta toda a gramática em inglês para 8 contextos: Externo, Interno, Design de Interiores, Luzes (Luminotécnico), Ambiente, Móveis, Móveis em 3D e até um Sistema Interativo de Plantas Baixas (2D para 3D).',
+        text: 'A graça é parar de brigar com a IA por tentativa e erro. Ele monta o prompt em 6 fases, do conceito ao último detalhe, e já fala a língua certa de cada cena: fachadas, interiores, iluminação, móveis em 3D e até plantas baixas que viram 3D.',
         sender: 'me',
         time: '13:12'
       },
       {
         type: 'ogCard',
         id: 4,
-        text: 'Clique no card abaixo ou acesse o atalho direto para abrir e testar o gerador agora:\nhttps://lucaslevino.com/archstudio',
+        text: 'Quer ver na prática? Abra o card abaixo e monte seu primeiro prompt em segundos:\nhttps://lucaslevino.com/archstudio',
         sender: 'me',
         time: '13:13',
         ogCard: {
-          title: 'ArchStudio — Gerador Dinâmico de Prompts Arquitetônicos',
-          description: 'Construa prompts técnicos em 6 fases para Fachadas, Interiores, Iluminação IES, Móveis 3D e Plantas Baixas Interativas.',
+          title: 'ArchStudio — Gerador de Prompts para Arquitetura e 3D',
+          description: 'Monte prompts profissionais em 6 fases: fachadas, interiores, iluminação, móveis 3D e plantas baixas interativas. De graça, no navegador.',
           image: AvatarArchPrompt,
           url: '/archstudio',
-          domain: 'lucaslevino.com/archstudio · Abrir Ambiente'
+          domain: 'lucaslevino.com/archstudio · Testar agora'
         }
       }
     ]

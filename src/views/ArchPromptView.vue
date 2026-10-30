@@ -1398,7 +1398,7 @@ const isHalfWidthField = (fieldId: string): boolean => {
             >
               {{
                 historyFilter === 'favorites'
-                  ? 'Nenhum prompt marcado como favorito. Clique em "Favoritar" acima para guardar suas melhores composições.'
+                  ? 'Nenhum prompt favoritado ainda. Use "Favoritar" acima para guardar suas melhores composições.'
                   : 'Prompts copiados são registrados automaticamente no navegador.'
               }}
             </div>
