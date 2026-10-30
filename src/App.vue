@@ -23,15 +23,41 @@ const navigateTo = (path: string) => {
   currentPath.value = getNormalizedPath()
 }
 
+type RouteMeta = { title: string; description: string; url: string }
+
+const META: Record<'home' | 'archstudio', RouteMeta> = {
+  home: {
+    title: 'Lucas Levino | Especialista e Arquiteto de Software',
+    description: 'Lucas Levino: Desenvolvedor Full Stack e Arquiteto de Software em Cuiabá-MT. Especialista na TVCA, cofundador da Sitemakers. Vue 3, Laravel, React, Flutter e SEO.',
+    url: 'https://lucaslevino.com/'
+  },
+  archstudio: {
+    title: 'ArchStudio: Gerador de Prompts para Arquitetura e 3D | Lucas Levino',
+    description: 'Gerador de prompts de IA para arquitetura: monte prompts em 6 fases para fachadas, interiores, iluminação, móveis 3D e plantas baixas. Grátis, no navegador.',
+    url: 'https://lucaslevino.com/archstudio'
+  }
+}
+
+const setTag = (selector: string, attr: string, value: string) => {
+  const el = document.head.querySelector(selector)
+  if (el) el.setAttribute(attr, value)
+}
+
+const applyMeta = (meta: RouteMeta) => {
+  document.title = meta.title
+  setTag('link[rel="canonical"]', 'href', meta.url)
+  setTag('meta[name="description"]', 'content', meta.description)
+  setTag('meta[property="og:title"]', 'content', meta.title)
+  setTag('meta[property="og:description"]', 'content', meta.description)
+  setTag('meta[property="og:url"]', 'content', meta.url)
+  setTag('meta[name="twitter:title"]', 'content', meta.title)
+  setTag('meta[name="twitter:description"]', 'content', meta.description)
+  setTag('meta[name="twitter:url"]', 'content', meta.url)
+}
+
 watch(
   isArchStudioRoute,
-  isArch => {
-    if (isArch) {
-      document.title = 'ArchStudio | Gerador de Prompts Arquitetônicos — Lucas Levino'
-    } else {
-      document.title = 'Lucas Levino | Especialista e Arquiteto de Software'
-    }
-  },
+  isArch => applyMeta(isArch ? META.archstudio : META.home),
   { immediate: true }
 )
 
